@@ -1,24 +1,138 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useSiteConfig } from './context/SiteConfigContext';
+
+// Layouts
+import PatientLayout from './components/PatientLayout';
+import SidebarLayout from './components/SidebarLayout';
+import DoctorLayout from './components/DoctorLayout';
+import AdminLayout from './components/AdminLayout';
+
+// Auth Pages
+import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
+
+// Patient Pages
+import PatientDashboard from './pages/PatientDashboard';
+import BillingDashboard from './pages/BillingDashboard';
+import BookingsDashboard from './pages/BookingsDashboard';
+import AppointmentDetails from './pages/AppointmentDetails';
+import BookVisit from './pages/BookVisit';
+import Messages from './pages/Messages';
+import MedicalRecords from './pages/MedicalRecords';
+import ProfileSettings from './pages/ProfileSettings';
+import VisitHistory from './pages/VisitHistory';
+
+// Booking Flow Pages
+import PickSchedule from './pages/PickSchedule';
+import PatientInfo from './pages/PatientInfo';
+import FinalizePayment from './pages/FinalizePayment';
+import AppointmentConfirmed from './pages/AppointmentConfirmed';
+
+// Doctor Pages
+import DoctorDashboard from './pages/doctor/DoctorDashboard';
+import PatientDirectory from './pages/doctor/PatientDirectory';
+import DoctorSchedule from './pages/doctor/DoctorSchedule';
+import ConfigureAvailability from './pages/doctor/ConfigureAvailability';
+import DoctorSettings from './pages/doctor/DoctorSettings';
+import DoctorMessages from './pages/doctor/DoctorMessages';
+import PerformanceAnalytics from './pages/doctor/PerformanceAnalytics';
+import PatientProfile from './pages/doctor/PatientProfile';
+
+// Admin Pages
+import AdminDashboard from './pages/admin/AdminDashboard';
+import UserManagement from './pages/admin/UserManagement';
+import AdminSettings from './pages/admin/AdminSettings';
+
+// Global Route
+import EmergencyContact from './pages/EmergencyContact';
 
 function App() {
+  const { t, i18n } = useTranslation();
+  const siteConfig = useSiteConfig();
+  const isRtl = i18n.language.startsWith('ar');
+
+  const patientTitle = isRtl ? siteConfig.portals.patient.titleAr : siteConfig.portals.patient.title;
+  const doctorTitle  = isRtl ? siteConfig.portals.doctor.titleAr  : siteConfig.portals.doctor.title;
+  const adminTitle   = isRtl ? siteConfig.portals.admin.titleAr   : siteConfig.portals.admin.title;
+
+  const patientPortalTabs = [
+    { name: t('nav.dashboard'), href: '/patient/dashboard' },
+    { name: t('nav.bookVisit'), href: '/patient/book/doctors' },
+    { name: t('nav.bookingsHistory'), href: '/patient/bookings' },
+    { name: t('nav.records'), href: '/patient/records' },
+    { name: t('nav.messages'), href: '/patient/messages' },
+    { name: t('nav.billing'), href: '/patient/billing' }
+  ];
+
+  const doctorPortalTabs = [
+    { name: t('nav.dashboard'), href: '/doctor/dashboard' },
+    { name: t('nav.patients'), href: '/doctor/patients' },
+    { name: t('nav.schedule'), href: '/doctor/schedule' },
+    { name: t('nav.messages'), href: '/doctor/messages' },
+    { name: t('nav.performance'), href: '/doctor/performance' }
+  ];
+
+  const adminPortalTabs = [
+    { name: t('nav.dashboard'), href: '/admin/dashboard' },
+    { name: t('nav.userManagement'), href: '/admin/users' }
+  ];
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        {/* Core Auth & Entry */}
+        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        
+        {/* Patient Portal Main Layout */}
+        <Route element={<PatientLayout title={patientTitle} tabs={patientPortalTabs} />}>
+          <Route path="/patient/dashboard" element={<PatientDashboard />} />
+          <Route path="/patient/book/doctors" element={<BookVisit />} />
+          <Route path="/patient/bookings" element={<BookingsDashboard />} />
+          <Route path="/patient/history" element={<VisitHistory />} />
+          <Route path="/patient/billing" element={<BillingDashboard />} />
+          <Route path="/patient/appointments/:id" element={<AppointmentDetails />} />
+          <Route path="/patient/messages" element={<Messages />} />
+          <Route path="/patient/records" element={<MedicalRecords />} />
+          <Route path="/patient/settings" element={<ProfileSettings />} />
+        </Route>
+
+        {/* Patient Booking Flow Layout (Sidebar) */}
+        <Route element={<SidebarLayout />}>
+          <Route path="/patient/book/schedule" element={<PickSchedule />} />
+          <Route path="/patient/book/patient" element={<PatientInfo />} />
+          <Route path="/patient/book/payment" element={<FinalizePayment />} />
+          <Route path="/patient/book/confirm" element={<AppointmentConfirmed />} />
+        </Route>
+
+        {/* Doctor Portal Main Layout */}
+        <Route element={<DoctorLayout title={doctorTitle} tabs={doctorPortalTabs} />}>
+          <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+          <Route path="/doctor/patients" element={<PatientDirectory />} />
+          <Route path="/doctor/schedule" element={<DoctorSchedule />} />
+          <Route path="/doctor/schedule/configure" element={<ConfigureAvailability />} />
+          <Route path="/doctor/performance" element={<PerformanceAnalytics />} />
+          <Route path="/doctor/settings" element={<DoctorSettings />} />
+          <Route path="/doctor/messages" element={<DoctorMessages />} />
+          <Route path="/doctor/patients/:id" element={<PatientProfile />} />
+        </Route>
+
+        {/* Admin Portal Main Layout */}
+        <Route element={<AdminLayout title={adminTitle} tabs={adminPortalTabs} />}>
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/users" element={<UserManagement />} />
+          <Route path="/admin/settings" element={<AdminSettings />} />
+        </Route>
+
+        <Route path="/emergency" element={<EmergencyContact />} />
+
+        {/* Catch all to login */}
+        <Route path="*" element={<Navigate to="/login" />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

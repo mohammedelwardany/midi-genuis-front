@@ -1,0 +1,212 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Bell, Settings, User, Search, LogOut, CheckCircle, AlertTriangle, FileText } from 'lucide-react';
+import { cn } from '../utils/cn';
+import { useSiteConfig } from '../context/SiteConfigContext';
+
+export default function TopNav({ title = "MediGenius Patient Portal", tabs = [], showSearch = false }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { t, i18n } = useTranslation();
+  const siteConfig = useSiteConfig();
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+
+  const toggleLanguage = () => {
+    const newLang = i18n.language.startsWith('en') ? 'ar' : 'en';
+    i18n.changeLanguage(newLang);
+  };
+
+  const getSettingsPath = () => {
+    if (location.pathname.startsWith('/doctor')) return '/doctor/settings';
+    if (location.pathname.startsWith('/admin')) return '/admin/settings';
+    return '/patient/settings';
+  };
+
+  const notifRef = useRef(null);
+  const profileRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (notifRef.current && !notifRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setShowProfileMenu(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <header className="bg-white border-b border-gray-100 flex items-center justify-between px-6 h-16 w-full sticky top-0 z-50">
+      <div className="flex items-center gap-8">
+        {/* Logo + Clinic Name */}
+        <div className="flex items-center gap-2.5 shrink-0">
+          <img
+            src={siteConfig.clinic.logoUrl}
+            alt={siteConfig.clinic.name}
+            className="h-8 w-auto object-contain"
+            onError={(e) => { e.target.style.display = 'none'; }}
+          />
+          <span className="text-[17px] font-bold text-primary-600 tracking-tight">
+            {siteConfig.clinic.name}
+          </span>
+        </div>
+        {tabs.length > 0 && (
+          <nav className="flex gap-6">
+            {tabs.map((tab) => (
+              <NavLink
+                key={tab.name}
+                to={tab.href}
+                className={({ isActive }) =>
+                  cn(
+                    "text-sm font-medium py-5 border-b-2 transition-colors whitespace-nowrap",
+                    isActive
+                      ? "text-primary-600 border-primary-600"
+                      : "text-slate-500 border-transparent hover:text-slate-800"
+                  )
+                }
+              >
+                {tab.name}
+              </NavLink>
+            ))}
+          </nav>
+        )}
+      </div>
+
+      <div className="flex items-center space-x-5">
+        {showSearch && (
+          <div className="relative">
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input
+              type="text"
+              placeholder={t('topNav.search')}
+              className="ps-9 pe-4 py-1.5 rounded-full bg-slate-50 text-sm border-none focus:ring-1 focus:ring-primary-500 outline-none w-64 text-slate-600 transition-shadow"
+            />
+          </div>
+        )}
+        <button
+          onClick={toggleLanguage}
+          className="text-xs font-bold text-primary-600 bg-primary-50 hover:bg-primary-100 px-3 py-1.5 rounded-lg border border-primary-200 transition-colors mx-2"
+        >
+          {i18n.language.startsWith('en') ? 'العربية' : 'English'}
+        </button>
+
+        {!showSearch && (
+          <button onClick={() => navigate('/emergency')} className="text-sm font-medium text-red-500 hover:text-red-600 me-2 whitespace-nowrap">
+            {t('topNav.emergencyContact')}
+          </button>
+        )}
+
+        {/* Notifications Dropdown */}
+        <div className="relative" ref={notifRef}>
+          <button
+            onClick={() => setShowNotifications(!showNotifications)}
+            className="text-slate-400 hover:text-slate-600 relative p-1"
+          >
+            <Bell className="w-5 h-5" />
+            <span className="absolute top-0.5 end-0.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+          </button>
+
+          {showNotifications && (
+            <div className="absolute end-0 mt-3 w-80 bg-white border border-slate-100 shadow-lg shadow-slate-200/50 rounded-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
+              <div className="flex justify-between items-center p-4 border-b border-slate-50 bg-slate-50/50">
+                <span className="font-bold text-slate-800 text-sm">{t('topNav.notifications')}</span>
+                <button className="text-[11px] font-bold text-primary-600 hover:text-primary-800">{t('topNav.markAllRead')}</button>
+              </div>
+              <div className="max-h-80 overflow-y-auto divide-y divide-slate-50">
+                <div className="p-4 hover:bg-slate-50 cursor-pointer transition-colors flex gap-3">
+                  <div className="mt-0.5 bg-blue-50 text-blue-500 p-1.5 rounded-full shrink-0"><CheckCircle className="w-4 h-4" /></div>
+                  <div>
+                    <div className="text-sm font-bold text-slate-800 mb-0.5 tracking-tight">{t('topNav.notificationsList.appointmentConfirmedTitle', { defaultValue: 'Appointment Confirmed' })}</div>
+                    <div className="text-xs text-slate-500 leading-snug">{t('topNav.notificationsList.appointmentConfirmedBody', { defaultValue: 'Your appointment with Dr. Chen is confirmed for tomorrow at 10:00 AM.' })}</div>
+                    <div className="text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-widest">{t('topNav.notificationsList.tenMinutesAgo', { defaultValue: '10 mins ago' })}</div>
+                  </div>
+                </div>
+                <div className="p-4 hover:bg-slate-50 cursor-pointer transition-colors flex gap-3">
+                  <div className="mt-0.5 bg-emerald-50 text-emerald-500 p-1.5 rounded-full shrink-0"><FileText className="w-4 h-4" /></div>
+                  <div>
+                    <div className="text-sm font-bold text-slate-800 mb-0.5 tracking-tight">{t('topNav.notificationsList.newLabResultsTitle', { defaultValue: 'New Lab Results' })}</div>
+                    <div className="text-xs text-slate-500 leading-snug">{t('topNav.notificationsList.newLabResultsBody', { defaultValue: 'Your recent comprehensive metabolic panel results are available.' })}</div>
+                    <div className="text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-widest">{t('topNav.notificationsList.twoHoursAgo', { defaultValue: '2 hours ago' })}</div>
+                  </div>
+                </div>
+                <div className="p-4 hover:bg-slate-50 cursor-pointer transition-colors flex gap-3">
+                  <div className="mt-0.5 bg-orange-50 text-orange-500 p-1.5 rounded-full shrink-0"><AlertTriangle className="w-4 h-4" /></div>
+                  <div>
+                    <div className="text-sm font-bold text-slate-800 mb-0.5 tracking-tight">{t('topNav.notificationsList.actionRequiredTitle', { defaultValue: 'Action Required' })}</div>
+                    <div className="text-xs text-slate-500 leading-snug">{t('topNav.notificationsList.actionRequiredBody', { defaultValue: 'Please complete your pre-visit intake forms.' })}</div>
+                    <div className="text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-widest">{t('topNav.notificationsList.yesterday', { defaultValue: 'Yesterday' })}</div>
+                  </div>
+                </div>
+              </div>
+              <div className="p-3 text-center border-t border-slate-50 bg-slate-50/50">
+                <button className="text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors">{t('topNav.viewAll')}</button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {showSearch && (
+          <button className="text-slate-400 hover:text-slate-600 p-1">
+            <Settings className="w-5 h-5" />
+          </button>
+        )}
+
+        {/* Profile Dropdown */}
+        <div className="relative" ref={profileRef}>
+          <button
+            onClick={() => setShowProfileMenu(!showProfileMenu)}
+            className="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center text-white overflow-hidden border border-slate-200 transition-transform active:scale-95"
+          >
+            <User className="w-5 h-5 opacity-80" />
+          </button>
+
+          {showProfileMenu && (
+            <div className="absolute end-0 mt-3 w-56 bg-white border border-slate-100 shadow-lg shadow-slate-200/50 rounded-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
+              <div className="p-4 border-b border-slate-50">
+                <div className="font-bold text-sm text-slate-900 truncate tracking-tight">Jonathan Aris</div>
+                <div className="text-xs text-slate-500 truncate mt-0.5">jonathan.aris@example.com</div>
+              </div>
+              <div className="p-2 space-y-1">
+                <button
+                  onClick={() => {
+                    setShowProfileMenu(false);
+                    navigate(getSettingsPath());
+                  }}
+                  className="w-full text-start px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-lg transition-colors flex items-center gap-2"
+                >
+                  <User className="w-4 h-4 text-slate-400" /> {t('topNav.myProfile')}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowProfileMenu(false);
+                    navigate(getSettingsPath());
+                  }}
+                  className="w-full text-start px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-lg transition-colors flex items-center gap-2"
+                >
+                  <Settings className="w-4 h-4 text-slate-400" /> {t('topNav.accountSettings')}
+                </button>
+              </div>
+              <div className="p-2 border-t border-slate-50">
+                <button
+                  onClick={() => {
+                    setShowProfileMenu(false);
+                    // Implement actual logout logic later
+                    navigate('/');
+                  }}
+                  className="w-full text-start px-3 py-2 text-sm font-bold text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-2"
+                >
+                  <LogOut className="w-4 h-4 text-red-500" /> {t('topNav.logOut')}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </header>
+  );
+}

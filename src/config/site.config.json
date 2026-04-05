@@ -1,0 +1,57 @@
+{
+  "clinic": {
+    "name": "MediGenius",
+    "tagline": "Advanced Clinical Intelligence",
+    "logoUrl": "/logo.png",
+    "address": "124 Healthcare Ave, Metropolis, NY 10001",
+    "phone": "1-800-MED-URGE",
+    "email": "support@medigenius.org",
+    "website": "https://medigenius.org"
+  },
+  "legal": {
+    "companyName": "MediGenius Intelligence Systems",
+    "copyrightYear": 2024,
+    "rightsReserved": "All rights reserved.",
+    "privacyPolicyUrl": "/privacy",
+    "termsOfServiceUrl": "/terms"
+  },
+  "branding": {
+    "colors": {
+      "primary": {
+        "50":  "#eff6ff",
+        "100": "#dbeafe",
+        "200": "#bfdbfe",
+        "300": "#93c5fd",
+        "400": "#60a5fa",
+        "500": "#3b82f6",
+        "600": "#2563eb",
+        "700": "#1d4ed8",
+        "800": "#1e40af",
+        "900": "#1e3a8a"
+      },
+      "accent": "#6366f1",
+      "danger": "#ef4444",
+      "success": "#10b981",
+      "warning": "#f59e0b"
+    },
+    "borderRadius": "xl",
+    "fontFamily": {
+      "ltr": "Inter",
+      "rtl": "Tajawal"
+    }
+  },
+  "portals": {
+    "patient": {
+      "title": "MediGenius Patient Portal",
+      "titleAr": "بوابة المرضى MediGenius"
+    },
+    "doctor": {
+      "title": "MediGenius Clinical Portal",
+      "titleAr": "البوابة السريرية MediGenius"
+    },
+    "admin": {
+      "title": "MediGenius Admin Console",
+      "titleAr": "لوحة إدارة MediGenius"
+    }
+  }
+}
