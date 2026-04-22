@@ -1,14 +1,20 @@
-import React from 'react';
 import { Users, Activity, DollarSign, TrendingUp, UserPlus, HeartPulse } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../../store/slices/authSlice';
 
 export default function AdminDashboard() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentUser = useSelector(selectCurrentUser);
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex justify-between items-center bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
         <div>
-          <h2 className="text-2xl font-extrabold text-slate-800 tracking-tight">{t('adminDashboard.title')}</h2>
+          <h2 className="text-2xl font-extrabold text-slate-800 tracking-tight">
+            {t('adminDashboard.title')}, {i18n.language.startsWith('ar') 
+              ? (currentUser?.name_ar || currentUser?.name || 'مدير النظام') 
+              : (currentUser?.name_en || currentUser?.name || 'System Administrator')}
+          </h2>
           <p className="text-sm font-medium text-slate-500 mt-1">{t('adminDashboard.desc')}</p>
         </div>
         <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-indigo-600/20 transition-all flex items-center gap-2">

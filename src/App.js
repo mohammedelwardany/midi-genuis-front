@@ -39,14 +39,19 @@ import DoctorSettings from './pages/doctor/DoctorSettings';
 import DoctorMessages from './pages/doctor/DoctorMessages';
 import PerformanceAnalytics from './pages/doctor/PerformanceAnalytics';
 import PatientProfile from './pages/doctor/PatientProfile';
+import DoctorProfilePage from './pages/doctor/DoctorProfilePage';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard';
 import UserManagement from './pages/admin/UserManagement';
 import AdminSettings from './pages/admin/AdminSettings';
+import EditDoctor from './pages/admin/EditDoctor';
+import PatientAdminProfile from './pages/admin/PatientAdminProfile';
 
 // Global Route
 import EmergencyContact from './pages/EmergencyContact';
+
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -81,6 +86,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <Toaster position="top-center" reverseOrder={false} />
       <Routes>
         {/* Core Auth & Entry */}
         <Route path="/" element={<Navigate to="/login" />} />
@@ -118,6 +124,7 @@ function App() {
           <Route path="/doctor/settings" element={<DoctorSettings />} />
           <Route path="/doctor/messages" element={<DoctorMessages />} />
           <Route path="/doctor/patients/:id" element={<PatientProfile />} />
+          <Route path="/doctor/profile/:id" element={<DoctorProfilePage />} />
         </Route>
 
         {/* Admin Portal Main Layout */}
@@ -125,6 +132,8 @@ function App() {
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/users" element={<UserManagement />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
+          <Route path="/admin/doctors/edit/:id" element={<EditDoctor />} />
+          <Route path="/admin/patients/:id" element={<PatientAdminProfile />} />
         </Route>
 
         <Route path="/emergency" element={<EmergencyContact />} />

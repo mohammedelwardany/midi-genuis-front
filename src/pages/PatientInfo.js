@@ -1,11 +1,73 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { UserCircle, ClipboardList, ShieldCheck, ArrowLeft, ArrowRight, Info, UploadCloud } from 'lucide-react';
+import { UserCircle, ClipboardList, ShieldCheck, ArrowLeft, ArrowRight, Info, UploadCloud, CheckCircle2, FileText, Loader2 } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { selectCurrentUser } from '../store/slices/authSlice';
+import { fetchMyReports, uploadReport, selectMyReports, selectPatientsLoading } from '../store/slices/patientSlice';
 
 export default function PatientInfo() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { t } = useTranslation();
+  const fileInputRef = useRef(null);
+
+  const user = useSelector(selectCurrentUser);
+  const reports = useSelector(selectMyReports);
+  const loading = useSelector(selectPatientsLoading);
+
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    reason: '',
+    symptoms: '',
+    insuranceProvider: '',
+    policyNumber: '',
+    groupId: '',
+  });
+
+  const [selectedReportIds, setSelectedReportIds] = useState([]);
+
+  useEffect(() => {
+    dispatch(fetchMyReports());
+    if (user) {
+      const names = (user.name_en || '').split(' ');
+      setFormData(prev => ({
+        ...prev,
+        firstName: names[0] || '',
+        lastName: names.slice(1).join(' ') || '',
+        email: user.email || '',
+        phone: user.phone || '',
+      }));
+    }
+  }, [user, dispatch]);
+
+  const toggleReportSelection = (id) => {
+    setSelectedReportIds(prev => 
+      prev.includes(id) ? prev.filter(rid => rid !== id) : [...prev, id]
+    );
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const fd = new FormData();
+    fd.append('file', file);
+
+    try {
+      toast.loading('Uploading...', { id: 'upload' });
+      const result = await dispatch(uploadReport(fd)).unwrap();
+      const newReport = result.data || result;
+      setSelectedReportIds(prev => [...prev, newReport.id]);
+      toast.success('Uploaded and selected', { id: 'upload' });
+    } catch (err) {
+      toast.error('Upload failed', { id: 'upload' });
+    }
+  };
 
   return (
     <div className="animate-in fade-in duration-500 max-w-4xl mx-auto pb-24">
@@ -26,19 +88,43 @@ export default function PatientInfo() {
            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                  <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-widest">{t('patientInfo.firstName', { defaultValue: 'First Name' })}</label>
-                 <input type="text" placeholder="e.g., Jonathan" className="w-full bg-slate-50 border-none rounded-xl px-4 py-3.5 text-slate-900 font-semibold focus:ring-2 focus:ring-primary-500 transition-shadow text-sm" />
+                 <input 
+                   type="text" 
+                   value={formData.firstName}
+                   onChange={e => setFormData({...formData, firstName: e.target.value})}
+                   placeholder="e.g., Jonathan" 
+                   className="w-full bg-slate-50 border-none rounded-xl px-4 py-3.5 text-slate-900 font-semibold focus:ring-2 focus:ring-primary-500 transition-shadow text-sm" 
+                 />
               </div>
               <div>
                  <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-widest">{t('patientInfo.lastName', { defaultValue: 'Last Name' })}</label>
-                 <input type="text" placeholder="e.g., Sterling" className="w-full bg-slate-50 border-none rounded-xl px-4 py-3.5 text-slate-900 font-semibold focus:ring-2 focus:ring-primary-500 transition-shadow text-sm" />
+                 <input 
+                   type="text" 
+                   value={formData.lastName}
+                   onChange={e => setFormData({...formData, lastName: e.target.value})}
+                   placeholder="e.g., Sterling" 
+                   className="w-full bg-slate-50 border-none rounded-xl px-4 py-3.5 text-slate-900 font-semibold focus:ring-2 focus:ring-primary-500 transition-shadow text-sm" 
+                 />
               </div>
               <div className="md:col-span-2">
                  <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-widest">{t('auth.emailLabel')}</label>
-                 <input type="email" placeholder="j.sterling@example.com" className="w-full bg-slate-50 border-none rounded-xl px-4 py-3.5 text-slate-900 font-semibold focus:ring-2 focus:ring-primary-500 transition-shadow text-sm" />
+                 <input 
+                   type="email" 
+                   value={formData.email}
+                   onChange={e => setFormData({...formData, email: e.target.value})}
+                   placeholder="j.sterling@example.com" 
+                   className="w-full bg-slate-50 border-none rounded-xl px-4 py-3.5 text-slate-900 font-semibold focus:ring-2 focus:ring-primary-500 transition-shadow text-sm" 
+                 />
               </div>
               <div className="md:col-span-2">
                  <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-widest">{t('patientInfo.phoneNumber', { defaultValue: 'Phone Number' })}</label>
-                 <input type="tel" placeholder="+1 (555) 000-0000" className="w-full bg-slate-50 border-none rounded-xl px-4 py-3.5 text-slate-900 font-semibold focus:ring-2 focus:ring-primary-500 transition-shadow text-sm" />
+                 <input 
+                   type="tel" 
+                   value={formData.phone}
+                   onChange={e => setFormData({...formData, phone: e.target.value})}
+                   placeholder="+1 (555) 000-0000" 
+                   className="w-full bg-slate-50 border-none rounded-xl px-4 py-3.5 text-slate-900 font-semibold focus:ring-2 focus:ring-primary-500 transition-shadow text-sm" 
+                 />
               </div>
            </div>
         </section>
@@ -51,7 +137,11 @@ export default function PatientInfo() {
            <div className="space-y-6">
               <div>
                  <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-widest">{t('patientInfo.reasonForVisit', { defaultValue: 'Reason for Visit' })}</label>
-                 <select className="w-full bg-slate-50 border-none rounded-xl px-4 py-3.5 text-slate-700 font-semibold focus:ring-2 focus:ring-primary-500 transition-shadow appearance-none text-sm cursor-pointer">
+                 <select 
+                   value={formData.reason}
+                   onChange={e => setFormData({...formData, reason: e.target.value})}
+                   className="w-full bg-slate-50 border-none rounded-xl px-4 py-3.5 text-slate-700 font-semibold focus:ring-2 focus:ring-primary-500 transition-shadow appearance-none text-sm cursor-pointer"
+                 >
                     <option value="">{t('patientInfo.selectPrimaryConcern', { defaultValue: 'Select primary concern' })}</option>
                     <option value="routine">Routine Checkup</option>
                     <option value="followup">Follow-up Consultation</option>
@@ -60,42 +150,58 @@ export default function PatientInfo() {
               </div>
               <div>
                  <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-widest">{t('patientInfo.describeSymptoms', { defaultValue: 'Describe Symptoms or Concerns' })}</label>
-                 <textarea rows="4" placeholder="Briefly describe what you've been experiencing..." className="w-full bg-slate-50 border-none rounded-xl px-4 py-4 text-slate-900 font-semibold focus:ring-2 focus:ring-primary-500 transition-shadow resize-none text-sm"></textarea>
+                 <textarea 
+                   rows="4" 
+                   value={formData.symptoms}
+                   onChange={e => setFormData({...formData, symptoms: e.target.value})}
+                   placeholder="Briefly describe what you've been experiencing..." 
+                   className="w-full bg-slate-50 border-none rounded-xl px-4 py-4 text-slate-900 font-semibold focus:ring-2 focus:ring-primary-500 transition-shadow resize-none text-sm"
+                 ></textarea>
               </div>
            </div>
         </section>
 
-        {/* Checkup Reports / Insurance */}
+        {/* Medical Reports */}
         <section className="mb-12">
            <h3 className="flex items-center gap-2 text-lg font-bold text-slate-900 mb-6 pb-2 border-b border-slate-50">
-              <ShieldCheck className="w-5 h-5 text-primary-600" /> {t('patientInfo.checkupReports', { defaultValue: 'Checkup Reports' })}
+              <ShieldCheck className="w-5 h-5 text-primary-600" /> {t('patientInfo.checkupReports', { defaultValue: 'Medical Records & Reports' })}
            </h3>
            <div className="space-y-6">
-              <div>
-                 <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-widest">{t('patientInfo.insuranceProvider', { defaultValue: 'Insurance Provider' })}</label>
-                 <input type="text" placeholder="e.g., Blue Cross Shield" className="w-full bg-slate-50 border-none rounded-xl px-4 py-3.5 text-slate-900 font-semibold focus:ring-2 focus:ring-primary-500 transition-shadow text-sm" />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                 <div>
-                    <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-widest">{t('patientInfo.policyNumber', { defaultValue: 'Policy Number' })}</label>
-                    <input type="text" placeholder="ABC-123456789" className="w-full bg-slate-50 border-none rounded-xl px-4 py-3.5 text-slate-900 font-mono focus:ring-2 focus:ring-primary-500 transition-shadow text-sm" />
-                 </div>
-                 <div>
-                    <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-widest">{t('patientInfo.groupIdOptional', { defaultValue: 'Group ID (Optional)' })}</label>
-                    <input type="text" placeholder="GRP-9988" className="w-full bg-slate-50 border-none rounded-xl px-4 py-3.5 text-slate-900 font-mono focus:ring-2 focus:ring-primary-500 transition-shadow text-sm" />
-                 </div>
+              <div className="bg-slate-50/50 rounded-[20px] p-6 border border-slate-100">
+                <label className="block text-[11px] font-bold text-slate-500 mb-4 uppercase tracking-widest">{t('patientInfo.selectExisting', { defaultValue: 'Select from existing records' })}</label>
+                <div className="flex flex-wrap gap-3">
+                  {reports?.map(report => (
+                    <button
+                      key={report.id}
+                      onClick={() => toggleReportSelection(report.id)}
+                      className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl border text-[13px] font-bold transition-all ${
+                        selectedReportIds.includes(report.id)
+                          ? 'bg-primary-600 border-primary-600 text-white shadow-md'
+                          : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
+                      }`}
+                    >
+                      {selectedReportIds.includes(report.id) ? (
+                        <CheckCircle2 className="w-4 h-4" />
+                      ) : (
+                        <FileText className="w-4 h-4 opacity-50" />
+                      )}
+                      <span className="truncate max-w-[140px]">{report.file_name || report.file_url.split('/').pop()}</span>
+                    </button>
+                  ))}
+                  {reports?.length === 0 && <span className="text-xs font-medium text-slate-400">No records found.</span>}
+                </div>
               </div>
 
-              {/* Upload Medical Records Feature */}
-              <div className="pt-4 border-t border-slate-50 mt-4">
-                 <label className="block text-[11px] font-bold text-slate-700 mb-3 uppercase tracking-widest">{t('patientInfo.attachRecordsOptional', { defaultValue: 'Attach Medical Records (Optional)' })}</label>
-                 <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-6 flex flex-col items-center justify-center text-center hover:border-primary-400 hover:bg-primary-50/50 transition-colors cursor-pointer group">
-                    <div className="bg-white p-2 rounded-full shadow-sm mb-3 group-hover:scale-110 transition-transform">
-                       <UploadCloud className="w-5 h-5 text-primary-600" />
-                    </div>
-                    <div className="font-bold text-slate-700 text-sm mb-1">{t('patientInfo.uploadPrompt', { defaultValue: 'Click to upload or drag & drop' })}</div>
-                    <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Relevant X-Rays, Lab Results, or Discharges</div>
+              <div 
+                onClick={() => fileInputRef.current?.click()}
+                className="bg-primary-50/30 border-2 border-dashed border-primary-100 rounded-2xl p-6 flex flex-col items-center justify-center text-center hover:border-primary-400 hover:bg-primary-50 transition-colors cursor-pointer group"
+              >
+                 <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
+                 <div className="bg-white p-2.5 rounded-full shadow-sm mb-3 group-hover:scale-110 transition-transform border border-primary-50">
+                    {loading ? <Loader2 className="w-5 h-5 text-primary-600 animate-spin" /> : <UploadCloud className="w-5 h-5 text-primary-600" />}
                  </div>
+                 <div className="font-bold text-slate-700 text-sm mb-1">{t('patientInfo.uploadNewReport', { defaultValue: 'Upload New Report' })}</div>
+                 <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">PDF, JPG or PNG (Max 10MB)</div>
               </div>
            </div>
         </section>
@@ -105,7 +211,10 @@ export default function PatientInfo() {
            <button onClick={() => navigate('/patient/book/schedule')} className="font-bold text-slate-700 flex items-center hover:text-slate-900 transition-colors py-2 text-sm">
               <ArrowLeft className="w-4 h-4 me-2" /> {t('patientInfo.backToSchedule', { defaultValue: 'Back to Schedule' })}
            </button>
-           <button onClick={() => navigate('/patient/book/payment')} className="bg-primary-600 hover:bg-primary-700 shadow-md shadow-primary-600/20 text-white font-bold py-3 px-8 rounded-xl transition-all hover:-translate-y-0.5 text-sm flex items-center">
+           <button 
+             onClick={() => navigate('/patient/book/payment', { state: { ...formData, reports: selectedReportIds } })} 
+             className="bg-primary-600 hover:bg-primary-700 shadow-md shadow-primary-600/20 text-white font-bold py-3 px-8 rounded-xl transition-all hover:-translate-y-0.5 text-sm flex items-center"
+           >
               {t('patientInfo.continueToPayment', { defaultValue: 'Continue to Payment' })} <ArrowRight className="w-4 h-4 ms-2" />
            </button>
         </div>

@@ -1,23 +1,123 @@
-import React, { useState } from 'react';
-import { UserPlus, Search, Shield, Filter, MoreVertical, Mail, Activity, AlertCircle, CheckCircle2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { UserPlus, User, Search, Filter, MoreVertical, Mail, AlertCircle, CheckCircle2, Trash2, Edit, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import toast from 'react-hot-toast';
 import { cn } from '../../utils/cn';
+import { 
+  fetchDoctors, 
+  addDoctor, 
+  deleteDoctor, 
+  selectDoctors, 
+  selectDoctorsLoading 
+} from '../../store/slices/doctorSlice';
+import {
+  fetchPatients,
+  addPatient,
+  deletePatient,
+  selectPatients,
+  selectPatientsLoading
+} from '../../store/slices/patientSlice';
 
 export default function UserManagement() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('doctors');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterSpec, setFilterSpec] = useState('All');
 
-  // Mock Data
-  const doctors = [
-    { id: '1', name: 'Dr. Sarah Chen', email: 'sarah.chen@medigenius.com', license: 'MD-100293', status: 'Active', patients: 142 },
-    { id: '2', name: 'Dr. Marcus Wright', email: 'm.wright@medigenius.com', license: 'MD-998234', status: 'Pending', patients: 0 },
-  ];
+  const doctors = useSelector(selectDoctors);
+  const doctorsLoading = useSelector(selectDoctorsLoading);
+  const patientsList = useSelector(selectPatients);
+  const patientsLoading = useSelector(selectPatientsLoading);
 
-  const patients = [
-    { id: '1', name: 'Jonathan Aris', email: 'jonathan@example.com', dob: '1990-05-15', status: 'Active' },
-    { id: '2', name: 'Amanda Smith', email: 'amanda.s@example.com', dob: '1985-11-20', status: 'Inactive' },
-  ];
+  const loading = activeTab === 'doctors' ? doctorsLoading : patientsLoading;
+
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    name_en: '',
+    name_ar: '',
+    specialization: '',
+    bio: '',
+    experience_years: '',
+    phone: '',
+    date_of_birth: '',
+    gender: 'Male'
+  });
+
+  useEffect(() => {
+    if (activeTab === 'doctors') {
+      dispatch(fetchDoctors());
+    } else {
+      dispatch(fetchPatients());
+    }
+  }, [dispatch, activeTab]);
+
+  const filteredItems = (activeTab === 'doctors' ? (doctors || []) : (patientsList || [])).filter(item => {
+    const name = item.name_en || item.name || '';
+    const email = item.email || '';
+    const matchesSearch = 
+      name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      email.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    if (activeTab === 'doctors') {
+      const matchesFilter = filterSpec === 'All' || item.specialization === filterSpec;
+      return matchesSearch && matchesFilter;
+    }
+    return matchesSearch;
+  });
+
+  const uniqueSpecializations = ['All', ...new Set((doctors || []).map(d => d.specialization).filter(Boolean))];
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      if (activeTab === 'doctors') {
+        await dispatch(addDoctor({
+          ...formData,
+          experience_years: parseInt(formData.experience_years)
+        })).unwrap();
+        toast.success('Physician account created successfully!');
+      } else {
+        await dispatch(addPatient({
+          ...formData
+        })).unwrap();
+        toast.success('Patient account created successfully!');
+      }
+      
+      setShowAddModal(false);
+      setFormData({
+        email: '', password: '', name_en: '', name_ar: '',
+        specialization: '', bio: '', experience_years: '',
+        phone: '', date_of_birth: '', gender: 'Male'
+      });
+      
+      if (activeTab === 'doctors') dispatch(fetchDoctors());
+      else dispatch(fetchPatients());
+    } catch (err) {
+      toast.error(err?.message || `Failed to register ${activeTab === 'doctors' ? 'physician' : 'patient'}.`);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDeleteItem = (id) => {
+    const type = activeTab === 'doctors' ? 'doctor' : 'patient';
+    if (window.confirm(`Are you sure you want to delete this ${type}?`)) {
+      if (activeTab === 'doctors') {
+        dispatch(deleteDoctor(id));
+      } else {
+        dispatch(deletePatient(id));
+      }
+    }
+  };
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -34,7 +134,8 @@ export default function UserManagement() {
               onClick={() => setShowAddModal(true)}
               className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-indigo-600/20 transition-all flex items-center gap-2 group"
             >
-              <UserPlus className="w-4 h-4 group-hover:scale-110 transition-transform" /> {t('userManagement.registerDoc')}
+              <UserPlus className="w-4 h-4 group-hover:scale-110 transition-transform" /> 
+              {activeTab === 'doctors' ? t('userManagement.registerDoc') : t('userManagement.registerPatient')}
             </button>
          </div>
 
@@ -58,64 +159,120 @@ export default function UserManagement() {
 
       {/* Toolbar */}
       <div className="flex justify-between items-center bg-white p-4 rounded-2xl border border-slate-100 shadow-[0_2px_10px_rgb(0,0,0,0.02)]">
-         <div className="relative w-72">
-            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input 
-              type="text" 
-              placeholder={`${t('userManagement.search')} ${activeTab === 'doctors' ? t('userManagement.doctorsTab') : t('userManagement.patientsTab')}`}
-              className="w-full ps-9 pe-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-            />
+          <div className="flex items-center justify-between w-full gap-4">
+            <div className="relative w-72">
+               <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+               <input 
+                 type="text" 
+                 value={searchQuery}
+                 onChange={(e) => setSearchQuery(e.target.value)}
+                 placeholder={`${t('userManagement.search')} ${activeTab === 'doctors' ? t('userManagement.doctorsTab') : t('userManagement.patientsTab')}`}
+                 className="w-full ps-9 pe-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+               />
+            </div>
+
+            {activeTab === 'doctors' && (
+              <div className="relative">
+                <Filter className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                <select 
+                  value={filterSpec}
+                  onChange={(e) => setFilterSpec(e.target.value)}
+                  className="ps-9 pe-8 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-slate-50 font-bold text-slate-600 appearance-none cursor-pointer"
+                >
+                  {uniqueSpecializations.map(spec => (
+                    <option key={spec} value={spec}>{spec === 'All' ? t('common.all', { defaultValue: 'All' }) : spec}</option>
+                  ))}
+                </select>
+              </div>
+            )}
          </div>
-         <button className="flex items-center gap-2 text-sm font-bold text-slate-600 bg-slate-50 px-4 py-2 rounded-xl hover:bg-slate-100 transition-colors border border-slate-200">
-            <Filter className="w-4 h-4" /> {t('userManagement.filter')}
-         </button>
       </div>
 
       {/* Table Area */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-[0_2px_10px_rgb(0,0,0,0.02)] overflow-hidden">
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-[0_2px_10px_rgb(0,0,0,0.02)] overflow-visible mb-12">
          <table className="w-full text-start border-collapse">
             <thead>
                <tr className="bg-slate-50 text-[11px] font-bold text-slate-500 uppercase tracking-widest border-b border-slate-100">
                   <th className="p-4 ps-6">{t('userManagement.thName')}</th>
-                  <th className="p-4">{activeTab === 'doctors' ? t('userManagement.thLicense') : t('userManagement.thDob')}</th>
+                  <th className="p-4">{activeTab === 'doctors' ? t('userManagement.thSpecialization') : t('userManagement.thDob')}</th>
                   <th className="p-4 text-center">{t('userManagement.thStatus')}</th>
-                  <th className="p-4 text-center">{activeTab === 'doctors' ? t('userManagement.thPatients') : t('userManagement.thVisits')}</th>
+                  <th className="p-4 text-center">{activeTab === 'doctors' ? t('userManagement.thExperience') : t('userManagement.thVisits')}</th>
                   <th className="p-4 text-end pe-6">{t('userManagement.thActions')}</th>
                </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-               {(activeTab === 'doctors' ? doctors : patients).map((user) => (
-                  <tr key={user.id} className="hover:bg-slate-50/50 transition-colors group">
+               {loading ? (
+                 <tr>
+                   <td colSpan="5" className="p-8 text-center text-slate-500 font-medium">
+                     <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-indigo-400" />
+                     {t('userManagement.loadingUser', { type: activeTab })}
+                   </td>
+                 </tr>
+               ) : filteredItems.map((user) => (
+                  <tr key={user.id || user.user_id} className="hover:bg-slate-50/50 transition-colors group">
                      <td className="p-4 ps-6">
                         <div className="flex items-center gap-3">
                            <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm">
-                             {user.name.charAt(0)}
+                             {(user.name_en || user.name || 'U').charAt(0)}
                            </div>
                            <div>
-                              <p className="text-sm font-bold text-slate-800">{user.name}</p>
+                              <p className="text-sm font-bold text-slate-800">{user.name_en || user.name}</p>
                               <p className="text-xs font-medium text-slate-500 flex items-center gap-1 mt-0.5"><Mail className="w-3 h-3" /> {user.email}</p>
                            </div>
                         </div>
                      </td>
                      <td className="p-4 text-sm font-medium text-slate-700">
-                        {activeTab === 'doctors' ? user.license : user.dob}
+                         {activeTab === 'doctors' ? user.specialization : (user.date_of_birth || user.dob || '---')}
                      </td>
                      <td className="p-4 text-center">
                         <span className={cn(
                            "px-2.5 py-1 rounded-full text-[11px] font-bold inline-flex items-center gap-1",
-                           user.status === 'Active' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
+                           (user.status === 'Active' || activeTab === 'doctors') ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
                         )}>
-                           {user.status === 'Active' && <CheckCircle2 className="w-3 h-3" />}
-                           {t('userManagement.' + user.status.toLowerCase().replace(' ', ''))}
+                           {(user.status === 'Active' || activeTab === 'doctors') && <CheckCircle2 className="w-3 h-3" />}
+                           {activeTab === 'doctors' ? t('userManagement.active') : t('userManagement.' + (user.status || 'active').toLowerCase().replace(' ', ''))}
                         </span>
                      </td>
                      <td className="p-4 text-center text-sm font-bold text-slate-700">
-                        {activeTab === 'doctors' ? user.patients : '0'}
+                        {activeTab === 'doctors' ? `${user.experience_years} ${t('userManagement.years')}` : '0'}
                      </td>
-                     <td className="p-4 text-end pe-6">
-                        <button className="text-slate-400 hover:text-indigo-600 p-2 rounded-lg hover:bg-indigo-50 transition-colors">
+                     <td className="p-4 text-end pe-6 relative">
+                         <button 
+                           onClick={() => {
+                             const uid = user.id || user.user_id;
+                             setOpenMenuId(openMenuId === uid ? null : uid);
+                           }}
+                          className="text-slate-400 hover:text-indigo-600 p-2 rounded-lg hover:bg-indigo-50 transition-colors"
+                        >
                            <MoreVertical className="w-5 h-5" />
                         </button>
+                        
+                         {openMenuId && (openMenuId === (user.id || user.user_id)) && (
+                          <div className="absolute right-6 top-12 bg-white border border-slate-100 shadow-xl rounded-xl py-2 z-100 min-w-[140px] animate-in fade-in zoom-in-95 duration-200">
+                            {activeTab === 'patients' ? (
+                              <button 
+                                onClick={() => navigate(`/admin/patients/${user.user_id || user.id}`)}
+                                className="w-full flex items-center gap-2 px-4 py-2 text-xs font-bold text-indigo-600 hover:bg-indigo-50 transition-colors"
+                              >
+                                <User className="w-3.5 h-3.5" /> {t('userManagement.viewProfile')}
+                              </button>
+                            ) : (
+                              <button 
+                                onClick={() => navigate(`/admin/doctors/edit/${user.user_id || user.id}`)}
+                                className="w-full flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                              >
+                                <Edit className="w-3.5 h-3.5" /> {t('userManagement.editDoctor')}
+                              </button>
+                            )}
+                            
+                            <button 
+                              onClick={() => { handleDeleteItem(user.user_id || user.id); setOpenMenuId(null); }}
+                              className="w-full flex items-center gap-2 px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50 transition-colors"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" /> {t('userManagement.delete')}
+                            </button>
+                          </div>
+                        )}
                      </td>
                   </tr>
                ))}
@@ -123,42 +280,95 @@ export default function UserManagement() {
          </table>
       </div>
 
-      {/* Add Doctor Modal */}
+      {/* Add User Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowAddModal(false)}></div>
-          <div className="relative bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md animate-in zoom-in-95 duration-200">
+          <div className="relative bg-white rounded-3xl shadow-2xl p-8 w-full max-w-2xl animate-in zoom-in-95 duration-200 overflow-y-auto max-h-[90vh]">
             <div className="flex justify-between items-center mb-6">
-               <h3 className="text-xl font-extrabold text-slate-800">Register Doctor</h3>
+               <h3 className="text-xl font-extrabold text-slate-800">
+                 {t('userManagement.registerModalTitle', { type: activeTab === 'doctors' ? t('userManagement.doctorSingular') : t('userManagement.patientSingular') })}
+               </h3>
                <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-slate-600">
                  <AlertCircle className="w-6 h-6 rotate-45" />
                </button>
             </div>
 
-            <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); setShowAddModal(false); }}>
-               <div className="space-y-1.5">
-                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">Full Name</label>
-                 <input type="text" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold" placeholder="Dr. John Doe" required />
-               </div>
-               <div className="space-y-1.5">
-                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">Email Address</label>
-                 <input type="email" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold" placeholder="doctor@medigenius.com" required />
-               </div>
-               <div className="space-y-1.5">
-                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">Medical License Number</label>
-                 <div className="relative">
-                    <Shield className="absolute start-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <input type="text" className="w-full ps-10 pe-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold" placeholder="MD-XXXXXX" required />
+            <form className="space-y-4" onSubmit={handleRegister}>
+               <div className="grid grid-cols-2 gap-4">
+                 <div className="space-y-1.5">
+                   <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('userManagement.thName')} (English)</label>
+                   <input type="text" value={formData.name_en} onChange={(e) => setFormData({...formData, name_en: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold" placeholder="Dr. John Doe" required />
+                 </div>
+                 <div className="space-y-1.5">
+                   <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('userManagement.thName')} (Arabic)</label>
+                   <input type="text" value={formData.name_ar} onChange={(e) => setFormData({...formData, name_ar: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold text-right" placeholder="دكتور جون دو" required />
                  </div>
                </div>
-               <div className="space-y-1.5">
-                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">Temporary Password</label>
-                 <input type="password" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold" required />
+
+               <div className="grid grid-cols-2 gap-4">
+                 <div className="space-y-1.5">
+                   <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('userManagement.thEmail')}</label>
+                   <input type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold" placeholder="doctor@medigenius.com" required />
+                 </div>
+                 <div className="space-y-1.5">
+                   <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('userManagement.thPassword')}</label>
+                   <input type="password" value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold" required />
+                 </div>
                </div>
 
-               <button type="submit" className="w-full bg-indigo-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 hover:-translate-y-0.5 transition-all mt-4">
-                 Create Doctor Account
-               </button>
+               {activeTab === 'doctors' ? (
+                 <>
+                   <div className="grid grid-cols-2 gap-4">
+                     <div className="space-y-1.5">
+                       <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('userManagement.thSpecialization')}</label>
+                       <input type="text" value={formData.specialization} onChange={(e) => setFormData({...formData, specialization: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold" placeholder="Cardiology" required />
+                     </div>
+                     <div className="space-y-1.5">
+                       <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('userManagement.thExperience')}</label>
+                       <input type="number" value={formData.experience_years} onChange={(e) => setFormData({...formData, experience_years: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold" placeholder="10" required />
+                     </div>
+                   </div>
+                   <div className="space-y-1.5">
+                     <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('userManagement.thBio')}</label>
+                     <textarea value={formData.bio} onChange={(e) => setFormData({...formData, bio: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold h-24" placeholder="Short biography..." required />
+                   </div>
+                 </>
+               ) : (
+                 <>
+                   <div className="grid grid-cols-2 gap-4">
+                     <div className="space-y-1.5">
+                       <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('patientInfo.phoneNumber')}</label>
+                       <input type="text" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold" placeholder="012XXXXXXXX" required />
+                     </div>
+                     <div className="space-y-1.5">
+                       <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('userManagement.thDob')}</label>
+                       <input type="date" value={formData.date_of_birth} onChange={(e) => setFormData({...formData, date_of_birth: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold" required />
+                     </div>
+                   </div>
+                   <div className="space-y-1.5">
+                     <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('patientInfo.gender')}</label>
+                     <select value={formData.gender} onChange={(e) => setFormData({...formData, gender: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold">
+                       <option value="Male">{t('userManagement.genderMale')}</option>
+                       <option value="Female">{t('userManagement.genderFemale')}</option>
+                     </select>
+                   </div>
+                 </>
+               )}
+
+               <button 
+                  type="submit" 
+                  disabled={submitting}
+                  className="w-full bg-indigo-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 hover:-translate-y-0.5 transition-all mt-4 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" /> {t('userManagement.creatingUser', { type: activeTab === 'doctors' ? t('userManagement.doctorSingular') : t('userManagement.patientSingular') })}
+                    </>
+                  ) : (
+                    t('userManagement.createUserBtn', { type: activeTab === 'doctors' ? t('userManagement.doctorSingular') : t('userManagement.patientSingular') })
+                  )}
+                </button>
             </form>
           </div>
         </div>

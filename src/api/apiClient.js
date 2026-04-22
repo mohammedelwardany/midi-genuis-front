@@ -30,7 +30,13 @@ async function request(method, endpoint, { body, params, headers: extraHeaders }
   };
 
   if (body !== undefined) {
-    config.body = JSON.stringify(body);
+    if (body instanceof FormData) {
+      config.body = body;
+      // Let the browser set the boundary for multipart/form-data
+      delete config.headers['Content-Type'];
+    } else {
+      config.body = JSON.stringify(body);
+    }
   }
 
   const response = await fetch(url, config);

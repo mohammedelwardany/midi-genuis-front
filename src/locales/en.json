@@ -33,9 +33,9 @@
     }
   },
   "app": {
-    "patientPortalTitle": "MediGenius Patient Portal",
-    "doctorPortalTitle": "MediGenius Clinical Portal",
-    "adminConsoleTitle": "MediGenius Admin Console",
+    "patientPortalTitle": "{{appName}} Patient Portal",
+    "doctorPortalTitle": "{{appName}} Clinical Portal",
+    "adminConsoleTitle": "{{appName}} Admin Console",
     "performanceComingSoon": "Performance Module Coming Soon"
   },
   "booking": {
@@ -58,7 +58,7 @@
   },
   "auth": {
     "welcomeBack": "Welcome Back",
-    "loginDesc": "Secure access to the MediGenius clinical ecosystem.",
+    "loginDesc": "Secure access to the {{appName}} clinical ecosystem.",
     "emailLabel": "Email Address",
     "passwordLabel": "Password",
     "forgotPassword": "Forgot password?",
@@ -67,7 +67,7 @@
     "registerHere": "Register as patient",
     "register": {
       "title": "Create Account",
-      "description": "Join the MediGenius clinical ecosystem.",
+      "description": "Join the {{appName}} clinical ecosystem.",
       "fullNameLabel": "Full Legal Name",
       "fullNamePlaceholder": "e.g. Jonathan Doe",
       "emailPlaceholder": "jonathan.doe@example.com",
@@ -405,10 +405,19 @@
     "startTime": "Start Time",
     "endTime": "End Time",
     "consultationDuration": "Consultation Duration",
-    "locations": "Locations",
+    "saveAvailability": "Save Availability",
+    "availabilityPreview": "Availability Preview",
+    "generateHint": "Based on current settings, you will generate:",
+    "individualSlots": "Individual Slots",
+    "available": "Available",
+    "selectRangeHint": "Select range to see slots",
+    "notesPlaceholder": "Mention any specific requirements for patients, such as 'Pre-appointment fasting required' or 'Bring current medication list'...",
+    "plannedDates": "Planned Schedule Dates",
+    "min15": "15 Min",
+    "min30": "30 Min",
+    "min60": "60 Min",
     "operationalNotes": "Operational Notes",
-    "discardChanges": "Discard Changes",
-    "saveAvailability": "Save Availability"
+    "discardChanges": "Discard Changes"
   },
   "doctorSettings": {
     "title": "Clinical Profile Settings",
@@ -463,5 +472,14 @@
     "fullName": "Full Name",
     "email": "Email",
     "updateProfile": "Update Profile"
+  },
+  "days": {
+    "mon": "Monday",
+    "tue": "Tuesday",
+    "wed": "Wednesday",
+    "thu": "Thursday",
+    "fri": "Friday",
+    "sat": "Saturday",
+    "sun": "Sunday"
   }
 }

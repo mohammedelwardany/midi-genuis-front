@@ -1,18 +1,22 @@
-import React from 'react';
 import { Users, Timer, MessageSquare, MoreVertical, Eye } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../../store/slices/authSlice';
 
 export default function DoctorDashboard() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentUser = useSelector(selectCurrentUser);
   return (
     <div className="animate-in fade-in duration-500 pb-20 relative">
       
       {/* Header Section */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-10 gap-6">
         <div>
-           <h2 className="text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">{t('doctorDashboard.title')}</h2>
+           <h2 className="text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">
+             {t('doctorDashboard.title')}, {i18n.language.startsWith('ar') ? (currentUser?.name_ar || currentUser?.name) : (currentUser?.name_en || currentUser?.name || 'Doctor')}!
+           </h2>
            <p className="text-[15px] font-medium text-slate-500">
-             {t('doctorDashboard.desc')}
+             {currentUser?.specialization || t('doctorDashboard.desc')}
            </p>
         </div>
         

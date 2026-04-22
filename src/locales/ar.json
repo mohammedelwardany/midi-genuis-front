@@ -33,9 +33,9 @@
     }
   },
   "app": {
-    "patientPortalTitle": "بوابة المرضى MediGenius",
-    "doctorPortalTitle": "البوابة السريرية MediGenius",
-    "adminConsoleTitle": "لوحة إدارة MediGenius",
+    "patientPortalTitle": "بوابة المرضى {{appName}}",
+    "doctorPortalTitle": "بوابة الأخصائيين {{appName}}",
+    "adminConsoleTitle": "لوحة إدارة {{appName}}",
     "performanceComingSoon": "وحدة الأداء قريباً"
   },
   "booking": {
@@ -58,7 +58,7 @@
   },
   "auth": {
     "welcomeBack": "مرحباً بعودتك",
-    "loginDesc": "الوصول الآمن إلى مستشفى MediGenius.",
+    "loginDesc": "الوصول الآمن إلى مستشفى {{appName}}.",
     "emailLabel": "البريد الإلكتروني",
     "passwordLabel": "كلمة المرور",
     "forgotPassword": "هل نسيت كلمة المرور؟",
@@ -67,7 +67,7 @@
     "registerHere": "سجل كمريض",
     "register": {
       "title": "إنشاء حساب",
-      "description": "انضم إلى منظومة MediGenius السريرية.",
+      "description": "انضم إلى منظومة {{appName}} العيادة.",
       "fullNameLabel": "الاسم القانوني الكامل",
       "fullNamePlaceholder": "مثال: جوناثان دو",
       "emailPlaceholder": "jonathan.doe@example.com",
@@ -108,7 +108,25 @@
     "thActions": "إجراءات",
     "active": "نشط",
     "pending": "قيد الانتظار",
-    "inactive": "غير نشط"
+    "inactive": "غير نشط",
+    "registerPatient": "تسجيل مريض",
+    "thSpecialization": "التخصص",
+    "thExperience": "الخبرة",
+    "loadingUser": "جاري تحميل {{type}}...",
+    "years": "سنوات",
+    "viewProfile": "عرض الملف",
+    "editDoctor": "تعديل الطبيب",
+    "delete": "حذف",
+    "registerModalTitle": "تسجيل {{type}}",
+    "thEmail": "البريد الإلكتروني",
+    "thPassword": "كلمة مرور مؤقتة",
+    "thBio": "نبذة تعريفية",
+    "creatingUser": "جاري إنشاء {{type}}...",
+    "createUserBtn": "إنشاء حساب {{type}}",
+    "doctorSingular": "طبيب",
+    "patientSingular": "مريض",
+    "genderMale": "ذكر",
+    "genderFemale": "أنثى"
   },
   "doctorDashboard": {
     "title": "الملخص اليومي",
@@ -230,7 +248,12 @@
     "nearestDate": "أقرب موعد",
     "nextAvailable": "أقرب توفر",
     "bookNow": "احجز الآن",
-    "viewMoreSpecialists": "عرض المزيد من الأخصائيين"
+    "viewMoreSpecialists": "عرض المزيد من الأخصائيين",
+    "featuredSpecialists": "الأطباء المتميزون",
+    "topRated": "الأعلى تقييماً"
+  },
+  "common": {
+    "seeAll": "عرض الكل"
   },
   "pickSchedule": {
     "title": "اختيار الموعد",
@@ -251,7 +274,7 @@
   },
   "patientInfo": {
     "title": "بيانات المريض",
-    "description": "يرجى إدخال التفاصيل الطبية وبيانات التواصل للمريض لضمان توثيق سريري دقيق.",
+    "description": "يرجى إدخال التفاصيل الطبية وبيانات التواصل للمريض لضمان توثيق عيادة دقيق.",
     "contactDetails": "بيانات التواصل",
     "firstName": "الاسم الأول",
     "lastName": "اسم العائلة",
@@ -306,7 +329,7 @@
     "consultationFee": "رسوم الاستشارة",
     "labServices": "خدمات المختبر",
     "totalAmountPaid": "إجمالي المبلغ المدفوع",
-    "clinicalGuidance": "إرشادات سريرية",
+    "clinicalGuidance": "إرشادات العيادة",
     "scheduleAnother": "جدولة موعد آخر",
     "returnToDashboard": "العودة للوحة التحكم"
   },
@@ -329,7 +352,7 @@
   },
   "visitHistory": {
     "title": "سجل الزيارات",
-    "description": "راجع مواعيدك السابقة والملاحظات السريرية وحمّل ملخصات الزيارة الشاملة لسجلاتك.",
+    "description": "أدر جلساتك الطبية واطلع على السجل وتابع رحلتك الصحية.",
     "searchPlaceholder": "ابحث عن طبيب أو ملاحظة...",
     "filterBy": "تصفية حسب:",
     "loadOlderVisits": "تحميل زيارات أقدم"
@@ -367,7 +390,7 @@
   },
   "doctorPatientDirectory": {
     "title": "دليل المرضى",
-    "description": "إدارة ومتابعة سجلات المرضى بدقة سريرية مع وصول سريع للتاريخ المرضي والحالات والجلسات.",
+    "description": "إدارة ومتابعة سجلات المرضى بدقة عالية مع وصول سريع للتاريخ المرضي والحالات والجلسات.",
     "allPatients": "كل المرضى",
     "myPatients": "مرضاي",
     "recentVisits": "الزيارات الأخيرة",
@@ -382,50 +405,59 @@
     }
   },
   "doctorSchedule": {
-    "clinicalWorkHours": "ساعات العمل السريري",
+    "clinicalWorkHours": "مواعيد الطبيب",
     "weeklyWorkHours": "ساعات العمل الأسبوعية",
-    "description": "قم بضبط توافرك السريري القياسي لاستشارات المرضى.",
+    "description": "قم بضبط توافرك الطبي القياسي لاستشارات المرضى.",
     "weeklyGrid": "الجدول الأسبوعي",
     "listView": "عرض القائمة",
     "updateChanges": "تحديث التغييرات",
     "quickAddBlocks": "إضافة سريعة للفترات",
-    "clinicalHours": "الساعات السريرية",
-    "clinicalSettings": "الإعدادات السريرية",
+    "clinicalHours": "مواعيد العيادة",
+    "clinicalSettings": "إعدادات العيادة",
     "consultationDuration": "مدة الاستشارة",
     "notePrepBuffer": "وقت تحضير الملاحظات",
-    "autoConfirmClinical": "تأكيد سريري تلقائي",
-    "clinicalCapacity": "القدرة السريرية"
+    "autoConfirmClinical": "تأكيد طبي تلقائي",
+    "clinicalCapacity": "سعة العيادة"
   },
   "doctorConfigureAvailability": {
     "backToSchedule": "العودة للجدول",
     "title": "ضبط التوفر",
     "description": "حدد ساعات العيادة الأسبوعية ومدة الاستشارة ومواقع العمل. سيظهر هذا الجدول للمرضى ومنسقي الفرز.",
-    "weeklyClinicalHours": "الساعات السريرية الأسبوعية",
+    "weeklyClinicalHours": "مواعيد العيادة الأسبوعية",
     "setActiveHours": "حدد ساعات نشاطك خلال الأسبوع",
     "startTime": "وقت البدء",
     "endTime": "وقت الانتهاء",
     "consultationDuration": "مدة الاستشارة",
-    "locations": "المواقع",
+    "saveAvailability": "حفظ التوفر",
+    "availabilityPreview": "معاينة التوفر",
+    "generateHint": "بناءً على الإعدادات الحالية، سيتم إنشاء:",
+    "individualSlots": "فترات فردية",
+    "available": "متاح",
+    "selectRangeHint": "اختر نطاقاً زمنياً لرؤية الفترات",
+    "notesPlaceholder": "اذكر أي متطلبات محددة للمرضى، مثل 'يتطلب صياماً قبل الموعد' أو 'إحضار قائمة الأدوية الحالية'...",
+    "plannedDates": "تواريخ الجدول المخططة",
+    "min15": "15 دقيقة",
+    "min30": "30 دقيقة",
+    "min60": "60 دقيقة",
     "operationalNotes": "ملاحظات تشغيلية",
-    "discardChanges": "تجاهل التغييرات",
-    "saveAvailability": "حفظ التوفر"
+    "discardChanges": "تجاهل التغييرات"
   },
   "doctorSettings": {
-    "title": "إعدادات الملف السريري",
+    "title": "إعدادات ملف الطبيب",
     "description": "إدارة بياناتك الشخصية واعتماداتك السريرية وأمان الحساب داخل شبكة الأطباء.",
     "staffIdentity": "هوية الطاقم",
-    "clinicalDirectory": "الدليل السريري",
+    "clinicalDirectory": "الدليل الطبي",
     "accountSecurity": "أمان الحساب"
   },
   "doctorMessages": {
     "title": "الرسائل",
     "searchPatients": "ابحث عن المرضى...",
     "patientActive": "مريض نشط",
-    "typeMessage": "اكتب رسالة سريرية آمنة..."
+    "typeMessage": "اكتب رسالة طبية آمنة..."
   },
   "doctorPerformance": {
     "title": "تحليلات الأداء",
-    "description": "نظرة تفصيلية على الكفاءة السريرية ونتائج المرضى.",
+    "description": "نظرة تفصيلية على الكفاءة الطبية ونتائج المرضى.",
     "monthly": "شهري",
     "quarterly": "ربع سنوي",
     "yearly": "سنوي"
@@ -433,7 +465,7 @@
   "doctorPatientProfile": {
     "editProfile": "تعديل الملف",
     "startNewSession": "بدء جلسة جديدة",
-    "reportsTitle": "التقارير والمرفقات السريرية",
+    "reportsTitle": "التقارير والمرفقات الطبية",
     "uploadNew": "رفع جديد",
     "quickActions": "إجراءات سريعة",
     "newPrescription": "وصفة جديدة",
@@ -453,7 +485,7 @@
     "saveChanges": "حفظ التغييرات",
     "securityStandardsDesc": "إدارة قواعد المصادقة لجميع مستخدمي المنصة.",
     "force2FA": "فرض التحقق الثنائي على الأطباء",
-    "force2FADesc": "المطالبة بالمصادقة متعددة العوامل لجميع الكوادر السريرية.",
+    "force2FADesc": "المطالبة بالمصادقة متعددة العوامل لجميع الكوادر الطبية.",
     "sessionTimeout": "مهلة انتهاء الجلسة",
     "sessionTimeoutDesc": "تسجيل خروج المستخدمين غير النشطين تلقائياً بعد فترة محددة.",
     "timeout15": "15 دقيقة",
@@ -463,5 +495,28 @@
     "fullName": "الاسم الكامل",
     "email": "البريد الإلكتروني",
     "updateProfile": "تحديث الملف الشخصي"
+  },
+  "days": {
+    "mon": "الاثنين",
+    "tue": "الثلاثاء",
+    "wed": "الأربعاء",
+    "thu": "الخميس",
+    "fri": "الجمعة",
+    "sat": "السبت",
+    "sun": "الأحد"
+  },
+  "patientAdminProfile": {
+    "title": "ملف المريض",
+    "recordNumber": "سجل رقم #",
+    "editProfile": "تعديل الملف",
+    "patientAccount": "حساب مريض",
+    "medicalRecords": "السجلات الطبية",
+    "recordsSubtitle": "تاريخ المستندات الطبية المرفوعة",
+    "noRecords": "لم يتم العثور على سجلات طبية لهذا المريض.",
+    "recordsCount": "{{count}} سجل",
+    "editModalTitle": "تعديل الملف",
+    "editModalSubtitle": "تحديث بيانات الهوية الطبية",
+    "saveChanges": "حفظ التغييرات",
+    "uploadedOn": "تم الرفع في"
   }
 }

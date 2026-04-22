@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Lock, Mail, User, Phone, Calendar, ChevronDown, ArrowRight, UserCircle2 } from 'lucide-react';
+import { Lock, Mail, User, Phone, Calendar, ChevronDown, ArrowRight, UserCircle2, Loader2 } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
+import { registerUser, selectAuthLoading, selectAuthError, clearError } from '../../store/slices/authSlice';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 
 // Common country codes with flags
@@ -36,8 +39,12 @@ const labelBase = 'block text-[11px] font-bold text-slate-600 uppercase tracking
 
 export default function Register() {
   const navigate   = useNavigate();
+  const dispatch   = useDispatch();
   const { t }      = useTranslation();
   const siteConfig = useSiteConfig();
+
+  const loading = useSelector(selectAuthLoading);
+  const apiError = useSelector(selectAuthError);
 
   const [form, setForm] = useState({
     name_en:       '',
@@ -67,7 +74,7 @@ export default function Register() {
     return errs;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
@@ -76,9 +83,14 @@ export default function Register() {
       ...form,
       phone: form.phone ? `${countryCode.code}${form.phone}` : '',
     };
-    console.log('Register payload:', payload);
-    // dispatch(registerUser(payload))  ← hook up to Redux thunk when ready
-    navigate('/login');
+    
+    try {
+      await dispatch(registerUser(payload)).unwrap();
+      toast.success('Account created successfully! Please sign in.');
+      navigate('/login');
+    } catch (err) {
+      toast.error(err?.message || 'Registration failed. Please try again.');
+    }
   };
 
   const selectedCountry = countryCode;
@@ -288,10 +300,17 @@ export default function Register() {
           <div className="pt-2">
             <button
               type="submit"
-              className="w-full hover:-translate-y-0.5 text-white font-bold text-[15px] py-4 rounded-xl shadow-md transition-all flex justify-center items-center gap-2 group bg-primary-600 hover:bg-primary-700 shadow-primary-600/20"
+              disabled={loading}
+              className="w-full hover:-translate-y-0.5 text-white font-bold text-[15px] py-4 rounded-xl shadow-md transition-all flex justify-center items-center gap-2 group bg-primary-600 hover:bg-primary-700 shadow-primary-600/20 disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              {t('auth.register.createAccountButton', { defaultValue: 'Create Account' })}
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              {loading ? (
+                <> <Loader2 className="w-5 h-5 animate-spin" /> {t('auth.register.creating', { defaultValue: 'Creating...' })} </>
+              ) : (
+                <>
+                  {t('auth.register.createAccountButton', { defaultValue: 'Create Account' })}
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
             </button>
           </div>
         </form>

@@ -1,12 +1,36 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { CalendarDays, Clock, MapPin, History, FileText, Download, ChevronDown } from 'lucide-react';
+import { CalendarDays, Clock, MapPin, History, FileText, Download, ChevronDown, Loader2, XCircle } from 'lucide-react';
+import { fetchAppointments, selectAppointments, selectAppointmentsLoading, cancelAppointment } from '../store/slices/appointmentSlice';
 import { cn } from '../utils/cn';
+import toast from 'react-hot-toast';
 
 export default function BookingsDashboard() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { t } = useTranslation();
+
+  const appointments = useSelector(selectAppointments);
+  const loading = useSelector(selectAppointmentsLoading);
+
+  useEffect(() => {
+    dispatch(fetchAppointments());
+  }, [dispatch]);
+
+  const upcoming = appointments.filter(a => a.status === 'confirmed' || a.status === 'pending');
+  const history = appointments.filter(a => a.status === 'completed' || a.status === 'cancelled');
+
+  const handleCancelClick = async (id) => {
+    if (!window.confirm('Are you sure you want to cancel this appointment?')) return;
+    try {
+      await dispatch(cancelAppointment(id)).unwrap();
+      toast.success('Appointment cancelled successfully');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to cancel appointment');
+    }
+  };
 
   return (
     <div className="animate-in fade-in duration-500 max-w-6xl mx-auto">
@@ -34,75 +58,63 @@ export default function BookingsDashboard() {
             {t('bookings.upcomingAppointments', { defaultValue: 'Upcoming Appointments' })}
           </h3>
           <span className="bg-primary-50 text-primary-600 px-3 py-1 rounded-full text-xs font-bold font-mono tracking-tight uppercase">
-            {t('bookings.activeCount', { defaultValue: '2 Active' })}
+            {t('bookings.activeCount', { defaultValue: `${upcoming.length} Active` })}
           </span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Card 1 */}
-          <div className="bg-white rounded-[24px] p-6 shadow-sm border border-slate-100 relative overflow-hidden group hover:shadow-md transition-shadow">
-            <div className="absolute top-0 start-0 w-1.5 h-full bg-primary-600 rounded-s-full"></div>
-            
-            <div className="flex justify-between items-start mb-6">
-              <div className="flex gap-4">
-                <img src="https://ui-avatars.com/api/?name=Sarah+Miller&background=dbeafe&color=1d4ed8&size=100" alt="Dr" className="w-14 h-14 rounded-full border-2 border-slate-50 shadow-sm" />
-                <div>
-                  <div className="font-bold text-lg text-slate-800 tracking-tight">Dr. Sarah Miller</div>
-                  <div className="text-sm font-medium text-slate-500">Cardiology Specialist</div>
+          {loading ? (
+             <div className="col-span-2 py-40 text-center bg-white rounded-[24px] border border-slate-100">
+                <Loader2 className="w-10 h-10 text-primary-600 animate-spin mx-auto mb-4" />
+                <p className="text-slate-500 font-bold">Synchronizing your schedule...</p>
+             </div>
+          ) : upcoming.length > 0 ? upcoming.map(appt => (
+            <div key={appt.id} className="bg-white rounded-[24px] p-6 shadow-sm border border-slate-100 relative overflow-hidden group hover:shadow-md transition-shadow">
+              <div className={cn("absolute top-0 start-0 w-1.5 h-full rounded-s-full", appt.status === 'confirmed' ? "bg-primary-600" : "bg-orange-500")}></div>
+              
+              <div className="flex justify-between items-start mb-6">
+                <div className="flex gap-4">
+                  <img src={`https://ui-avatars.com/api/?name=${appt.doctor_name || 'Dr'}&background=dbeafe&color=1d4ed8&size=100`} alt="Dr" className="w-14 h-14 rounded-full border-2 border-slate-50 shadow-sm" />
+                  <div>
+                    <div className="font-bold text-lg text-slate-800 tracking-tight">{appt.doctor_name || 'Medical Specialist'}</div>
+                    <div className="text-sm font-medium text-slate-500">{appt.service || 'Clinical Session'}</div>
+                  </div>
                 </div>
+                <span className={cn(
+                  "px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-widest",
+                  appt.status === 'confirmed' ? "bg-emerald-50 text-emerald-600" : "bg-orange-50 text-orange-600"
+                )}>
+                  {appt.status}
+                </span>
               </div>
-              <span className="bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-widest">{t('bookings.confirmed', { defaultValue: 'Confirmed' })}</span>
-            </div>
 
-            <div className="bg-slate-50/50 rounded-xl p-4 flex gap-8 mb-6 border border-slate-100/50">
-               <div>
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {t('bookings.dateTime', { defaultValue: 'Date & Time' })}</div>
-                  <div className="text-sm font-bold text-slate-800">Oct 24, 09:30 AM</div>
-               </div>
-               <div>
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1 flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> {t('bookings.clinic', { defaultValue: 'Clinic' })}</div>
-                  <div className="text-sm font-bold text-slate-800">North Wing, R-204</div>
-               </div>
-            </div>
-
-            <div className="flex gap-3">
-               <button onClick={() => navigate('/patient/appointments/1')} className="flex-1 bg-primary-50 hover:bg-primary-100 text-primary-700 font-bold text-sm py-2.5 rounded-lg transition-colors border border-primary-100/50">{t('bookings.reschedule', { defaultValue: 'Reschedule' })}</button>
-               <button className="flex-1 bg-white hover:bg-red-50 text-red-600 font-bold text-sm py-2.5 rounded-lg transition-colors border border-slate-100 hover:border-red-100">{t('bookings.cancel', { defaultValue: 'Cancel' })}</button>
-            </div>
-          </div>
-
-          {/* Card 2 */}
-           <div className="bg-white rounded-[24px] p-6 shadow-sm border border-slate-100 relative overflow-hidden group hover:shadow-md transition-shadow">
-            <div className="absolute top-0 start-0 w-1.5 h-full bg-orange-500 rounded-s-full"></div>
-            
-            <div className="flex justify-between items-start mb-6">
-              <div className="flex gap-4">
-                <img src="https://ui-avatars.com/api/?name=Michael+Chen&background=ffedd5&color=c2410c&size=100" alt="Dr" className="w-14 h-14 rounded-full border-2 border-slate-50 shadow-sm" />
-                <div>
-                  <div className="font-bold text-lg text-slate-800 tracking-tight">Dr. Michael Chen</div>
-                  <div className="text-sm font-medium text-slate-500">Annual Health Checkup</div>
-                </div>
+              <div className="bg-slate-50/50 rounded-xl p-4 flex gap-8 mb-6 border border-slate-100/50">
+                 <div>
+                    <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> Date & Time</div>
+                    <div className="text-sm font-bold text-slate-800">{appt.date}, {appt.time}</div>
+                 </div>
+                 <div>
+                    <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1 flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> Clinic</div>
+                    <div className="text-sm font-bold text-slate-800">{appt.location || 'Main Center'}</div>
+                 </div>
               </div>
-              <span className="bg-orange-50 text-orange-600 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-widest">{t('bookings.pending', { defaultValue: 'Pending' })}</span>
-            </div>
 
-            <div className="bg-slate-50/50 rounded-xl p-4 flex gap-8 mb-6 border border-slate-100/50">
-               <div>
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> Date & Time</div>
-                  <div className="text-sm font-bold text-slate-800">Nov 02, 02:15 PM</div>
-               </div>
-               <div>
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1 flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> Clinic</div>
-                  <div className="text-sm font-bold text-slate-800">Main Plaza, Lobby A</div>
-               </div>
+              <div className="flex gap-3">
+                 <button onClick={() => navigate(`/patient/appointments/${appt.id}`)} className="flex-1 bg-primary-50 hover:bg-primary-100 text-primary-700 font-bold text-sm py-2.5 rounded-lg transition-colors border border-primary-100/50">Manage</button>
+                 <button 
+                  onClick={() => handleCancelClick(appt.id)}
+                  className="flex-1 bg-white hover:bg-red-50 text-red-600 font-bold text-sm py-2.5 rounded-lg transition-colors border border-slate-100 hover:border-red-100"
+                 >
+                   Cancel
+                 </button>
+              </div>
             </div>
-
-            <div className="flex gap-3">
-               <button className="flex-1 bg-primary-50 hover:bg-primary-100 text-primary-700 font-bold text-sm py-2.5 rounded-lg transition-colors border border-primary-100/50">{t('bookings.completeForms', { defaultValue: 'Complete Forms' })}</button>
-               <button className="flex-1 bg-white hover:bg-red-50 text-red-600 font-bold text-sm py-2.5 rounded-lg transition-colors border border-slate-100 hover:border-red-100">{t('bookings.cancel', { defaultValue: 'Cancel' })}</button>
+          )) : (
+            <div className="col-span-2 py-20 text-center bg-white rounded-[24px] border border-slate-100 border-dashed">
+               <p className="text-slate-400 font-bold">No upcoming appointments scheduled.</p>
+               <button onClick={() => navigate('/patient/book/doctors')} className="mt-4 text-primary-600 font-bold hover:underline">Book your first visit</button>
             </div>
-          </div>
-
+          )}
         </div>
       </div>
 
@@ -130,70 +142,37 @@ export default function BookingsDashboard() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50 text-sm">
-              <tr className="hover:bg-slate-50/50 transition-colors">
-                 <td className="p-4 ps-6 flex items-center gap-3">
-                    <img src="https://ui-avatars.com/api/?name=Emily+Watson&size=80&background=f1f5f9" className="w-8 h-8 rounded-full border border-slate-200" alt="avatar" />
-                    <span className="font-bold text-slate-800">Dr. Emily Watson</span>
-                 </td>
-                 <td className="p-4 font-medium text-slate-500">Dermatology Consult</td>
-                 <td className="p-4 font-bold text-slate-800">Sep 12, 2023</td>
-                 <td className="p-4">
-                    <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-widest border border-slate-200/60">{t('bookings.completed', { defaultValue: 'Completed' })}</span>
-                 </td>
-                 <td className="p-4 text-end pe-6">
-                    <button className="inline-flex items-center text-primary-600 font-bold text-sm hover:text-primary-700">
-                      <FileText className="w-4 h-4 me-1.5" /> {t('bookings.report', { defaultValue: 'Report' })}
-                    </button>
-                 </td>
-              </tr>
-              <tr className="hover:bg-slate-50/50 transition-colors">
-                 <td className="p-4 ps-6 flex items-center gap-3">
-                    <img src="https://ui-avatars.com/api/?name=James+Wilson&size=80&background=f1f5f9" className="w-8 h-8 rounded-full border border-slate-200" alt="avatar" />
-                    <span className="font-bold text-slate-800">Dr. James Wilson</span>
-                 </td>
-                 <td className="p-4 font-medium text-slate-500">Vaccination (Flu)</td>
-                 <td className="p-4 font-bold text-slate-800">Aug 28, 2023</td>
-                 <td className="p-4">
-                    <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-widest border border-slate-200/60">{t('bookings.completed', { defaultValue: 'Completed' })}</span>
-                 </td>
-                 <td className="p-4 text-end pe-6">
-                    <button className="inline-flex items-center text-primary-600 font-bold text-sm hover:text-primary-700">
-                      <Download className="w-4 h-4 me-1.5" /> {t('bookings.certificate', { defaultValue: 'Certificate' })}
-                    </button>
-                 </td>
-              </tr>
-              <tr className="hover:bg-slate-50/50 transition-colors">
-                 <td className="p-4 ps-6 flex items-center gap-3">
-                    <img src="https://ui-avatars.com/api/?name=Sarah+Miller&size=80&background=f1f5f9" className="w-8 h-8 rounded-full border border-slate-200" alt="avatar" />
-                    <span className="font-bold text-slate-800">Dr. Sarah Miller</span>
-                 </td>
-                 <td className="p-4 font-medium text-slate-500">Routine ECG</td>
-                 <td className="p-4 font-bold text-slate-800">Jul 15, 2023</td>
-                 <td className="p-4">
-                     <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-widest border border-slate-200/60">{t('bookings.completed', { defaultValue: 'Completed' })}</span>
-                 </td>
-                 <td className="p-4 text-end pe-6">
-                    <button className="inline-flex items-center text-primary-600 font-bold text-sm hover:text-primary-700">
-                      <FileText className="w-4 h-4 me-1.5" /> {t('bookings.report', { defaultValue: 'Report' })}
-                    </button>
-                 </td>
-              </tr>
-              <tr className="hover:bg-slate-50/50 transition-colors">
-                 <td className="p-4 ps-6 flex items-center gap-3">
-                    <img src="https://ui-avatars.com/api/?name=Michael+Chen&size=80&background=f1f5f9" className="w-8 h-8 rounded-full border border-slate-200" alt="avatar" />
-                    <span className="font-bold text-slate-800">Dr. Michael Chen</span>
-                 </td>
-                 <td className="p-4 font-medium text-slate-500">Blood Work Analysis</td>
-                 <td className="p-4 font-bold text-slate-800">Jun 02, 2023</td>
-                 <td className="p-4">
-                     <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-widest border border-slate-200/60">{t('bookings.completed', { defaultValue: 'Completed' })}</span>
-                 </td>
-                 <td className="p-4 text-end pe-6">
-                    <button className="inline-flex items-center text-primary-600 font-bold text-sm hover:text-primary-700">
-                      <FileText className="w-4 h-4 me-1.5" /> {t('bookings.results', { defaultValue: 'Results' })}
-                    </button>
-                 </td>
-              </tr>
+              {loading ? (
+                <tr><td colSpan="5" className="py-20 text-center"><Loader2 className="w-6 h-6 animate-spin mx-auto text-primary-400" /></td></tr>
+              ) : history.length > 0 ? history.map(appt => (
+                <tr key={appt.id} className="hover:bg-slate-50/50 transition-colors">
+                   <td className="p-4 ps-6 flex items-center gap-3">
+                      <img src={`https://ui-avatars.com/api/?name=${appt.doctor_name || 'Dr'}&size=80&background=f1f5f9`} className="w-8 h-8 rounded-full border border-slate-200" alt="avatar" />
+                      <span className="font-bold text-slate-800">{appt.doctor_name || 'Unknown Doctor'}</span>
+                   </td>
+                   <td className="p-4 font-medium text-slate-500">{appt.service || 'Clinical Consultation'}</td>
+                   <td className="p-4 font-bold text-slate-800">{appt.date}</td>
+                   <td className="p-4">
+                      <span className={cn(
+                        "px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-widest border",
+                        appt.status === 'completed' ? "bg-slate-100 text-slate-600 border-slate-200/60" : "bg-red-50 text-red-600 border-red-100/60"
+                      )}>
+                        {appt.status}
+                      </span>
+                   </td>
+                   <td className="p-4 text-end pe-6">
+                      {appt.status === 'completed' ? (
+                        <button className="inline-flex items-center text-primary-600 font-bold text-sm hover:text-primary-700">
+                          <FileText className="w-4 h-4 me-1.5" /> Report
+                        </button>
+                      ) : (
+                        <span className="text-slate-400 italic text-xs">No records</span>
+                      )}
+                   </td>
+                </tr>
+              )) : (
+                <tr><td colSpan="5" className="py-8 text-center text-slate-400 italic">No historical visits found.</td></tr>
+              )}
             </tbody>
           </table>
           

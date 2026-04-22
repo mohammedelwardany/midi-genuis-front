@@ -4,6 +4,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 
 import translationEN from './locales/en.json';
 import translationAR from './locales/ar.json';
+import siteConfig from './config/site.config.json';
 
 const resources = {
   en: { translation: translationEN },
@@ -17,7 +18,10 @@ i18n
     resources,
     fallbackLng: 'en',
     interpolation: {
-      escapeValue: false 
+      escapeValue: false,
+      defaultVariables: {
+        appName: siteConfig.clinic.name
+      }
     }
   });
 

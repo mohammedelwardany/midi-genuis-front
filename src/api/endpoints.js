@@ -3,7 +3,7 @@
  * Update BASE_URL to your real backend.
  */
 
-export const BASE_URL = process.env.REACT_APP_API_URL || 'https://api.medigenius.org/v1';
+export const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/backend/api';
 
 export const ENDPOINTS = {
   // ── Auth ──────────────────────────────────────────
@@ -11,23 +11,38 @@ export const ENDPOINTS = {
     login:    '/auth/login',
     logout:   '/auth/logout',
     refresh:  '/auth/refresh',
-    register: '/auth/register',
+    register: '/patients/register',
   },
 
   // ── Patients ──────────────────────────────────────
   patients: {
-    list:         '/patients',
-    byId:         (id) => `/patients/${id}`,
-    records:      (id) => `/patients/${id}/records`,
-    appointments: (id) => `/patients/${id}/appointments`,
+    register:      '/patients/register',
+    updateMe:      '/patients/updateMe',
+    deleteMe:      '/patients/deleteMe',
+    addPatient:    '/patients/addPatient',
+    list:          '/patients/getAllPatients',
+    byId:          (id) => `/patients/getPatientById/${id}`,
+    update:        (id) => `/patients/updatePatient/${id}`,
+    delete:        (id) => `/patients/deletePatient/${id}`,
+    uploadReport:  '/patients/uploadReport',
+    getMyReports:  '/patients/getMyReports',
+    deleteMyReport: (id) => `/patients/deleteMyReport/${id}`,
+    getPatientReports: (id) => `/patients/getPatientReports/${id}`,
+    deletePatientReport: (pid, rid) => `/patients/deletePatientReport/${pid}/${rid}`,
   },
 
   // ── Doctors ───────────────────────────────────────
   doctors: {
-    list:     '/doctors',
-    byId:     (id) => `/doctors/${id}`,
-    schedule: (id) => `/doctors/${id}/schedule`,
-    patients: (id) => `/doctors/${id}/patients`,
+    list:         '/doctors/getAllDoctors',
+    add:          '/doctors/addDoctor',
+    byId:         (id) => `/doctors/getDoctorById/${id}`,
+    update:       (id) => `/doctors/updateDoctor/${id}`,
+    delete:       (id) => `/doctors/deleteDoctor/${id}`,
+    schedule:     (id) => `/doctors/${id}/schedule`,
+    patients:     (id) => `/doctors/${id}/patients`,
+    addAvailability: '/doctors/addAvailability',
+    upcomingAvailability: (id) => `/doctors/getUpcomingAvailability/${id}`,
+    getTopDoctors: '/doctors/getTopDoctors',
   },
 
   // ── Appointments ──────────────────────────────────

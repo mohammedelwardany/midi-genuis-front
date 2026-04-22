@@ -1,10 +1,29 @@
 import React, { useState } from 'react';
 import { User, Shield, Building2, Bell, CheckCircle2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectCurrentUser } from '../../store/slices/authSlice';
 
 export default function AdminSettings() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentUser = useSelector(selectCurrentUser);
   const [activeTab, setActiveTab] = useState('profile');
+  
+  const [formData, setFormData] = useState({
+    name_en: currentUser?.name_en || (currentUser?.role === 'admin' ? 'System Administrator' : ''),
+    name_ar: currentUser?.name_ar || (currentUser?.role === 'admin' ? 'مدير النظام' : ''),
+    email: currentUser?.email || ''
+  });
+
+  React.useEffect(() => {
+    if (currentUser) {
+      setFormData({
+        name_en: currentUser.name_en || (currentUser.role === 'admin' ? 'System Administrator' : ''),
+        name_ar: currentUser.name_ar || (currentUser.role === 'admin' ? 'مدير النظام' : ''),
+        email: currentUser.email || ''
+      });
+    }
+  }, [currentUser]);
 
   const renderContent = () => {
     switch (activeTab) {
@@ -70,14 +89,33 @@ export default function AdminSettings() {
             <p className="text-sm font-medium text-slate-500 mb-6">{t('adminSettings.adminProfileDesc')}</p>
             
             <div className="space-y-4 max-w-2xl">
-               <div className="grid grid-cols-2 gap-4">
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                  <div>
-                   <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-widest">{t('adminSettings.fullName')}</label>
-                   <input type="text" defaultValue="System Administrator" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm" />
+                   <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-widest">{t('adminSettings.fullName')} (EN)</label>
+                   <input 
+                     type="text" 
+                     value={formData.name_en} 
+                     onChange={(e) => setFormData({...formData, name_en: e.target.value})}
+                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm" 
+                   />
                  </div>
                  <div>
+                   <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-widest">{t('adminSettings.fullName')} (AR)</label>
+                   <input 
+                     type="text" 
+                     value={formData.name_ar} 
+                     onChange={(e) => setFormData({...formData, name_ar: e.target.value})}
+                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm text-right" 
+                   />
+                 </div>
+                 <div className="md:col-span-2">
                    <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-widest">{t('adminSettings.email')}</label>
-                   <input type="email" defaultValue="admin@medigenius.org" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm" />
+                   <input 
+                     type="email" 
+                     value={formData.email} 
+                     readOnly
+                     className="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 text-slate-500 font-semibold focus:outline-none cursor-not-allowed text-sm" 
+                   />
                  </div>
                </div>
                

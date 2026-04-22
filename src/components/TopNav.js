@@ -2,14 +2,18 @@ import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Bell, Settings, User, Search, LogOut, CheckCircle, AlertTriangle, FileText } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
 import { cn } from '../utils/cn';
 import { useSiteConfig } from '../context/SiteConfigContext';
+import { selectCurrentUser, logoutUser } from '../store/slices/authSlice';
 
 export default function TopNav({ title = "MediGenius Patient Portal", tabs = [], showSearch = false }) {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const location = useLocation();
   const { t, i18n } = useTranslation();
   const siteConfig = useSiteConfig();
+  const user = useSelector(selectCurrentUser);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
@@ -160,16 +164,22 @@ export default function TopNav({ title = "MediGenius Patient Portal", tabs = [],
         <div className="relative" ref={profileRef}>
           <button
             onClick={() => setShowProfileMenu(!showProfileMenu)}
-            className="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center text-white overflow-hidden border border-slate-200 transition-transform active:scale-95"
+            className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white overflow-hidden border border-slate-200 transition-transform active:scale-95 font-bold text-xs"
           >
-            <User className="w-5 h-5 opacity-80" />
+            {i18n.language.startsWith('ar') 
+              ? (user?.name_ar?.charAt(0) || user?.name?.charAt(0)) 
+              : (user?.name_en?.charAt(0) || user?.name?.charAt(0)) || <User className="w-4 h-4" />}
           </button>
 
           {showProfileMenu && (
             <div className="absolute end-0 mt-3 w-56 bg-white border border-slate-100 shadow-lg shadow-slate-200/50 rounded-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
               <div className="p-4 border-b border-slate-50">
-                <div className="font-bold text-sm text-slate-900 truncate tracking-tight">Jonathan Aris</div>
-                <div className="text-xs text-slate-500 truncate mt-0.5">jonathan.aris@example.com</div>
+                <div className="font-bold text-sm text-slate-900 truncate tracking-tight">
+                  {i18n.language.startsWith('ar') 
+                    ? (user?.name_ar || user?.name || (user?.role === 'admin' ? 'مدير النظام' : 'مستخدم')) 
+                    : (user?.name_en || user?.name || (user?.role === 'admin' ? 'System Administrator' : 'User'))}
+                </div>
+                <div className="text-xs text-slate-500 truncate mt-0.5">{user?.email || 'user@example.com'}</div>
               </div>
               <div className="p-2 space-y-1">
                 <button
@@ -195,8 +205,8 @@ export default function TopNav({ title = "MediGenius Patient Portal", tabs = [],
                 <button
                   onClick={() => {
                     setShowProfileMenu(false);
-                    // Implement actual logout logic later
-                    navigate('/');
+                    dispatch(logoutUser());
+                    navigate('/login');
                   }}
                   className="w-full text-start px-3 py-2 text-sm font-bold text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-2"
                 >
