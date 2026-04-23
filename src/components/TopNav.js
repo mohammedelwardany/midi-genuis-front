@@ -99,11 +99,11 @@ export default function TopNav({ title = "MediGenius Patient Portal", tabs = [],
           {i18n.language.startsWith('en') ? 'العربية' : 'English'}
         </button>
 
-        {!showSearch && (
+        {/* {!showSearch && (
           <button onClick={() => navigate('/emergency')} className="text-sm font-medium text-red-500 hover:text-red-600 me-2 whitespace-nowrap">
             {t('topNav.emergencyContact')}
           </button>
-        )}
+        )} */}
 
         {/* Notifications Dropdown */}
         <div className="relative" ref={notifRef}>
@@ -166,8 +166,8 @@ export default function TopNav({ title = "MediGenius Patient Portal", tabs = [],
             onClick={() => setShowProfileMenu(!showProfileMenu)}
             className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white overflow-hidden border border-slate-200 transition-transform active:scale-95 font-bold text-xs"
           >
-            {i18n.language.startsWith('ar') 
-              ? (user?.name_ar?.charAt(0) || user?.name?.charAt(0)) 
+            {i18n.language.startsWith('ar')
+              ? (user?.name_ar?.charAt(0) || user?.name?.charAt(0))
               : (user?.name_en?.charAt(0) || user?.name?.charAt(0)) || <User className="w-4 h-4" />}
           </button>
 
@@ -175,8 +175,8 @@ export default function TopNav({ title = "MediGenius Patient Portal", tabs = [],
             <div className="absolute end-0 mt-3 w-56 bg-white border border-slate-100 shadow-lg shadow-slate-200/50 rounded-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
               <div className="p-4 border-b border-slate-50">
                 <div className="font-bold text-sm text-slate-900 truncate tracking-tight">
-                  {i18n.language.startsWith('ar') 
-                    ? (user?.name_ar || user?.name || (user?.role === 'admin' ? 'مدير النظام' : 'مستخدم')) 
+                  {i18n.language.startsWith('ar')
+                    ? (user?.name_ar || user?.name || (user?.role === 'admin' ? 'مدير النظام' : 'مستخدم'))
                     : (user?.name_en || user?.name || (user?.role === 'admin' ? 'System Administrator' : 'User'))}
                 </div>
                 <div className="text-xs text-slate-500 truncate mt-0.5">{user?.email || 'user@example.com'}</div>

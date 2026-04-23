@@ -120,51 +120,51 @@ export const fetchTopDoctors = createAsyncThunk(
 const doctorSlice = createSlice({
   name: 'doctors',
   initialState: {
-    list:       [],
+    list: [],
     topDoctors: [],
-    selected:   null,
-    schedule:   [],
-    total:      0,
-    loading:    false,
-    error:      null,
+    selected: null,
+    schedule: [],
+    total: 0,
+    loading: false,
+    error: null,
   },
   reducers: {
     clearSelectedDoctor: (state) => { state.selected = null; },
-    clearDoctorError:    (state) => { state.error    = null; },
+    clearDoctorError: (state) => { state.error = null; },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchDoctors.pending,   (s) => { s.loading = true;  s.error = null; })
+      .addCase(fetchDoctors.pending, (s) => { s.loading = true; s.error = null; })
       .addCase(fetchDoctors.fulfilled, (s, { payload }) => {
         s.loading = false;
-        s.list    = payload.data  ?? payload;
-        s.total   = payload.total ?? payload.length;
+        s.list = payload.data ?? payload;
+        s.total = payload.total ?? payload.length;
       })
-      .addCase(fetchDoctors.rejected,  (s, { payload }) => {
+      .addCase(fetchDoctors.rejected, (s, { payload }) => {
         s.loading = false;
-        s.error   = payload?.message || 'Failed to load doctors';
+        s.error = payload?.message || 'Failed to load doctors';
       });
 
     builder
-      .addCase(fetchDoctorById.pending,   (s) => { s.loading = true; })
+      .addCase(fetchDoctorById.pending, (s) => { s.loading = true; })
       .addCase(fetchDoctorById.fulfilled, (s, { payload }) => {
-        s.loading  = false;
+        s.loading = false;
         s.selected = payload;
       })
-      .addCase(fetchDoctorById.rejected,  (s, { payload }) => {
+      .addCase(fetchDoctorById.rejected, (s, { payload }) => {
         s.loading = false;
-        s.error   = payload?.message || 'Failed to load doctor';
+        s.error = payload?.message || 'Failed to load doctor';
       });
 
     builder
-      .addCase(fetchDoctorSchedule.pending,   (s) => { s.loading = true; })
+      .addCase(fetchDoctorSchedule.pending, (s) => { s.loading = true; })
       .addCase(fetchDoctorSchedule.fulfilled, (s, { payload }) => {
-        s.loading  = false;
+        s.loading = false;
         s.schedule = payload;
       })
-      .addCase(fetchDoctorSchedule.rejected,  (s, { payload }) => {
+      .addCase(fetchDoctorSchedule.rejected, (s, { payload }) => {
         s.loading = false;
-        s.error   = payload?.message || 'Failed to load schedule';
+        s.error = payload?.message || 'Failed to load schedule';
       });
 
     builder.addCase(updateDoctorSchedule.fulfilled, (s, { payload }) => {
@@ -244,11 +244,11 @@ const doctorSlice = createSlice({
 export const { clearSelectedDoctor, clearDoctorError } = doctorSlice.actions;
 
 // Selectors
-export const selectDoctors        = (state) => state.doctors.list;
-export const selectTopDoctors     = (state) => state.doctors.topDoctors;
+export const selectDoctors = (state) => state.doctors.list;
+export const selectTopDoctors = (state) => state.doctors.topDoctors;
 export const selectSelectedDoctor = (state) => state.doctors.selected;
 export const selectDoctorSchedule = (state) => state.doctors.schedule;
 export const selectDoctorsLoading = (state) => state.doctors.loading;
-export const selectDoctorsError   = (state) => state.doctors.error;
+export const selectDoctorsError = (state) => state.doctors.error;
 
 export default doctorSlice.reducer;

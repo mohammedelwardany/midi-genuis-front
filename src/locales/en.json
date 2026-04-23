@@ -159,7 +159,7 @@
     "completed": "Completed"
   },
   "patientDashboard": {
-    "welcome": "Welcome back, Alex",
+    "welcome": "Welcome back,",
     "subtitle": "Your recovery is on track.",
     "heartRate": "Heart Rate",
     "bloodPressure": "Blood Pressure",
@@ -178,7 +178,10 @@
     "bookAppt": "Book Appointment",
     "messageClinic": "Message Clinic",
     "refill": "Refill Prescription",
-    "medications": "Medications"
+    "medications": "Medications",
+    "noUpcoming": "You have no upcoming appointments. Stay on top of your health by booking a checkup.",
+    "noRecords": "No medical records available at this time.",
+    "loadingRecords": "Loading clinical records..."
   },
   "billing": {
     "title": "Billing & Payments",
