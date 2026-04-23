@@ -23,6 +23,7 @@ export default function EditDoctor() {
   const loading = useSelector(selectDoctorsLoading);
 
   const [formData, setFormData] = useState({
+    id: '',
     name_en: '',
     name_ar: '',
     specialization: '',
@@ -40,6 +41,7 @@ export default function EditDoctor() {
   useEffect(() => {
     if (doctor) {
       setFormData({
+        id: doctor.id || '',
         name_en: doctor.name_en || '',
         name_ar: doctor.name_ar || '',
         specialization: doctor.specialization || '',
@@ -53,13 +55,13 @@ export default function EditDoctor() {
   const handleSubmit = (e) => {
     e.preventDefault();
     dispatch(updateDoctor({
-      id: id,
+      id: formData.id,
       data: {
         name_en: formData.name_en,
         name_ar: formData.name_ar,
         specialization: formData.specialization,
         bio: formData.bio,
-        experience_years: formData.experience_years
+        experience_years: formData.experience_years.toString()
       }
     })).then((res) => {
       if (!res.error) {
