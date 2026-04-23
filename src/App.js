@@ -67,7 +67,7 @@ function App() {
     { name: t('nav.bookVisit'), href: '/patient/book/doctors' },
     { name: t('nav.bookingsHistory'), href: '/patient/bookings' },
     { name: t('nav.records'), href: '/patient/records' },
-    { name: t('nav.messages'), href: '/patient/messages' },
+    // { name: t('nav.messages'), href: '/patient/messages' },
     { name: t('nav.billing'), href: '/patient/billing' }
   ];
 
@@ -75,7 +75,7 @@ function App() {
     { name: t('nav.dashboard'), href: '/doctor/dashboard' },
     { name: t('nav.patients'), href: '/doctor/patients' },
     { name: t('nav.schedule'), href: '/doctor/schedule' },
-    { name: t('nav.messages'), href: '/doctor/messages' },
+    // { name: t('nav.messages'), href: '/doctor/messages' },
     { name: t('nav.performance'), href: '/doctor/performance' }
   ];
 

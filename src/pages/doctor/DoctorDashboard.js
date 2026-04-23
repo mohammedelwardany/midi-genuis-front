@@ -156,9 +156,9 @@ export default function DoctorDashboard() {
          </div>
 
          {/* Floating Chat Button */}
-         <button className="fixed bottom-8 end-8 bg-primary-600 hover:bg-primary-700 text-white p-4 rounded-2xl shadow-xl shadow-primary-600/30 transition-transform hover:-translate-y-1 z-50">
+         {/* <button className="fixed bottom-8 end-8 bg-primary-600 hover:bg-primary-700 text-white p-4 rounded-2xl shadow-xl shadow-primary-600/30 transition-transform hover:-translate-y-1 z-50">
             <MessageSquare className="w-6 h-6" />
-         </button>
+         </button> */}
 
       </div>
    )

@@ -20,10 +20,10 @@ export default function AppointmentDetails() {
             <Printer className="w-4 h-4 me-2" />
             {t('appointmentDetails.printSummary', { defaultValue: 'Print Summary' })}
           </button>
-          <button className="bg-primary-600 text-white hover:bg-primary-700 px-5 py-2 rounded-lg flex items-center font-bold transition-colors text-sm shadow-sm hover:shadow">
+          {/* <button className="bg-primary-600 text-white hover:bg-primary-700 px-5 py-2 rounded-lg flex items-center font-bold transition-colors text-sm shadow-sm hover:shadow">
             <MessageSquare className="w-4 h-4 me-2" />
             {t('appointmentDetails.contactClinic', { defaultValue: 'Contact Clinic' })}
-          </button>
+          </button> */}
         </div>
       </div>
 
