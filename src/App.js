@@ -59,24 +59,24 @@ function App() {
   const isRtl = i18n.language.startsWith('ar');
 
   const patientTitle = isRtl ? siteConfig.portals.patient.titleAr : siteConfig.portals.patient.title;
-  const doctorTitle  = isRtl ? siteConfig.portals.doctor.titleAr  : siteConfig.portals.doctor.title;
-  const adminTitle   = isRtl ? siteConfig.portals.admin.titleAr   : siteConfig.portals.admin.title;
+  const doctorTitle = isRtl ? siteConfig.portals.doctor.titleAr : siteConfig.portals.doctor.title;
+  const adminTitle = isRtl ? siteConfig.portals.admin.titleAr : siteConfig.portals.admin.title;
 
   const patientPortalTabs = [
     { name: t('nav.dashboard'), href: '/patient/dashboard' },
     { name: t('nav.bookVisit'), href: '/patient/book/doctors' },
-    { name: t('nav.bookingsHistory'), href: '/patient/bookings' },
+    // { name: t('nav.bookingsHistory'), href: '/patient/bookings' },
     { name: t('nav.records'), href: '/patient/records' },
     // { name: t('nav.messages'), href: '/patient/messages' },
-    { name: t('nav.billing'), href: '/patient/billing' }
+    // { name: t('nav.billing'), href: '/patient/billing' }
   ];
 
   const doctorPortalTabs = [
     { name: t('nav.dashboard'), href: '/doctor/dashboard' },
-    { name: t('nav.patients'), href: '/doctor/patients' },
+    // { name: t('nav.patients'), href: '/doctor/patients' },
     { name: t('nav.schedule'), href: '/doctor/schedule' },
     // { name: t('nav.messages'), href: '/doctor/messages' },
-    { name: t('nav.performance'), href: '/doctor/performance' }
+    // { name: t('nav.performance'), href: '/doctor/performance' }
   ];
 
   const adminPortalTabs = [
@@ -92,7 +92,7 @@ function App() {
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        
+
         {/* Patient Portal Main Layout */}
         <Route element={<PatientLayout title={patientTitle} tabs={patientPortalTabs} />}>
           <Route path="/patient/dashboard" element={<PatientDashboard />} />
@@ -108,10 +108,10 @@ function App() {
 
         {/* Patient Booking Flow Layout (Sidebar) */}
         <Route element={<SidebarLayout />}>
-          <Route path="/patient/book/schedule" element={<PickSchedule />} />
+          {/* <Route path="/patient/book/schedule" element={<PickSchedule />} />
           <Route path="/patient/book/patient" element={<PatientInfo />} />
           <Route path="/patient/book/payment" element={<FinalizePayment />} />
-          <Route path="/patient/book/confirm" element={<AppointmentConfirmed />} />
+          <Route path="/patient/book/confirm" element={<AppointmentConfirmed />} /> */}
         </Route>
 
         {/* Doctor Portal Main Layout */}
