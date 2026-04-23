@@ -126,7 +126,18 @@
     "doctorSingular": "طبيب",
     "patientSingular": "مريض",
     "genderMale": "ذكر",
-    "genderFemale": "أنثى"
+    "genderFemale": "أنثى",
+    "physicianSuccess": "تم إنشاء حساب الطبيب بنجاح!",
+    "patientSuccess": "تم إنشاء حساب المريض بنجاح!",
+    "failRegister": "فشل تسجيل {{type}}.",
+    "deleteConfirm": "هل أنت متأكد أنك تريد حذف هذا ال{{type}}؟",
+    "nameEnPlaceholder": "مثال: Dr. John Doe",
+    "nameArPlaceholder": "مثال: دكتور جون دو",
+    "emailPlaceholder": "example@medigenius.com",
+    "specializationPlaceholder": "مثال: أمراض القلب",
+    "experiencePlaceholder": "مثال: 10",
+    "bioPlaceholder": "نبذة تعريفية مختصرة...",
+    "phonePlaceholder": "012XXXXXXXX"
   },
   "doctorDashboard": {
     "title": "الملخص اليومي",
@@ -253,6 +264,10 @@
     "topRated": "الأعلى تقييماً"
   },
   "common": {
+    "all": "الكل",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "search": "بحث",
     "seeAll": "عرض الكل"
   },
   "pickSchedule": {

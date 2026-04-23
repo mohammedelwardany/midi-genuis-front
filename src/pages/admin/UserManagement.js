@@ -84,12 +84,12 @@ export default function UserManagement() {
           ...formData,
           experience_years: parseInt(formData.experience_years)
         })).unwrap();
-        toast.success('Physician account created successfully!');
+        toast.success(t('userManagement.physicianSuccess'));
       } else {
         await dispatch(addPatient({
           ...formData
         })).unwrap();
-        toast.success('Patient account created successfully!');
+        toast.success(t('userManagement.patientSuccess'));
       }
       
       setShowAddModal(false);
@@ -102,15 +102,15 @@ export default function UserManagement() {
       if (activeTab === 'doctors') dispatch(fetchDoctors());
       else dispatch(fetchPatients());
     } catch (err) {
-      toast.error(err?.message || `Failed to register ${activeTab === 'doctors' ? 'physician' : 'patient'}.`);
+      toast.error(err?.message || t('userManagement.failRegister', { type: activeTab === 'doctors' ? t('userManagement.doctorSingular') : t('userManagement.patientSingular') }));
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleDeleteItem = (id) => {
-    const type = activeTab === 'doctors' ? 'doctor' : 'patient';
-    if (window.confirm(`Are you sure you want to delete this ${type}?`)) {
+    const type = activeTab === 'doctors' ? t('userManagement.doctorSingular') : t('userManagement.patientSingular');
+    if (window.confirm(t('userManagement.deleteConfirm', { type }))) {
       if (activeTab === 'doctors') {
         dispatch(deleteDoctor(id));
       } else {
@@ -298,18 +298,18 @@ export default function UserManagement() {
                <div className="grid grid-cols-2 gap-4">
                  <div className="space-y-1.5">
                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('userManagement.thName')} (English)</label>
-                   <input type="text" value={formData.name_en} onChange={(e) => setFormData({...formData, name_en: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold" placeholder="Dr. John Doe" required />
+                   <input type="text" value={formData.name_en} onChange={(e) => setFormData({...formData, name_en: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold" placeholder={t('userManagement.nameEnPlaceholder')} required />
                  </div>
                  <div className="space-y-1.5">
                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('userManagement.thName')} (Arabic)</label>
-                   <input type="text" value={formData.name_ar} onChange={(e) => setFormData({...formData, name_ar: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold text-right" placeholder="دكتور جون دو" required />
+                   <input type="text" value={formData.name_ar} onChange={(e) => setFormData({...formData, name_ar: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold text-right" placeholder={t('userManagement.nameArPlaceholder')} required />
                  </div>
                </div>
 
                <div className="grid grid-cols-2 gap-4">
                  <div className="space-y-1.5">
                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('userManagement.thEmail')}</label>
-                   <input type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold" placeholder="doctor@medigenius.com" required />
+                   <input type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold" placeholder={t('userManagement.emailPlaceholder')} required />
                  </div>
                  <div className="space-y-1.5">
                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('userManagement.thPassword')}</label>
@@ -322,16 +322,16 @@ export default function UserManagement() {
                    <div className="grid grid-cols-2 gap-4">
                      <div className="space-y-1.5">
                        <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('userManagement.thSpecialization')}</label>
-                       <input type="text" value={formData.specialization} onChange={(e) => setFormData({...formData, specialization: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold" placeholder="Cardiology" required />
+                       <input type="text" value={formData.specialization} onChange={(e) => setFormData({...formData, specialization: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold" placeholder={t('userManagement.specializationPlaceholder')} required />
                      </div>
                      <div className="space-y-1.5">
                        <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('userManagement.thExperience')}</label>
-                       <input type="number" value={formData.experience_years} onChange={(e) => setFormData({...formData, experience_years: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold" placeholder="10" required />
+                       <input type="number" value={formData.experience_years} onChange={(e) => setFormData({...formData, experience_years: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold" placeholder={t('userManagement.experiencePlaceholder')} required />
                      </div>
                    </div>
                    <div className="space-y-1.5">
                      <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('userManagement.thBio')}</label>
-                     <textarea value={formData.bio} onChange={(e) => setFormData({...formData, bio: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold h-24" placeholder="Short biography..." required />
+                     <textarea value={formData.bio} onChange={(e) => setFormData({...formData, bio: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold h-24" placeholder={t('userManagement.bioPlaceholder')} required />
                    </div>
                  </>
                ) : (
@@ -339,7 +339,7 @@ export default function UserManagement() {
                    <div className="grid grid-cols-2 gap-4">
                      <div className="space-y-1.5">
                        <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('patientInfo.phoneNumber')}</label>
-                       <input type="text" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold" placeholder="012XXXXXXXX" required />
+                       <input type="text" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold" placeholder={t('userManagement.phonePlaceholder')} required />
                      </div>
                      <div className="space-y-1.5">
                        <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('userManagement.thDob')}</label>

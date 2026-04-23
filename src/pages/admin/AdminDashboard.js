@@ -43,7 +43,7 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-[0_2px_10px_rgb(0,0,0,0.02)] p-6">
+        <div className="lg:col-span-3 bg-white rounded-2xl border border-slate-100 shadow-[0_2px_10px_rgb(0,0,0,0.02)] p-6">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-extrabold text-slate-800">{t('adminDashboard.platformUtilization')}</h3>
             <select className="bg-slate-50 border-none text-sm font-bold text-slate-600 rounded-lg py-1.5 focus:ring-0">
@@ -66,38 +66,6 @@ export default function AdminDashboard() {
           <div className="flex justify-between mt-4 text-xs font-bold text-slate-400 capitalize">
             <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
           </div>
-        </div>
-
-        <div className="bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden flex flex-col">
-          <div className="absolute -end-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
-          <div className="absolute -start-10 -bottom-10 w-40 h-40 bg-indigo-400/20 rounded-full blur-2xl"></div>
-          
-          <div className="relative z-10 flex-1">
-            <h3 className="text-xl font-black mb-2 flex items-center gap-2">
-              <Activity className="w-5 h-5 text-indigo-300" /> {t('adminDashboard.systemStatusTitle')}
-            </h3>
-            <p className="text-indigo-200 text-sm font-medium mb-6">{t('adminDashboard.systemStatusDesc')}</p>
-            
-            <div className="space-y-4">
-              <div className="bg-white/10 rounded-xl p-4 border border-white/5 backdrop-blur-sm">
-                <div className="flex justify-between mb-1">
-                   <span className="text-xs font-bold text-indigo-100 uppercase tracking-wider">Database Load</span>
-                   <span className="text-xs font-bold text-white">42%</span>
-                </div>
-                <div className="w-full bg-white/20 rounded-full h-1.5"><div className="bg-emerald-400 h-1.5 rounded-full w-[42%]"></div></div>
-              </div>
-              <div className="bg-white/10 rounded-xl p-4 border border-white/5 backdrop-blur-sm">
-                <div className="flex justify-between mb-1">
-                   <span className="text-xs font-bold text-indigo-100 uppercase tracking-wider">Storage Capacity</span>
-                   <span className="text-xs font-bold text-white">88%</span>
-                </div>
-                <div className="w-full bg-white/20 rounded-full h-1.5"><div className="bg-amber-400 h-1.5 rounded-full w-[88%]"></div></div>
-              </div>
-            </div>
-          </div>
-          <button className="mt-6 bg-white text-indigo-900 w-full py-3 rounded-xl text-sm font-bold hover:bg-indigo-50 transition-colors z-10">
-            {t('adminDashboard.viewInfra')}
-          </button>
         </div>
       </div>
     </div>
