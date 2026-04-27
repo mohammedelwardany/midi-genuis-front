@@ -6,6 +6,7 @@ import { UserCircle, ClipboardList, ShieldCheck, ArrowLeft, ArrowRight, Info, Up
 import toast from 'react-hot-toast';
 import { selectCurrentUser } from '../store/slices/authSlice';
 import { fetchMyReports, uploadReport, selectMyReports, selectPatientsLoading } from '../store/slices/patientSlice';
+import { updateBookingDraft, selectBookingDraft } from '../store/slices/appointmentSlice';
 
 export default function PatientInfo() {
   const navigate = useNavigate();
@@ -16,24 +17,26 @@ export default function PatientInfo() {
   const user = useSelector(selectCurrentUser);
   const reports = useSelector(selectMyReports);
   const loading = useSelector(selectPatientsLoading);
+  const draft = useSelector(selectBookingDraft);
 
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    reason: '',
-    symptoms: '',
-    insuranceProvider: '',
-    policyNumber: '',
-    groupId: '',
+    firstName: draft.firstName || '',
+    lastName: draft.lastName || '',
+    email: draft.email || '',
+    phone: draft.phone || '',
+    reason: draft.reason || '',
+    symptoms: draft.symptoms || '',
+    insuranceProvider: draft.insuranceProvider || '',
+    policyNumber: draft.policyNumber || '',
+    groupId: draft.groupId || '',
   });
 
-  const [selectedReportIds, setSelectedReportIds] = useState([]);
+  const [selectedReportIds, setSelectedReportIds] = useState(draft.reports || []);
 
   useEffect(() => {
     dispatch(fetchMyReports());
-    if (user) {
+    // Auto-fill from user ONLY if draft fields are empty
+    if (user && !draft.firstName && !draft.email) {
       const names = (user.name_en || '').split(' ');
       setFormData(prev => ({
         ...prev,
@@ -43,12 +46,13 @@ export default function PatientInfo() {
         phone: user.phone || '',
       }));
     }
-  }, [user, dispatch]);
+  }, [user, dispatch, draft.firstName, draft.email]);
 
   const toggleReportSelection = (id) => {
-    setSelectedReportIds(prev => 
-      prev.includes(id) ? prev.filter(rid => rid !== id) : [...prev, id]
-    );
+    const newSelection = selectedReportIds.includes(id) 
+      ? selectedReportIds.filter(rid => rid !== id) 
+      : [...selectedReportIds, id];
+    setSelectedReportIds(newSelection);
   };
 
   const handleFileUpload = async (e) => {
@@ -143,9 +147,9 @@ export default function PatientInfo() {
                    className="w-full bg-slate-50 border-none rounded-xl px-4 py-3.5 text-slate-700 font-semibold focus:ring-2 focus:ring-primary-500 transition-shadow appearance-none text-sm cursor-pointer"
                  >
                     <option value="">{t('patientInfo.selectPrimaryConcern', { defaultValue: 'Select primary concern' })}</option>
-                    <option value="routine">Routine Checkup</option>
-                    <option value="followup">Follow-up Consultation</option>
-                    <option value="illness">New Illness/Symptom</option>
+                    <option value="routine">{t('patientInfo.routineCheckup', { defaultValue: 'Routine Checkup' })}</option>
+                    <option value="followup">{t('patientInfo.followupConsultation', { defaultValue: 'Follow-up Consultation' })}</option>
+                    <option value="illness">{t('patientInfo.newIllnessSymptom', { defaultValue: 'New Illness/Symptom' })}</option>
                  </select>
               </div>
               <div>
@@ -188,7 +192,7 @@ export default function PatientInfo() {
                       <span className="truncate max-w-[140px]">{report.file_name || report.file_url.split('/').pop()}</span>
                     </button>
                   ))}
-                  {reports?.length === 0 && <span className="text-xs font-medium text-slate-400">No records found.</span>}
+                  {reports?.length === 0 && <span className="text-xs font-medium text-slate-400">{t('patientDashboard.noRecords', { defaultValue: 'No records found.' })}</span>}
                 </div>
               </div>
 
@@ -212,7 +216,10 @@ export default function PatientInfo() {
               <ArrowLeft className="w-4 h-4 me-2" /> {t('patientInfo.backToSchedule', { defaultValue: 'Back to Schedule' })}
            </button>
            <button 
-             onClick={() => navigate('/patient/book/payment', { state: { ...formData, reports: selectedReportIds } })} 
+             onClick={() => {
+               dispatch(updateBookingDraft({ ...formData, reports: selectedReportIds }));
+               navigate('/patient/book/payment');
+             }} 
              className="bg-primary-600 hover:bg-primary-700 shadow-md shadow-primary-600/20 text-white font-bold py-3 px-8 rounded-xl transition-all hover:-translate-y-0.5 text-sm flex items-center"
            >
               {t('patientInfo.continueToPayment', { defaultValue: 'Continue to Payment' })} <ArrowRight className="w-4 h-4 ms-2" />

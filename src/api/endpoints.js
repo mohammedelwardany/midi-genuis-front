@@ -29,6 +29,7 @@ export const ENDPOINTS = {
     deleteMyReport: (id) => `/patients/deleteMyReport/${id}`,
     getPatientReports: (id) => `/patients/getPatientReports/${id}`,
     deletePatientReport: (pid, rid) => `/patients/deletePatientReport/${pid}/${rid}`,
+    getDoctorAvailability: (id) => `/patients/getDoctorAvailability/${id}`,
   },
 
   // ── Doctors ───────────────────────────────────────

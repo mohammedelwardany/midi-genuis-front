@@ -256,15 +256,17 @@
     "telehealthDescription": "استشر أفضل الأخصائيين من منزلك.",
     "learnMore": "اعرف المزيد",
     "availableSpecialists": "الأخصائيون المتاحون",
-    "showingCount": "عرض 128 طبيب قلب ضمن شبكتك.",
     "sortBy": "الترتيب حسب:",
     "highestRated": "الأعلى تقييماً",
     "nearestDate": "أقرب موعد",
     "nextAvailable": "أقرب توفر",
     "bookNow": "احجز الآن",
     "viewMoreSpecialists": "عرض المزيد من الأخصائيين",
+    "filters": "تصفية",
     "featuredSpecialists": "الأطباء المتميزون",
-    "topRated": "الأعلى تقييماً"
+    "topRated": "الأعلى تقييماً",
+    "featured": "مميز",
+    "showingCount": "عرض 128 طبيب قلب ضمن شبكتك."
   },
   "common": {
     "all": "الكل",
@@ -288,7 +290,19 @@
     "booked": "محجوز",
     "backToDoctors": "العودة للأطباء",
     "selectedSession": "الجلسة المحددة",
-    "continueToPatientInfo": "المتابعة إلى بيانات المريض"
+    "continueToPatientInfo": "المتابعة إلى بيانات المريض",
+    "bookingType": "نوع الحجز",
+    "consultation": "كشف",
+    "followup": "استشارة",
+    "morning": "صباحاً",
+    "afternoon": "ظهراً",
+    "evening": "مساءً",
+    "noSlots": "اختر تاريخاً لعرض الفترات المتاحة.",
+    "pickDate": "اختر تاريخاً",
+    "noAvailability": "لا يوجد توفر لهذا الطبيب في شهر {{month}}.",
+    "updatingSchedule": "جاري تحديث الجدول...",
+    "consultationEn": "Consultation",
+    "followupEn": "Follow-up"
   },
   "patientInfo": {
     "title": "بيانات المريض",
@@ -309,7 +323,12 @@
     "uploadPrompt": "انقر للرفع أو اسحب وأفلت",
     "backToSchedule": "العودة للجدولة",
     "continueToPayment": "المتابعة إلى الدفع",
-    "privacySecurity": "الخصوصية والأمان"
+    "privacySecurity": "الخصوصية والأمان",
+    "routineCheckup": "فحص روتيني",
+    "followupConsultation": "استشارة متابعة",
+    "newIllnessSymptom": "مرض جديد / عرض",
+    "uploadNewReport": "رفع تقرير جديد",
+    "selectExisting": "اختر من السجلات الموجودة"
   },
   "finalizePayment": {
     "secureTransaction": "عملية دفع آمنة",
@@ -521,7 +540,14 @@
     "thu": "الخميس",
     "fri": "الجمعة",
     "sat": "السبت",
-    "sun": "الأحد"
+    "sun": "الأحد",
+    "mon_short": "ن",
+    "tue_short": "ث",
+    "wed_short": "ر",
+    "thu_short": "خ",
+    "fri_short": "ج",
+    "sat_short": "س",
+    "sun_short": "ح"
   },
   "patientAdminProfile": {
     "title": "ملف المريض",

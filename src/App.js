@@ -108,10 +108,10 @@ function App() {
 
         {/* Patient Booking Flow Layout (Sidebar) */}
         <Route element={<SidebarLayout />}>
-          {/* <Route path="/patient/book/schedule" element={<PickSchedule />} />
+          <Route path="/patient/book/schedule/:id" element={<PickSchedule />} />
           <Route path="/patient/book/patient" element={<PatientInfo />} />
           <Route path="/patient/book/payment" element={<FinalizePayment />} />
-          <Route path="/patient/book/confirm" element={<AppointmentConfirmed />} /> */}
+          <Route path="/patient/book/confirm" element={<AppointmentConfirmed />} />
         </Route>
 
         {/* Doctor Portal Main Layout */}

@@ -51,6 +51,13 @@ async function request(method, endpoint, { body, params, headers: extraHeaders }
   }
 
   if (!response.ok) {
+    // Global 401 Logout
+    if (response.status === 401 && !url.includes('/auth/login')) {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_data');
+      window.location.href = '/login';
+    }
+
     // Throw structured error so Redux thunks can catch it
     const error = new Error(data?.message || `HTTP ${response.status}`);
     error.status = response.status;

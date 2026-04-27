@@ -256,6 +256,9 @@
     "telehealthDescription": "Consult with top specialists from the comfort of your home.",
     "learnMore": "Learn More",
     "availableSpecialists": "Available Specialists",
+    "filters": "Filters",
+    "featuredSpecialists": "Featured Specialists",
+    "topRated": "Top Rated",
     "showingCount": "Showing 128 cardiologists in your network.",
     "sortBy": "Sort by:",
     "highestRated": "Highest Rated",
@@ -279,7 +282,19 @@
     "booked": "Booked",
     "backToDoctors": "Back to Doctors",
     "selectedSession": "Selected Session",
-    "continueToPatientInfo": "Continue to Patient Info"
+    "continueToPatientInfo": "Continue to Patient Info",
+    "bookingType": "Booking Type",
+    "consultation": "Consultation",
+    "followup": "Follow-up",
+    "morning": "Morning",
+    "afternoon": "Afternoon",
+    "evening": "Evening",
+    "noSlots": "Select a date to view available slots.",
+    "pickDate": "Pick a date",
+    "noAvailability": "No availability found for this doctor in {{month}}.",
+    "updatingSchedule": "Updating Schedule...",
+    "consultationEn": "Consultation",
+    "followupEn": "Follow-up"
   },
   "patientInfo": {
     "title": "Patient Information",
@@ -300,7 +315,12 @@
     "uploadPrompt": "Click to upload or drag & drop",
     "backToSchedule": "Back to Schedule",
     "continueToPayment": "Continue to Payment",
-    "privacySecurity": "Privacy & Security"
+    "privacySecurity": "Privacy & Security",
+    "routineCheckup": "Routine Checkup",
+    "followupConsultation": "Follow-up Consultation",
+    "newIllnessSymptom": "New Illness/Symptom",
+    "uploadNewReport": "Upload New Report",
+    "selectExisting": "Select from existing records"
   },
   "finalizePayment": {
     "secureTransaction": "Secure Transaction",
@@ -512,7 +532,14 @@
     "thu": "Thursday",
     "fri": "Friday",
     "sat": "Saturday",
-    "sun": "Sunday"
+    "sun": "Sunday",
+    "mon_short": "Mon",
+    "tue_short": "Tue",
+    "wed_short": "Wed",
+    "thu_short": "Thu",
+    "fri_short": "Fri",
+    "sat_short": "Sat",
+    "sun_short": "Sun"
   },
   "common": {
     "all": "All",

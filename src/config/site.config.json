@@ -53,5 +53,9 @@
       "title": "MediGenius Admin Console",
       "titleAr": "لوحة إدارة MediGenius"
     }
+  },
+  "payment": {
+    "instapay": "medigenius@instapay",
+    "wallet": "01012345678"
   }
 }

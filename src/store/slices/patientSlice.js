@@ -153,34 +153,46 @@ export const deletePatientReport = createAsyncThunk(
   }
 );
 
+export const fetchDoctorAvailability = createAsyncThunk(
+  'patients/fetchDoctorAvailability',
+  async (doctorId, { rejectWithValue }) => {
+    try {
+      return await apiClient.get(ENDPOINTS.patients.getDoctorAvailability(doctorId));
+    } catch (err) {
+      return rejectWithValue({ message: err.message, status: err.status });
+    }
+  }
+);
+
 // ─── Slice ────────────────────────────────────────────────────────────────────
 
 const patientSlice = createSlice({
   name: 'patients',
   initialState: {
-    list:     [],
+    list: [],
     selected: null,
-    reports:  [],
-    total:    0,
-    loading:  false,
-    error:    null,
+    reports: [],
+    availability: [],
+    total: 0,
+    loading: false,
+    error: null,
   },
   reducers: {
     clearSelectedPatient: (state) => { state.selected = null; },
-    clearPatientError:    (state) => { state.error    = null; },
+    clearPatientError: (state) => { state.error = null; },
   },
   extraReducers: (builder) => {
     // ... basic patient CRUD ... (keeping existing logic implicit)
     builder
-      .addCase(fetchPatients.pending,   (s) => { s.loading = true; s.error = null; })
+      .addCase(fetchPatients.pending, (s) => { s.loading = true; s.error = null; })
       .addCase(fetchPatients.fulfilled, (s, { payload }) => {
         s.loading = false;
-        s.list    = payload.data  ?? payload;
-        s.total   = payload.total ?? (Array.isArray(payload) ? payload.length : 0);
+        s.list = payload.data ?? payload;
+        s.total = payload.total ?? (Array.isArray(payload) ? payload.length : 0);
       })
-      .addCase(fetchPatients.rejected,  (s, { payload }) => {
+      .addCase(fetchPatients.rejected, (s, { payload }) => {
         s.loading = false;
-        s.error   = payload?.message || 'Failed to load patients';
+        s.error = payload?.message || 'Failed to load patients';
       });
 
     builder
@@ -197,8 +209,8 @@ const patientSlice = createSlice({
     builder
       .addCase(updatePatient.fulfilled, (s, { payload }) => {
         const updated = payload.data ?? payload;
-        const uid     = updated.user_id || updated.id;
-        const idx     = s.list.findIndex(p => (p.user_id || p.id) === uid);
+        const uid = updated.user_id || updated.id;
+        const idx = s.list.findIndex(p => (p.user_id || p.id) === uid);
         if (idx !== -1) s.list[idx] = updated;
         if ((s.selected?.user_id || s.selected?.id) === uid) s.selected = updated;
       });
@@ -245,16 +257,29 @@ const patientSlice = createSlice({
       .addCase(deletePatientReport.fulfilled, (s, { payload }) => {
         s.reports = s.reports.filter(r => (r.id !== payload.reportId && r.report_id !== payload.reportId));
       });
+
+    builder
+      .addCase(fetchDoctorAvailability.pending, (s) => { s.loading = true; })
+      .addCase(fetchDoctorAvailability.fulfilled, (s, { payload }) => {
+        s.loading = false;
+        console.log("Doctor Availability", payload.data || payload);
+        s.availability = payload.data || payload;
+      })
+      .addCase(fetchDoctorAvailability.rejected, (s, { payload }) => {
+        s.loading = false;
+        s.error = payload?.message || 'Failed to fetch doctor availability';
+      });
   }
 });
 
 export const { clearSelectedPatient, clearPatientError } = patientSlice.actions;
 
 // Selectors
-export const selectPatients        = (state) => state.patients.list;
+export const selectPatients = (state) => state.patients.list;
 export const selectSelectedPatient = (state) => state.patients.selected;
-export const selectMyReports       = (state) => state.patients.reports;
+export const selectMyReports = (state) => state.patients.reports;
+export const selectDoctorAvailability = (state) => state.patients.availability;
 export const selectPatientsLoading = (state) => state.patients.loading;
-export const selectPatientsError   = (state) => state.patients.error;
+export const selectPatientsError = (state) => state.patients.error;
 
 export default patientSlice.reducer;

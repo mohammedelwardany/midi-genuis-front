@@ -48,10 +48,41 @@ const appointmentSlice = createSlice({
     total:    0,
     loading:  false,
     error:    null,
+    bookingDraft: {
+      doctorId: null,
+      selectedDate: null,
+      selectedSlot: null,
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      reason: '',
+      symptoms: '',
+      reports: [],
+      bookingType: 'consultation' // 'consultation' or 'followup'
+    }
   },
   reducers: {
     clearAppointmentError: (state) => { state.error    = null; },
     setSelectedAppt:       (state, action) => { state.selected = action.payload; },
+    updateBookingDraft:    (state, action) => { 
+      state.bookingDraft = { ...state.bookingDraft, ...action.payload }; 
+    },
+    clearBookingDraft:     (state) => { 
+      state.bookingDraft = {
+        doctorId: null,
+        selectedDate: null,
+        selectedSlot: null,
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        reason: '',
+        symptoms: '',
+        reports: [],
+        bookingType: 'consultation'
+      };
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -84,12 +115,13 @@ const appointmentSlice = createSlice({
   },
 });
 
-export const { clearAppointmentError, setSelectedAppt } = appointmentSlice.actions;
+export const { clearAppointmentError, setSelectedAppt, updateBookingDraft, clearBookingDraft } = appointmentSlice.actions;
 
 // Selectors
 export const selectAppointments        = (state) => state.appointments.list;
 export const selectSelectedAppt        = (state) => state.appointments.selected;
 export const selectAppointmentsLoading = (state) => state.appointments.loading;
 export const selectAppointmentsError   = (state) => state.appointments.error;
+export const selectBookingDraft        = (state) => state.appointments.bookingDraft;
 
 export default appointmentSlice.reducer;

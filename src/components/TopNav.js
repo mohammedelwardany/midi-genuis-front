@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Bell, Settings, User, Search, LogOut, CheckCircle, AlertTriangle, FileText } from 'lucide-react';
+import { Bell, Settings, User, Search, LogOut, CheckCircle, AlertTriangle, FileText, Menu } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { cn } from '../utils/cn';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { selectCurrentUser, logoutUser } from '../store/slices/authSlice';
 
-export default function TopNav({ title = "MediGenius Patient Portal", tabs = [], showSearch = false }) {
+export default function TopNav({ title = "MediGenius Patient Portal", tabs = [], showSearch = false, onMenuClick }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
@@ -45,22 +45,30 @@ export default function TopNav({ title = "MediGenius Patient Portal", tabs = [],
   }, []);
 
   return (
-    <header className="bg-white border-b border-gray-100 flex items-center justify-between px-6 h-16 w-full sticky top-0 z-50">
-      <div className="flex items-center gap-8">
+    <header className="bg-white border-b border-gray-100 flex items-center justify-between px-4 md:px-6 h-16 w-full sticky top-0 z-50">
+      <div className="flex items-center gap-2 md:gap-8">
+        {/* Mobile Menu Toggle */}
+        <button 
+          onClick={onMenuClick}
+          className="lg:hidden p-2 -ms-2 text-slate-500 hover:text-slate-800 transition-colors"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
+
         {/* Logo + Clinic Name */}
         <div className="flex items-center gap-2.5 shrink-0">
           <img
             src={siteConfig.clinic.logoUrl}
             alt={siteConfig.clinic.name}
-            className="h-8 w-auto object-contain"
+            className="h-7 md:h-8 w-auto object-contain"
             onError={(e) => { e.target.style.display = 'none'; }}
           />
-          <span className="text-[17px] font-bold text-primary-600 tracking-tight">
+          <span className="text-sm md:text-[17px] font-bold text-primary-600 tracking-tight hidden xs:block">
             {siteConfig.clinic.name}
           </span>
         </div>
         {tabs.length > 0 && (
-          <nav className="flex gap-6">
+          <nav className="hidden md:flex gap-6">
             {tabs.map((tab) => (
               <NavLink
                 key={tab.name}
@@ -116,12 +124,12 @@ export default function TopNav({ title = "MediGenius Patient Portal", tabs = [],
           </button>
 
           {showNotifications && (
-            <div className="absolute end-0 mt-3 w-80 bg-white border border-slate-100 shadow-lg shadow-slate-200/50 rounded-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
+            <div className="fixed md:absolute inset-x-4 md:inset-auto md:end-0 mt-3 md:w-80 bg-white border border-slate-100 shadow-xl md:shadow-lg shadow-slate-200/50 rounded-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 top-16 md:top-auto">
               <div className="flex justify-between items-center p-4 border-b border-slate-50 bg-slate-50/50">
                 <span className="font-bold text-slate-800 text-sm">{t('topNav.notifications')}</span>
                 <button className="text-[11px] font-bold text-primary-600 hover:text-primary-800">{t('topNav.markAllRead')}</button>
               </div>
-              <div className="max-h-80 overflow-y-auto divide-y divide-slate-50">
+              <div className="max-h-[calc(100vh-200px)] md:max-h-80 overflow-y-auto divide-y divide-slate-50">
                 <div className="p-4 hover:bg-slate-50 cursor-pointer transition-colors flex gap-3">
                   <div className="mt-0.5 bg-blue-50 text-blue-500 p-1.5 rounded-full shrink-0"><CheckCircle className="w-4 h-4" /></div>
                   <div>
@@ -172,7 +180,7 @@ export default function TopNav({ title = "MediGenius Patient Portal", tabs = [],
           </button>
 
           {showProfileMenu && (
-            <div className="absolute end-0 mt-3 w-56 bg-white border border-slate-100 shadow-lg shadow-slate-200/50 rounded-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
+            <div className="fixed md:absolute inset-x-4 md:inset-auto md:end-0 mt-3 md:w-56 bg-white border border-slate-100 shadow-xl md:shadow-lg shadow-slate-200/50 rounded-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 top-16 md:top-auto">
               <div className="p-4 border-b border-slate-50">
                 <div className="font-bold text-sm text-slate-900 truncate tracking-tight">
                   {i18n.language.startsWith('ar')
