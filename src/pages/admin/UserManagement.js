@@ -23,7 +23,7 @@ import {
 export default function UserManagement() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState('doctors');
   const [showAddModal, setShowAddModal] = useState(false);
   const [openMenuId, setOpenMenuId] = useState(null);
@@ -180,7 +180,7 @@ export default function UserManagement() {
                   className="ps-9 pe-8 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-slate-50 font-bold text-slate-600 appearance-none cursor-pointer"
                 >
                   {uniqueSpecializations.map(spec => (
-                    <option key={spec} value={spec}>{spec === 'All' ? t('common.all', { defaultValue: 'All' }) : spec}</option>
+                    <option key={spec} value={spec}>{spec === 'All' ? t('common.all', { defaultValue: 'All' }) : t('specializations.' + spec, { defaultValue: spec })}</option>
                   ))}
                 </select>
               </div>
@@ -213,16 +213,18 @@ export default function UserManagement() {
                      <td className="p-4 ps-6">
                         <div className="flex items-center gap-3">
                            <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm">
-                             {(user.name_en || user.name || 'U').charAt(0)}
+                             {(i18n.language.startsWith('ar') ? (user.name_ar || user.name_en || user.name || 'U') : (user.name_en || user.name || 'U')).charAt(0)}
                            </div>
                            <div>
-                              <p className="text-sm font-bold text-slate-800">{user.name_en || user.name}</p>
+                              <p className="text-sm font-bold text-slate-800">
+                                {i18n.language.startsWith('ar') ? (user.name_ar || user.name_en || user.name) : (user.name_en || user.name)}
+                              </p>
                               <p className="text-xs font-medium text-slate-500 flex items-center gap-1 mt-0.5"><Mail className="w-3 h-3" /> {user.email}</p>
                            </div>
                         </div>
                      </td>
                      <td className="p-4 text-sm font-medium text-slate-700">
-                         {activeTab === 'doctors' ? user.specialization : (user.date_of_birth || user.dob || '---')}
+                         {activeTab === 'doctors' ? t('specializations.' + user.specialization, { defaultValue: user.specialization }) : (user.date_of_birth || user.dob || '---')}
                      </td>
                      <td className="p-4 text-center">
                         <span className={cn(
