@@ -14,25 +14,12 @@ export default function ConfigureAvailability() {
 
    const [activeDays, setActiveDays] = useState(['mon', 'tue', 'wed', 'thu', 'fri']);
    const [excludedDates, setExcludedDates] = useState([]);
-   const [customizations, setCustomizations] = useState({}); // { [dateStr]: [slotIndices] }
-   const [editingDate, setEditingDate] = useState(null);
    const [isSaving, setIsSaving] = useState(false);
-   const [duration, setDuration] = useState('30m'); // '15m' | '30m' | '60m'
 
    const toggleExcludeDate = (dateStr) => {
       setExcludedDates(prev => 
          prev.includes(dateStr) ? prev.filter(d => d !== dateStr) : [...prev, dateStr]
       );
-   };
-
-   const toggleSlotCustomization = (dateStr, slotIndex) => {
-      setCustomizations(prev => {
-         const current = prev[dateStr] || [];
-         const updated = current.includes(slotIndex) 
-            ? current.filter(idx => idx !== slotIndex) 
-            : [...current, slotIndex];
-         return { ...prev, [dateStr]: updated };
-      });
    };
 
    const [formData, setFormData] = useState({
@@ -42,29 +29,11 @@ export default function ConfigureAvailability() {
 
    const [previewSlots, setPreviewSlots] = useState([]);
 
-   // Utility to generate slots
-   const generateSlots = (start, end, durMin) => {
-      const slots = [];
-      let current = new Date(`2000-01-01T${start}:00`);
-      const stop = new Date(`2000-01-01T${end}:00`);
-
-      while (current < stop) {
-         const slotStart = current.toTimeString().slice(0, 5);
-         current.setMinutes(current.getMinutes() + durMin);
-         if (current > stop) break;
-         const slotEnd = current.toTimeString().slice(0, 5);
-         slots.push({ start: slotStart, end: slotEnd });
-      }
-      return slots;
-   };
-
-   const durValue = parseInt(duration); // 15, 30, 60
-
    useEffect(() => {
       if (formData.start_time && formData.end_time) {
-         setPreviewSlots(generateSlots(formData.start_time, formData.end_time, durValue));
+         setPreviewSlots([{ start: formData.start_time, end: formData.end_time }]);
       }
-   }, [formData.start_time, formData.end_time, duration]);
+   }, [formData.start_time, formData.end_time]);
 
    const toggleDay = (day) => {
       setActiveDays(prev =>
@@ -82,8 +51,7 @@ export default function ConfigureAvailability() {
          const ds = d.toISOString().split('T')[0];
          const dn = dayMapping[d.getDay()];
          if (activeDays.includes(dn) && !excludedDates.includes(ds)) {
-            const dayCustoms = customizations[ds] || [];
-            total += Math.max(0, previewSlots.length - dayCustoms.length);
+            total += 1;
          }
       }
       return total;
@@ -92,11 +60,6 @@ export default function ConfigureAvailability() {
    const handleSave = async () => {
       if (activeDays.length === 0) {
          toast.error('Please select at least one active day');
-         return;
-      }
-
-      if (previewSlots.length === 0) {
-         toast.error('Invalid time range or duration');
          return;
       }
 
@@ -118,34 +81,27 @@ export default function ConfigureAvailability() {
             const dateStr = currentDate.toISOString().split('T')[0];
             
             if (activeDays.includes(dayName) && !excludedDates.includes(dateStr)) {
-               const dayCustoms = customizations[dateStr] || [];
-               previewSlots.forEach((slot, idx) => {
-                  if (!dayCustoms.includes(idx)) {
-                     allSlotsToCreate.push({
-                        available_date: dateStr,
-                        start_time: slot.start,
-                        end_time: slot.end
-                     });
-                  }
+               allSlotsToCreate.push({
+                  available_date: dateStr,
+                  start_time: formData.start_time,
+                  end_time: formData.end_time
                });
             }
          }
 
          if (allSlotsToCreate.length === 0) {
-            toast.error('No slots generated for the selected days');
+            toast.error('No availability blocks generated for the selected days');
             setIsSaving(false);
             return;
          }
 
-         toast.loading(`Generating ${allSlotsToCreate.length} slots for the next month...`, { id: 'bulk-add' });
+         toast.loading(`Generating ${allSlotsToCreate.length} availability blocks for the next month...`, { id: 'bulk-add' });
 
-         // Chunk requests to avoid overwhelming the server if needed, 
-         // but for now we'll do them all since we want every day handled.
          await Promise.all(allSlotsToCreate.map(slotData => 
             dispatch(addAvailability(slotData)).unwrap()
          ));
 
-         toast.success(`Successfully configured ${allSlotsToCreate.length} slots for the month`, { id: 'bulk-add' });
+         toast.success(`Successfully configured ${allSlotsToCreate.length} availability blocks for the month`, { id: 'bulk-add' });
          navigate('/doctor/schedule');
       } catch (err) {
          toast.error(err?.message || 'Failed to save availability', { id: 'bulk-add' });
@@ -165,7 +121,7 @@ export default function ConfigureAvailability() {
          <div className="mb-10">
             <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-3">{t('doctorConfigureAvailability.title', { defaultValue: 'Configure Availability' })}</h2>
             <p className="text-[16px] font-medium text-slate-500 leading-relaxed max-w-3xl">
-               {t('doctorConfigureAvailability.description', { defaultValue: 'Define your weekly clinic hours, consultation durations, and operational locations. This schedule will be visible to patients and triage coordinators.' })}
+               {t('doctorConfigureAvailability.description', { defaultValue: 'Define your weekly clinic hours and operational locations. This schedule will be visible to patients and triage coordinators.' })}
             </p>
          </div>
 
@@ -227,23 +183,6 @@ export default function ConfigureAvailability() {
                      </div>
 
                      {/* Duration Selection */}
-                     <div>
-                        <label className="block text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-3">{t('doctorConfigureAvailability.consultationDuration', { defaultValue: 'Consultation Duration' })}</label>
-                        <div className="flex gap-4">
-                           {[
-                              { id: '15m', label: t('doctorConfigureAvailability.min15', { defaultValue: '15 Min' }) },
-                              { id: '30m', label: t('doctorConfigureAvailability.min30', { defaultValue: '30 Min' }) },
-                              { id: '60m', label: t('doctorConfigureAvailability.min60', { defaultValue: '60 Min' }) }
-                           ].map((item) => (
-                              <button
-                                 key={item.id}
-                                 onClick={() => setDuration(item.id)}
-                                 className={`flex-1 py-4 font-bold rounded-2xl text-[15px] transition-all duration-300 ${duration === item.id ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/20' : 'bg-slate-50 text-slate-600 hover:bg-slate-100'}`}>
-                                 {item.label}
-                              </button>
-                           ))}
-                        </div>
-                     </div>
                   </div>
                </div>
 
@@ -317,13 +256,12 @@ export default function ConfigureAvailability() {
 
                      if (activeDays.includes(dayName)) {
                         const isExcluded = excludedDates.includes(dateStr);
-                        const dayCustoms = customizations[dateStr] || [];
                         const locale = i18n.language === 'ar' ? 'ar-EG' : 'en-US';
 
                         return (
                            <button
                               key={i}
-                              onClick={() => setEditingDate(date)}
+                              onClick={() => toggleExcludeDate(dateStr)}
                               className={`group relative text-start transition-all duration-300 border rounded-2xl p-4 overflow-hidden ${isExcluded
                                     ? 'bg-slate-50 border-slate-200 opacity-60'
                                     : 'bg-white border-slate-100 hover:border-primary-300 hover:shadow-xl hover:shadow-primary-600/5 hover:-translate-y-1'
@@ -344,7 +282,7 @@ export default function ConfigureAvailability() {
                                  <div className="mt-3 flex flex-wrap items-center gap-1.5">
                                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                                     <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wide">
-                                       {dayCustoms.length > 0 ? `${previewSlots.length - dayCustoms.length} Slots` : 'Full Day'}
+                                       Included
                                     </span>
                                  </div>
                               )}
@@ -357,79 +295,6 @@ export default function ConfigureAvailability() {
             </div>
 
             {/* Editing Modal */}
-            {editingDate && (
-               <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
-                  <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setEditingDate(null)}></div>
-                  <div className="relative w-full max-w-lg bg-white rounded-[32px] shadow-2xl animate-in zoom-in-95 fade-in duration-300 overflow-hidden border border-slate-100">
-                     {/* Modal Header */}
-                     <div className="p-8 border-b border-slate-50 bg-slate-50/50">
-                        <div className="flex justify-between items-start mb-6">
-                           <div>
-                              <div className="text-[11px] font-black text-primary-600 uppercase tracking-widest mb-1">{editingDate.toLocaleDateString(i18n.language === 'ar' ? 'ar-EG' : 'en-US', { weekday: 'long' })}</div>
-                              <h3 className="text-3xl font-black text-slate-900 tracking-tight">{editingDate.toLocaleDateString(i18n.language === 'ar' ? 'ar-EG' : 'en-US', { month: 'long', day: 'numeric' })}</h3>
-                           </div>
-                           <button onClick={() => setEditingDate(null)} className="w-10 h-10 rounded-full hover:bg-slate-200 transition-colors flex items-center justify-center text-slate-400">
-                              <ArrowLeft className="w-5 h-5 rotate-180" />
-                           </button>
-                        </div>
-
-                        {/* Whole Day Toggle */}
-                        <div 
-                           onClick={() => toggleExcludeDate(editingDate.toISOString().split('T')[0])}
-                           className={`p-4 rounded-2xl flex items-center justify-between cursor-pointer transition-all border-2 ${excludedDates.includes(editingDate.toISOString().split('T')[0]) ? 'bg-slate-100 border-transparent opactity-70' : 'bg-primary-50/50 border-primary-100'}`}>
-                           <div className="flex items-center gap-3">
-                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${excludedDates.includes(editingDate.toISOString().split('T')[0]) ? 'bg-slate-200 text-slate-500' : 'bg-primary-600 text-white shadow-md'}`}>
-                                 <Calendar className="w-5 h-5" />
-                              </div>
-                              <div>
-                                 <div className="font-black text-slate-900 text-sm">Include this Day</div>
-                                 <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Global Generation for this Date</div>
-                              </div>
-                           </div>
-                           <div className={`w-12 h-6 rounded-full transition-all relative ${!excludedDates.includes(editingDate.toISOString().split('T')[0]) ? 'bg-primary-600' : 'bg-slate-300'}`}>
-                              <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${!excludedDates.includes(editingDate.toISOString().split('T')[0]) ? 'left-7' : 'left-1'}`}></div>
-                           </div>
-                        </div>
-                     </div>
-
-                     {/* Slots List */}
-                     <div className={`p-8 max-h-[400px] overflow-y-auto custom-scrollbar transition-opacity duration-300 ${excludedDates.includes(editingDate.toISOString().split('T')[0]) ? 'opacity-30 pointer-events-none grayscale' : 'opacity-100'}`}>
-                        <div className="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-4">Availability for this day</div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                           {previewSlots.map((slot, idx) => {
-                              const isSlotDisabled = (customizations[editingDate.toISOString().split('T')[0]] || []).includes(idx);
-                              return (
-                                 <button
-                                    key={idx}
-                                    onClick={() => toggleSlotCustomization(editingDate.toISOString().split('T')[0], idx)}
-                                    className={`p-4 rounded-2xl border-2 text-start transition-all ${!isSlotDisabled ? 'bg-white border-slate-100 shadow-sm hover:border-primary-200' : 'bg-slate-50 border-transparent opacity-60'}`}>
-                                    <div className="flex items-center justify-between">
-                                       <span className={`font-black text-[15px] ${!isSlotDisabled ? 'text-slate-800' : 'text-slate-400'}`}>{slot.start} - {slot.end}</span>
-                                       <div className={`w-5 h-5 rounded-md flex items-center justify-center transition-all ${!isSlotDisabled ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-400'}`}>
-                                          {!isSlotDisabled ? <Check className="w-3 h-3" strokeWidth={4} /> : <div className="w-1.5 h-1.5 rounded-full bg-slate-400" />}
-                                       </div>
-                                    </div>
-                                    <div className={`text-[9px] font-bold uppercase tracking-widest mt-1 ${!isSlotDisabled ? 'text-emerald-600' : 'text-slate-400'}`}>
-                                       {!isSlotDisabled ? 'Available' : 'Disabled'}
-                                    </div>
-                                 </button>
-                              );
-                           })}
-                        </div>
-                     </div>
-
-                     {/* Modal Footer */}
-                     <div className="p-6 bg-slate-50 flex justify-center">
-                        <button 
-                           onClick={() => setEditingDate(null)}
-                           disabled={loading}
-                           className="bg-slate-900 text-white font-black text-[14px] px-10 py-3 rounded-2xl shadow-lg hover:-translate-y-1 transition-all active:scale-95 disabled:opacity-50">
-                           DONE
-                        </button>
-                     </div>
-                  </div>
-               </div>
-            )}
 
             {/* BOTTOM Operational Notes */}
             <div className="bg-white rounded-3xl p-8 shadow-[0_2px_12px_rgb(0,0,0,0.03)] border border-slate-100">

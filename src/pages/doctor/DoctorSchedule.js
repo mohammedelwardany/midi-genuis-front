@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
-import { Settings, Plus, LayoutGrid, List as ListIcon, Clock, MapPin, ChevronDown, Calendar, Loader2, ArrowLeft } from 'lucide-react';
+import { Settings, Plus, LayoutGrid, List as ListIcon, Clock, MapPin, ChevronDown, Calendar, Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { 
   fetchUpcomingAvailability, 
@@ -31,29 +31,13 @@ export default function DoctorSchedule() {
   const [newSlot, setNewSlot] = useState({
     available_date: new Date().toISOString().split('T')[0],
     start_time: '08:00',
-    end_time: '11:00',
-    duration: '30'
+    end_time: '11:00'
   });
 
   // Calculate grid position
   const getTimeInMinutes = (timeStr) => {
     const [h, m] = timeStr.split(':').map(Number);
     return h * 60 + m;
-  };
-
-  const generateSlots = (start, end, durMin) => {
-    const slots = [];
-    let current = new Date(`2000-01-01T${start}:00`);
-    const stop = new Date(`2000-01-01T${end}:00`);
-    
-    while (current < stop) {
-      const slotStart = current.toTimeString().slice(0, 5);
-      current.setMinutes(current.getMinutes() + parseInt(durMin));
-      if (current > stop) break;
-      const slotEnd = current.toTimeString().slice(0, 5);
-      slots.push({ start: slotStart, end: slotEnd });
-    }
-    return slots;
   };
 
   const GRID_START = 8 * 60; // 08:00
@@ -73,11 +57,50 @@ export default function DoctorSchedule() {
     };
   };
 
-  // Group schedule by day index (0=Sun, 1=Mon, ...)
+  const [currentWeekStart, setCurrentWeekStart] = useState(() => {
+    const today = new Date();
+    const day = today.getDay();
+    const diff = today.getDate() - day + (day === 0 ? -6 : 1); // Adjust to Monday
+    const monday = new Date(today.setDate(diff));
+    monday.setHours(0, 0, 0, 0);
+    return monday;
+  });
+
+  const getWeekDays = (start) => {
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      days.push(d);
+    }
+    return days;
+  };
+
+  const navigateWeek = (direction) => {
+    const newStart = new Date(currentWeekStart);
+    newStart.setDate(currentWeekStart.getDate() + (direction * 7));
+    setCurrentWeekStart(newStart);
+  };
+
+  const goToToday = () => {
+    const today = new Date();
+    const day = today.getDay();
+    const diff = today.getDate() - day + (day === 0 ? -6 : 1);
+    const monday = new Date(today.setDate(diff));
+    monday.setHours(0, 0, 0, 0);
+    setCurrentWeekStart(monday);
+  };
+
+  const formatDate = (date) => {
+    const d = new Date(date);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+
+  // Group schedule by exact local date string
   const groupedSchedule = schedule.reduce((acc, slot) => {
-    const day = new Date(slot.available_date).getDay();
-    if (!acc[day]) acc[day] = [];
-    acc[day].push(slot);
+    const dateStr = formatDate(slot.available_date);
+    if (!acc[dateStr]) acc[dateStr] = [];
+    acc[dateStr].push(slot);
     return acc;
   }, {});
 
@@ -91,21 +114,13 @@ export default function DoctorSchedule() {
   const handleAddSlot = async (e) => {
     if (e) e.preventDefault();
     try {
-      const slots = generateSlots(newSlot.start_time, newSlot.end_time, newSlot.duration);
-      if (slots.length === 0) {
-        toast.error('Invalid timeframe or duration');
-        return;
-      }
+      await dispatch(addAvailability({
+        available_date: newSlot.available_date,
+        start_time: newSlot.start_time,
+        end_time: newSlot.end_time
+      })).unwrap();
 
-      await Promise.all(slots.map(s => 
-        dispatch(addAvailability({
-          available_date: newSlot.available_date,
-          start_time: s.start,
-          end_time: s.end
-        })).unwrap()
-      ));
-
-      toast.success(`Generated ${slots.length} availability slots`);
+      toast.success(t('doctorSchedule.slotAdded', { defaultValue: 'Availability block added successfully' }));
       setShowAddModal(false);
       // Refresh list
       const doctorId = currentUser?.user_id || currentUser?.id;
@@ -125,7 +140,7 @@ export default function DoctorSchedule() {
              {view === 'grid' ? t('doctorSchedule.clinicalWorkHours') : t('doctorSchedule.weeklyWorkHours')}
            </h2>
            <p className="text-[15px] font-medium text-slate-500 max-w-xl">
-             {t('doctorSchedule.description', { defaultValue: 'Configure your standard clinical availability for patient consultations.' })}
+             {t('doctorConfigureAvailability.description', { defaultValue: 'Define your weekly clinic hours and operational locations. This schedule will be visible to patients and triage coordinators.' })}
            </p>
         </div>
         
@@ -157,18 +172,60 @@ export default function DoctorSchedule() {
             
             {view === 'grid' ? (
                /* Grid View Content */
-               <div className="p-4 overflow-x-auto">
-                 <div className="min-w-[700px]">
-                    {/* Grid Headers */}
-                    <div className="grid grid-cols-8 border-b border-slate-100 pb-4 mb-4 text-center">
-                       <div className="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest text-start ps-4 pt-2">Time</div>
-                       
-                       {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => (
-                          <div key={day} className="py-2">
-                             <div className="font-extrabold text-slate-900 text-sm">{day}</div>
-                          </div>
-                       ))}
-                    </div>
+                <div className="p-4">
+                  <div className="min-w-[750px]">
+                     {/* Calendar Navigation Header */}
+                     <div className="flex items-center justify-between mb-8 px-2">
+                        <div className="flex items-center gap-6">
+                           <div className="flex items-center gap-2">
+                              <button 
+                                onClick={() => navigateWeek(-1)}
+                                className="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-50 text-slate-600 hover:bg-slate-100 transition-colors border border-slate-100"
+                              >
+                                 <ArrowLeft className="w-5 h-5" />
+                              </button>
+                              <button 
+                                onClick={() => navigateWeek(1)}
+                                className="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-50 text-slate-600 hover:bg-slate-100 transition-colors border border-slate-100"
+                              >
+                                 <ArrowRight className="w-5 h-5" />
+                              </button>
+                           </div>
+                           <div>
+                              <h3 className="text-xl font-black text-slate-900 tracking-tight">
+                                 {currentWeekStart.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                              </h3>
+                              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
+                                 {currentWeekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(new Date(currentWeekStart).setDate(currentWeekStart.getDate() + 6)).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                              </div>
+                           </div>
+                        </div>
+                        <button 
+                          onClick={goToToday}
+                          className="px-5 py-2 text-xs font-bold bg-primary-50 text-primary-700 rounded-xl hover:bg-primary-100 transition-colors"
+                        >
+                           Today
+                        </button>
+                     </div>
+
+                     {/* Grid Headers */}
+                     <div className="grid grid-cols-8 border-b border-slate-100 pb-6 mb-4">
+                        <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest pt-2 ps-4">Time</div>
+                        
+                        {getWeekDays(currentWeekStart).map((date, i) => {
+                           const isToday = formatDate(new Date()) === formatDate(date);
+                           return (
+                              <div key={i} className="text-center group">
+                                 <div className={`text-[10px] font-black uppercase tracking-widest mb-1 transition-colors ${isToday ? 'text-primary-600' : 'text-slate-400'}`}>
+                                    {date.toLocaleDateString('en-US', { weekday: 'short' })}
+                                 </div>
+                                 <div className={`w-9 h-9 mx-auto flex items-center justify-center rounded-xl font-black text-lg transition-all ${isToday ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/20' : 'text-slate-800'}`}>
+                                    {date.getDate()}
+                                 </div>
+                              </div>
+                           );
+                        })}
+                     </div>
 
                     {/* Grid Body */}
                     <div className="relative h-[600px] grid grid-cols-8 px-4 gap-0 divide-x divide-slate-50/50">
@@ -181,24 +238,33 @@ export default function DoctorSchedule() {
                        </div>
 
                        {/* Days Mon-Sun */}
-                       {[1, 2, 3, 4, 5, 6, 0].map((dayIdx) => (
-                          <div key={dayIdx} className={`relative h-full flex flex-col border-l border-slate-100/50 group ${dayIdx === 0 || dayIdx === 6 ? 'bg-slate-50/30' : ''}`}>
-                             {[...Array(10)].map((_, i) => <div key={i} className="flex-1 border-t border-slate-100/50"></div>)}
-                             
-                                                           {groupedSchedule[dayIdx]?.map((slot, i) => (
-                                <div 
-                                  key={i}
-                                  title={`${slot.available_date}: ${slot.start_time} - ${slot.end_time}`}
-                                  style={{ ...getSlotStyle(slot.start_time, slot.end_time), height: "24px" }}
-                                  className="absolute start-0.5 end-0.5 bg-blue-100/90 rounded border-s-[3px] border-s-blue-600 px-1 hover:bg-blue-200 transition-all cursor-pointer overflow-hidden flex items-center justify-center group/slot"
-                                >
-                                   <div className="text-[10px] font-black text-blue-700 opacity-60 group-hover/slot:opacity-100 truncate">
-                                      {slot.start_time}
-                                   </div>
-                                </div>
-                              ))}
-                          </div>
-                       ))}
+                        {getWeekDays(currentWeekStart).map((date, idx) => {
+                           const dateStr = formatDate(date);
+                           const isToday = formatDate(new Date()) === dateStr;
+                           const daySlots = groupedSchedule[dateStr] || [];
+
+                           return (
+                              <div key={idx} className={`relative h-full flex flex-col border-l border-slate-100/50 group ${isToday ? 'bg-primary-50/10' : ''}`}>
+                                 {[...Array(10)].map((_, i) => <div key={i} className="flex-1 border-t border-slate-100/50"></div>)}
+                                 
+                                 {daySlots.map((slot, i) => (
+                                    <div 
+                                      key={i}
+                                      title={`${slot.available_date}: ${slot.start_time} - ${slot.end_time}`}
+                                      style={getSlotStyle(slot.start_time, slot.end_time)}
+                                      className="absolute start-1 end-1 bg-blue-50/90 border-s-4 border-s-blue-500 rounded-xl shadow-sm px-3 hover:bg-blue-100 transition-all cursor-pointer overflow-hidden flex flex-col justify-center group/slot"
+                                    >
+                                       <div className="text-[10px] font-black text-blue-700 leading-none mb-1">
+                                          {slot.start_time.substring(0, 5)} - {slot.end_time.substring(0, 5)}
+                                       </div>
+                                       <div className="text-[9px] font-bold text-blue-400 leading-none truncate">
+                                          Clinical Availability
+                                       </div>
+                                    </div>
+                                 ))}
+                              </div>
+                           );
+                        })}
                     </div>
                  </div>
                </div>
@@ -389,21 +455,6 @@ export default function DoctorSchedule() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-2">Duration per Slot</label>
-                <div className="flex gap-3">
-                  {['15', '30', '60'].map((dur) => (
-                    <button
-                      key={dur}
-                      type="button"
-                      onClick={() => setNewSlot({...newSlot, duration: dur})}
-                      className={`flex-1 py-3 font-bold rounded-xl text-sm transition-all ${newSlot.duration === dur ? 'bg-primary-600 text-white' : 'bg-slate-50 text-slate-600 hover:bg-slate-100'}`}
-                    >
-                      {dur} Min
-                    </button>
-                  ))}
-                </div>
-              </div>
 
               <div className="flex gap-3 pt-2">
                 <button 
@@ -415,7 +466,7 @@ export default function DoctorSchedule() {
                 </button>
                 <button 
                   type="submit"
-                  disabled={loading || generateSlots(newSlot.start_time, newSlot.end_time, newSlot.duration).length === 0}
+                  disabled={loading}
                   className="flex-1 px-6 py-3.5 bg-primary-600 text-white font-extrabold text-sm rounded-xl hover:bg-primary-700 shadow-md shadow-primary-600/20 flex items-center justify-center gap-2 disabled:opacity-70"
                 >
                   {loading && <Loader2 className="w-4 h-4 animate-spin" />}

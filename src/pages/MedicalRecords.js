@@ -43,6 +43,7 @@ export default function MedicalRecords() {
     try {
       toast.loading('Uploading document...', { id: 'upload-doc' });
       await dispatch(uploadReport(formData)).unwrap();
+      dispatch(fetchMyReports());
       toast.success('Document uploaded successfully', { id: 'upload-doc' });
       e.target.value = ''; // Reset input
     } catch (err) {
@@ -54,6 +55,7 @@ export default function MedicalRecords() {
     if (!window.confirm('Are you sure you want to delete this record?')) return;
     try {
       await dispatch(deleteMyReport(id)).unwrap();
+      dispatch(fetchMyReports());
       toast.success('Record deleted successfully');
     } catch (err) {
       toast.error(err?.message || 'Failed to delete record');

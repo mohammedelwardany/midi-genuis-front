@@ -263,7 +263,7 @@ export default function PickSchedule() {
                             onClick={() => setSelectedSlot(slot)}
                             className={`p-4 rounded-xl text-start border-2 transition-all ${selectedSlot === slot ? 'border-primary-600 bg-primary-600 shadow-md' : 'border-slate-100 hover:border-primary-500 bg-white'}`}
                           >
-                             <div className={`font-bold text-sm mb-1 ${selectedSlot === slot ? 'text-white' : 'text-slate-800'}`}>{slot.start_time}</div>
+                             <div className={`font-bold text-sm mb-1 ${selectedSlot === slot ? 'text-white' : 'text-slate-800'}`}>{slot.start_time} - {slot.end_time}</div>
                              <div className={`text-[10px] font-bold uppercase tracking-widest ${selectedSlot === slot ? 'text-primary-100' : 'text-primary-600'}`}>{t('pickSchedule.available', { defaultValue: 'Available' })}</div>
                           </button>
                         ))}
@@ -281,7 +281,7 @@ export default function PickSchedule() {
                             onClick={() => setSelectedSlot(slot)}
                             className={`p-4 rounded-xl text-start border-2 transition-all ${selectedSlot === slot ? 'border-primary-600 bg-primary-600 shadow-md' : 'border-slate-100 hover:border-primary-500 bg-white'}`}
                           >
-                             <div className={`font-bold text-sm mb-1 ${selectedSlot === slot ? 'text-white' : 'text-slate-800'}`}>{slot.start_time}</div>
+                             <div className={`font-bold text-sm mb-1 ${selectedSlot === slot ? 'text-white' : 'text-slate-800'}`}>{slot.start_time} - {slot.end_time}</div>
                              <div className={`text-[10px] font-bold uppercase tracking-widest ${selectedSlot === slot ? 'text-primary-100' : 'text-primary-600'}`}>{t('pickSchedule.available', { defaultValue: 'Available' })}</div>
                           </button>
                         ))}
@@ -299,7 +299,7 @@ export default function PickSchedule() {
                             onClick={() => setSelectedSlot(slot)}
                             className={`p-4 rounded-xl text-start border-2 transition-all ${selectedSlot === slot ? 'border-primary-600 bg-primary-600 shadow-md' : 'border-slate-100 hover:border-primary-500 bg-white'}`}
                           >
-                             <div className={`font-bold text-sm mb-1 ${selectedSlot === slot ? 'text-white' : 'text-slate-800'}`}>{slot.start_time}</div>
+                             <div className={`font-bold text-sm mb-1 ${selectedSlot === slot ? 'text-white' : 'text-slate-800'}`}>{slot.start_time} - {slot.end_time}</div>
                              <div className={`text-[10px] font-bold uppercase tracking-widest ${selectedSlot === slot ? 'text-primary-100' : 'text-primary-600'}`}>{t('pickSchedule.available', { defaultValue: 'Available' })}</div>
                           </button>
                         ))}
@@ -325,7 +325,7 @@ export default function PickSchedule() {
             {selectedSlot && (
               <div className="text-center sm:text-end">
                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">{t('pickSchedule.selectedSession', { defaultValue: 'Selected Session' })}</div>
-                 <div className="font-bold text-sm text-slate-900">{new Date(selectedDate).toLocaleDateString(i18n.language.startsWith('ar') ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric' })} at {selectedSlot.start_time}</div>
+                 <div className="font-bold text-sm text-slate-900">{new Date(selectedDate).toLocaleDateString(i18n.language.startsWith('ar') ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric' })} at {selectedSlot.start_time} - {selectedSlot.end_time}</div>
               </div>
             )}
             <button 

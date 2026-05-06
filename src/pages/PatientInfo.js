@@ -189,7 +189,7 @@ export default function PatientInfo() {
                       ) : (
                         <FileText className="w-4 h-4 opacity-50" />
                       )}
-                      <span className="truncate max-w-[140px]">{report.file_name || report.file_url.split('/').pop()}</span>
+                      <span className="truncate max-w-[140px]">{report.file_name || (report.file_url ? report.file_url.split('/').pop() : 'Report')}</span>
                     </button>
                   ))}
                   {reports?.length === 0 && <span className="text-xs font-medium text-slate-400">{t('patientDashboard.noRecords', { defaultValue: 'No records found.' })}</span>}
