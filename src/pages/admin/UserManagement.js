@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { UserPlus, User, Search, Filter, MoreVertical, Mail, AlertCircle, CheckCircle2, Trash2, Edit, Loader2 } from 'lucide-react';
+import { UserPlus, User, Search, Filter, MoreVertical, Mail, AlertCircle, CheckCircle2, Trash2, Edit, Loader2, Calendar, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { cn } from '../../utils/cn';
@@ -250,7 +250,7 @@ export default function UserManagement() {
                         </button>
                         
                          {openMenuId && (openMenuId === (user.id || user.user_id)) && (
-                          <div className="absolute right-6 top-12 bg-white border border-slate-100 shadow-xl rounded-xl py-2 z-100 min-w-[140px] animate-in fade-in zoom-in-95 duration-200">
+                          <div className="absolute right-6 top-12 bg-white border border-slate-100 shadow-xl rounded-xl py-2 z-[100] min-w-[140px] animate-in fade-in zoom-in-95 duration-200">
                             {activeTab === 'patients' ? (
                               <button 
                                 onClick={() => navigate(`/admin/patients/${user.user_id || user.id}`)}
@@ -259,11 +259,28 @@ export default function UserManagement() {
                                 <User className="w-3.5 h-3.5" /> {t('userManagement.viewProfile')}
                               </button>
                             ) : (
+                              <>
+                                <button 
+                                  onClick={() => navigate(`/admin/doctors/edit/${user.user_id || user.id}`)}
+                                  className="w-full flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                                >
+                                  <Edit className="w-3.5 h-3.5" /> {t('userManagement.editDoctor')}
+                                </button>
+                                <button 
+                                  onClick={() => navigate(`/admin/doctors/availability/${user.user_id || user.id}`)}
+                                  className="w-full flex items-center gap-2 px-4 py-2 text-xs font-bold text-indigo-600 hover:bg-indigo-50 transition-colors"
+                                >
+                                  <Calendar className="w-3.5 h-3.5" /> {t('userManagement.setAvailability', { defaultValue: 'Set Availability' })}
+                                </button>
+                              </>
+                            )}
+
+                            {activeTab === 'patients' && (
                               <button 
-                                onClick={() => navigate(`/admin/doctors/edit/${user.user_id || user.id}`)}
-                                className="w-full flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                                onClick={() => navigate(`/admin/book-for-patient/${user.user_id || user.id}`)}
+                                className="w-full flex items-center gap-2 px-4 py-2 text-xs font-bold text-emerald-600 hover:bg-emerald-50 transition-colors"
                               >
-                                <Edit className="w-3.5 h-3.5" /> {t('userManagement.editDoctor')}
+                                <Plus className="w-3.5 h-3.5" /> {t('userManagement.bookVisit', { defaultValue: 'Book Visit' })}
                               </button>
                             )}
                             

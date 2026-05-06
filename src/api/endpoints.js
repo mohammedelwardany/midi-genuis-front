@@ -56,8 +56,6 @@ export const ENDPOINTS = {
 
   // ── Admin ─────────────────────────────────────────
   admin: {
-    users: '/admin/users',
-    userById: (id) => `/admin/users/${id}`,
     stats: '/admin/stats',
     settings: '/admin/settings',
   },

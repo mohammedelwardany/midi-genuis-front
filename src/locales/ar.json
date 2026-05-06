@@ -91,6 +91,11 @@
     "storage": "سعة التخزين",
     "viewInfra": "عرض البنية التحتية"
   },
+  "admin": {
+    "manageAvailability": "إدارة توافر الأخصائيين",
+    "bookForPatient": "حجز إداري",
+    "selectDoctor": "اختر الطبيب"
+  },
   "userManagement": {
     "title": "إدارة المستخدمين",
     "desc": "إدارة الوصول، الأدوار، وملفات التعريف.",
@@ -137,7 +142,9 @@
     "specializationPlaceholder": "مثال: أمراض القلب",
     "experiencePlaceholder": "مثال: 10",
     "bioPlaceholder": "نبذة تعريفية مختصرة...",
-    "phonePlaceholder": "012XXXXXXXX"
+    "phonePlaceholder": "012XXXXXXXX",
+    "setAvailability": "تحديد التوافر",
+    "bookVisit": "حجز موعد"
   },
   "doctorDashboard": {
     "title": "الملخص اليومي",
@@ -331,26 +338,29 @@
     "selectExisting": "اختر من السجلات الموجودة"
   },
   "finalizePayment": {
-    "secureTransaction": "عملية دفع آمنة",
-    "title": "إتمام الدفع",
-    "completeBookingFor": "أكمل الحجز لـ",
-    "specialistConsultation": "استشارة اختصاصي",
-    "payWithApplePay": "الدفع عبر Apple Pay",
-    "instantBankTransfer": "تحويل بنكي فوري",
-    "orPayByCard": "أو ادفع بالبطاقة",
-    "cardholderName": "اسم حامل البطاقة",
-    "cardNumber": "رقم البطاقة",
-    "expiryDate": "تاريخ الانتهاء",
-    "cvv": "CVV / CVC",
+    "secureBooking": "حجز موعد آمن",
+    "title": "تأكيد موعدك",
+    "instruction": "يرجى مراجعة تفاصيل الحجز أدناه. بمجرد التأكيد، سيتم جدولة موعدك فوراً.",
+    "uploadScreenshot": "رفع صورة معاملة الدفع",
+    "confirmBooking": "تأكيد وحجز الموعد",
+    "waitingForUpload": "جاري الرفع...",
+    "manualApproval": "يتطلب موافقة يدوية",
+    "manualApprovalNotice": "سيتم تأكيد موعدك بمجرد مراجعة الإدارة لصورة الدفع.",
     "bookingSummary": "ملخص الحجز",
+    "specialistConsultation": "استشارة اختصاصي",
     "consultationFee": "رسوم الاستشارة",
-    "clinicFacilityCharge": "رسوم مرافق العيادة",
-    "serviceTax": "ضريبة الخدمة (4%)",
-    "totalAmount": "إجمالي المبلغ",
-    "completePayment": "إكمال الدفع",
-    "needHelp": "تحتاج مساعدة؟",
-    "concierge": "فريق الدعم متاح 24/7",
-    "chat": "دردشة"
+    "readyToBook": "هل أنت جاهز للإتمام؟",
+    "toastSuccess": "تم حجز الموعد بنجاح!",
+    "toastError": "فشل حجز الموعد",
+    "changeImage": "انقر لتغيير الصورة",
+    "clickToUpload": "انقر أو اسحب للرفع",
+    "secureTransaction": "عملية دفع آمنة",
+    "errorMissingInfo": "بيانات الحجز ناقصة",
+    "toastUploading": "جاري رفع إثبات الدفع...",
+    "toastUploadSuccess": "تم رفع إثبات الدفع بنجاح",
+    "errorNoRefId": "نجح الرفع ولكن فشل الحصول على رقم المرجع",
+    "errorUploadFail": "فشل رفع صورة الدفع",
+    "instantConfirmation": "تأكيد فوري"
   },
   "appointmentConfirmed": {
     "title": "تم تأكيد الموعد!",
@@ -367,6 +377,8 @@
     "labServices": "خدمات المختبر",
     "totalAmountPaid": "إجمالي المبلغ المدفوع",
     "clinicalGuidance": "إرشادات العيادة",
+    "guidance1": "يرجى الحضور قبل الموعد بـ 15 دقيقة لإجراء الفحوصات الحيوية وإنهاء إجراءات الدخول.",
+    "guidance2": "يرجى إحضار جميع الأدوية الحالية أو قائمة رقمية ليقوم الطبيب بمراجعتها.",
     "scheduleAnother": "جدولة موعد آخر",
     "returnToDashboard": "العودة للوحة التحكم"
   },
@@ -449,11 +461,25 @@
     "listView": "عرض القائمة",
     "updateChanges": "تحديث التغييرات",
     "quickAddBlocks": "إضافة سريعة للفترات",
+    "addAvailability": "إضافة توافر",
     "clinicalHours": "مواعيد العيادة",
     "clinicalSettings": "إعدادات العيادة",
     "notePrepBuffer": "وقت تحضير الملاحظات",
     "autoConfirmClinical": "تأكيد طبي تلقائي",
-    "clinicalCapacity": "سعة العيادة"
+    "clinicalCapacity": "سعة العيادة",
+    "time": "الوقت",
+    "available": "متاح",
+    "day": "اليوم",
+    "status": "الحالة",
+    "action": "إجراء",
+    "remove": "إزالة",
+    "noAvailabilityFound": "لم يتم جدولة أي توافر بعد",
+    "availableDate": "تاريخ التوفر",
+    "startTime": "وقت البدء",
+    "endTime": "وقت الانتهاء",
+    "confirm": "تأكيد",
+    "loading": "جاري التحميل...",
+    "medicalSpecialist": "أخصائي طبي"
   },
   "doctorConfigureAvailability": {
     "backToSchedule": "العودة للجدول",
@@ -599,5 +625,30 @@
     "editModalSubtitle": "تحديث بيانات الهوية الطبية",
     "saveChanges": "حفظ التغييرات",
     "uploadedOn": "تم الرفع في"
+  },
+  "adminBookVisit": {
+    "bookingFor": "الحجز لـ:",
+    "searchPlaceholder": "البحث باسم الطبيب...",
+    "loadingSpecialists": "جاري تحميل دليل الأخصائيين...",
+    "backToDoctors": "العودة لاختيار الطبيب",
+    "step2Title": "اختر موعداً متاحاً",
+    "pickDate": "اختر تاريخاً",
+    "selectedDoctor": "الطبيب المختار",
+    "availableSlotsFor": "الفترات المتاحة لتاريخ {{date}}",
+    "noSlotsFound": "لا توجد فترات متاحة لهذا التاريخ",
+    "continueToConfirm": "المتابعة للتأكيد",
+    "finalConfirmation": "التأكيد النهائي",
+    "reviewDetails": "يرجى مراجعة تفاصيل الموعد قبل التأكيد النهائي.",
+    "patient": "المريض",
+    "doctor": "الطبيب",
+    "date": "التاريخ",
+    "timeSlot": "الفترة الزمنية",
+    "goBack": "الرجوع",
+    "confirmSchedule": "التأكيد والجدولة",
+    "successToast": "تم حجز وتأكيد الموعد بنجاح!",
+    "errorToast": "فشل حجز الموعد",
+    "step1": "الخطوة 1: اختر الطبيب",
+    "step2": "الخطوة 2: اختر موعداً متاحاً",
+    "step3": "الخطوة 3: التأكيد النهائي"
   }
 }

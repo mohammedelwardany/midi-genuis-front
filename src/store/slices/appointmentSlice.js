@@ -50,6 +50,9 @@ const appointmentSlice = createSlice({
     error:    null,
     bookingDraft: {
       doctorId: null,
+      doctorName: null,
+      doctorSpecialization: null,
+      doctorAvatar: null,
       selectedDate: null,
       selectedSlot: null,
       firstName: '',
@@ -71,6 +74,9 @@ const appointmentSlice = createSlice({
     clearBookingDraft:     (state) => { 
       state.bookingDraft = {
         doctorId: null,
+        doctorName: null,
+        doctorSpecialization: null,
+        doctorAvatar: null,
         selectedDate: null,
         selectedSlot: null,
         firstName: '',

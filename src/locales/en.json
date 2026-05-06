@@ -91,6 +91,11 @@
     "storage": "Storage Capacity",
     "viewInfra": "View Infrastructure"
   },
+  "admin": {
+    "manageAvailability": "Manage Clinician Availability",
+    "bookForPatient": "Admin Booking",
+    "selectDoctor": "Select a Doctor"
+  },
   "userManagement": {
     "title": "User Management",
     "desc": "Manage platform access, roles, and user profiles.",
@@ -137,7 +142,9 @@
     "specializationPlaceholder": "e.g. Cardiology",
     "experiencePlaceholder": "e.g. 10",
     "bioPlaceholder": "Short biography...",
-    "phonePlaceholder": "012XXXXXXXX"
+    "phonePlaceholder": "012XXXXXXXX",
+    "setAvailability": "Set Availability",
+    "bookVisit": "Book Visit"
   },
   "doctorDashboard": {
     "title": "Daily Overview",
@@ -323,26 +330,29 @@
     "selectExisting": "Select from existing records"
   },
   "finalizePayment": {
-    "secureTransaction": "Secure Transaction",
-    "title": "Finalize Payment",
-    "completeBookingFor": "Complete your booking for",
-    "specialistConsultation": "Specialist Consultation",
-    "payWithApplePay": "Pay with Apple Pay",
-    "instantBankTransfer": "Instant Bank Transfer",
-    "orPayByCard": "Or pay by card",
-    "cardholderName": "Cardholder Name",
-    "cardNumber": "Card Number",
-    "expiryDate": "Expiry Date",
-    "cvv": "CVV / CVC",
+    "secureBooking": "Secure Appointment Booking",
+    "title": "Confirm Your Appointment",
+    "instruction": "Please review your booking details below. Once confirmed, your appointment will be scheduled immediately.",
+    "uploadScreenshot": "Upload Transaction Screenshot",
+    "confirmBooking": "Confirm & Book Appointment",
+    "waitingForUpload": "Waiting for upload...",
+    "manualApproval": "Manual Approval Required",
+    "manualApprovalNotice": "Your appointment will be confirmed once the administration verifies your payment screenshot.",
     "bookingSummary": "Booking Summary",
+    "specialistConsultation": "Specialist Consultation",
     "consultationFee": "Consultation Fee",
-    "clinicFacilityCharge": "Clinic Facility Charge",
-    "serviceTax": "Service Tax (4%)",
-    "totalAmount": "Total Amount",
-    "completePayment": "Complete Payment",
-    "needHelp": "Need help?",
-    "concierge": "Our concierge is available 24/7",
-    "chat": "Chat"
+    "readyToBook": "Ready to finalize?",
+    "toastSuccess": "Appointment booked successfully!",
+    "toastError": "Failed to book appointment",
+    "changeImage": "Tap to Change Image",
+    "clickToUpload": "Click or drag to upload",
+    "secureTransaction": "Secure Transaction",
+    "errorMissingInfo": "Missing booking information",
+    "toastUploading": "Uploading payment proof...",
+    "toastUploadSuccess": "Payment proof uploaded successfully",
+    "errorNoRefId": "Upload succeeded but failed to get reference ID",
+    "errorUploadFail": "Failed to upload screenshot",
+    "instantConfirmation": "Instant Confirmation"
   },
   "appointmentConfirmed": {
     "title": "Appointment Confirmed!",
@@ -359,6 +369,8 @@
     "labServices": "Lab Services",
     "totalAmountPaid": "Total Amount Paid",
     "clinicalGuidance": "Clinical Guidance",
+    "guidance1": "Please arrive 15 minutes early for vital checks and check-in documentation.",
+    "guidance2": "Bring all current medications or a digital list for the doctor to review.",
     "scheduleAnother": "Schedule Another Appointment",
     "returnToDashboard": "Return to Dashboard"
   },
@@ -441,11 +453,25 @@
     "listView": "List View",
     "updateChanges": "Update Changes",
     "quickAddBlocks": "Quick Add Blocks",
+    "addAvailability": "Add Availability",
     "clinicalHours": "Clinical Hours",
     "clinicalSettings": "Clinical Settings",
     "notePrepBuffer": "Note Prep Buffer",
     "autoConfirmClinical": "Auto-Confirm Clinical",
-    "clinicalCapacity": "Clinical Capacity"
+    "clinicalCapacity": "Clinical Capacity",
+    "time": "Time",
+    "available": "Available",
+    "day": "Day",
+    "status": "Status",
+    "action": "Action",
+    "remove": "Remove",
+    "noAvailabilityFound": "No availability scheduled yet",
+    "availableDate": "Available Date",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "confirm": "Confirm",
+    "loading": "Loading...",
+    "medicalSpecialist": "Medical Specialist"
   },
   "doctorConfigureAvailability": {
     "backToSchedule": "Back to Schedule",
@@ -598,5 +624,30 @@
     "editModalSubtitle": "Update clinical identity information",
     "saveChanges": "Save Changes",
     "uploadedOn": "Uploaded on"
+  },
+  "adminBookVisit": {
+    "bookingFor": "Booking for:",
+    "searchPlaceholder": "Search by doctor name...",
+    "loadingSpecialists": "Loading specialist directory...",
+    "backToDoctors": "Back to Doctor Selection",
+    "step2Title": "Pick an Available Slot",
+    "pickDate": "Pick a Date",
+    "selectedDoctor": "Selected Doctor",
+    "availableSlotsFor": "Available Slots for {{date}}",
+    "noSlotsFound": "No slots found for this date",
+    "continueToConfirm": "Continue to Confirmation",
+    "finalConfirmation": "Final Confirmation",
+    "reviewDetails": "Please review the appointment details before final confirmation.",
+    "patient": "Patient",
+    "doctor": "Doctor",
+    "date": "Date",
+    "timeSlot": "Time Slot",
+    "goBack": "Go Back",
+    "confirmSchedule": "Confirm & Schedule",
+    "successToast": "Appointment booked and confirmed successfully!",
+    "errorToast": "Failed to book appointment",
+    "step1": "Step 1: Select a Doctor",
+    "step2": "Step 2: Pick an Available Slot",
+    "step3": "Step 3: Final Confirmation"
   }
 }

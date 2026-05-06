@@ -149,7 +149,7 @@ const doctorSlice = createSlice({
       .addCase(fetchDoctorById.pending, (s) => { s.loading = true; })
       .addCase(fetchDoctorById.fulfilled, (s, { payload }) => {
         s.loading = false;
-        s.selected = payload;
+        s.selected = payload.data ?? payload;
       })
       .addCase(fetchDoctorById.rejected, (s, { payload }) => {
         s.loading = false;

@@ -47,6 +47,8 @@ import UserManagement from './pages/admin/UserManagement';
 import AdminSettings from './pages/admin/AdminSettings';
 import EditDoctor from './pages/admin/EditDoctor';
 import PatientAdminProfile from './pages/admin/PatientAdminProfile';
+import AdminSetAvailability from './pages/admin/AdminSetAvailability';
+import AdminBookVisit from './pages/admin/AdminBookVisit';
 
 // Global Route
 import EmergencyContact from './pages/EmergencyContact';
@@ -133,6 +135,8 @@ function App() {
           <Route path="/admin/users" element={<UserManagement />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
           <Route path="/admin/doctors/edit/:id" element={<EditDoctor />} />
+          <Route path="/admin/doctors/availability/:id" element={<AdminSetAvailability />} />
+          <Route path="/admin/book-for-patient/:id" element={<AdminBookVisit />} />
           <Route path="/admin/patients/:id" element={<PatientAdminProfile />} />
         </Route>
 

@@ -56,12 +56,23 @@ export default function PickSchedule() {
     if (doctorId) {
       dispatch(fetchDoctorAvailability(doctorId));
       dispatch(fetchDoctorById(doctorId));
-      // Save doctorId to draft if it's new
-      if (doctorId !== draft.doctorId) {
-        dispatch(updateBookingDraft({ doctorId }));
-      }
     }
-  }, [dispatch, doctorId, draft.doctorId]);
+  }, [dispatch, doctorId]);
+
+  // Sync doctor details to draft when loaded
+  useEffect(() => {
+    if (selectedDoctor) {
+      dispatch(updateBookingDraft({
+        doctorId: selectedDoctor.id || selectedDoctor.user_id,
+        doctorName: {
+          en: selectedDoctor.name_en || selectedDoctor.name,
+          ar: selectedDoctor.name_ar || selectedDoctor.name
+        },
+        doctorSpecialization: selectedDoctor.specialization,
+        doctorAvatar: selectedDoctor.avatar
+      }));
+    }
+  }, [dispatch, selectedDoctor]);
 
   // Group slots by date - Normalize to YYYY-MM-DD to avoid mismatch with time components
   const availableDates = [...new Set(availability.map(slot => {
@@ -123,7 +134,7 @@ export default function PickSchedule() {
         <div>
           <h2 className="text-3xl font-extrabold text-slate-900 mb-2">{t('pickSchedule.title', { defaultValue: 'Pick Schedule' })}</h2>
           <p className="text-slate-500 max-w-xl text-[15px] font-medium leading-relaxed">
-            {t('pickSchedule.descriptionPrefix', { defaultValue: 'Select an available date and time slot for' })} <span className="text-slate-700 font-bold">{selectedDoctor?.name_en || 'Specialist'}</span>.
+            {t('pickSchedule.descriptionPrefix', { defaultValue: 'Select an available date and time slot for' })} <span className="text-slate-700 font-bold">{i18n.language.startsWith('ar') ? (selectedDoctor?.name_ar || selectedDoctor?.name) : (selectedDoctor?.name_en || selectedDoctor?.name || 'Specialist')}</span>.
           </p>
         </div>
         <div className="bg-primary-50 text-primary-600 px-4 py-2 rounded-full text-[10px] font-extrabold uppercase tracking-widest flex items-center gap-2 border border-primary-100/50">

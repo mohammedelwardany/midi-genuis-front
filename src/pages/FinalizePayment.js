@@ -42,7 +42,7 @@ export default function FinalizePayment() {
 
       try {
         setIsUploading(true);
-        toast.loading('Uploading payment proof...', { id: 'upload' });
+        toast.loading(t('finalizePayment.toastUploading', { defaultValue: 'Uploading payment proof...' }), { id: 'upload' });
         const result = await dispatch(uploadReport(fd)).unwrap();
 
         // Be robust about finding the ID
@@ -50,13 +50,13 @@ export default function FinalizePayment() {
 
         if (reportId) {
           setPaymentScreenshotId(reportId);
-          toast.success('Payment proof uploaded successfully', { id: 'upload' });
+          toast.success(t('finalizePayment.toastUploadSuccess', { defaultValue: 'Payment proof uploaded successfully' }), { id: 'upload' });
         } else {
           console.error('Upload succeeded but no ID found in response:', result);
-          toast.error('Upload succeeded but failed to get reference ID', { id: 'upload' });
+          toast.error(t('finalizePayment.errorNoRefId', { defaultValue: 'Upload succeeded but failed to get reference ID' }), { id: 'upload' });
         }
       } catch (err) {
-        toast.error('Failed to upload screenshot', { id: 'upload' });
+        toast.error(t('finalizePayment.errorUploadFail', { defaultValue: 'Failed to upload screenshot' }), { id: 'upload' });
       } finally {
         setIsUploading(false);
       }
@@ -65,7 +65,7 @@ export default function FinalizePayment() {
 
   const handleCompletePayment = async () => {
     if (!doctorId || !selectedDate || !selectedSlot) {
-      toast.error('Missing booking information');
+      toast.error(t('finalizePayment.errorMissingInfo', { defaultValue: 'Missing booking information' }));
       return;
     }
 
@@ -91,7 +91,7 @@ export default function FinalizePayment() {
         state: {
           doctorName: i18n.language.startsWith('ar') ? (selectedDoctor?.name_ar || selectedDoctor?.name) : (selectedDoctor?.name_en || selectedDoctor?.name || 'Specialist'),
           date: selectedDate,
-          time: selectedSlot.start_time,
+          time: `${selectedSlot.start_time} - ${selectedSlot.end_time}`,
           pending: true
         }
       });
@@ -172,7 +172,7 @@ export default function FinalizePayment() {
                     </div>
                     <p className="text-xs font-black text-primary-600 uppercase tracking-widest flex items-center justify-center gap-2">
                       {isUploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Camera className="w-3.5 h-3.5" />}
-                      {isUploading ? 'Uploading...' : t('finalizePayment.changeImage', { defaultValue: 'Tap to Change Image' })}
+                      {isUploading ? t('finalizePayment.waitingForUpload', { defaultValue: 'Uploading...' }) : t('finalizePayment.changeImage', { defaultValue: 'Tap to Change Image' })}
                     </p>
                   </div>
                 ) : (
@@ -195,7 +195,7 @@ export default function FinalizePayment() {
             <div>
               <h4 className="font-bold text-primary-900 mb-1">{t('finalizePayment.manualApproval', { defaultValue: 'Manual Approval Required' })}</h4>
               <p className="text-sm text-primary-700 leading-relaxed">
-                Your appointment will be confirmed once the administration verifies your payment screenshot.
+                {t('finalizePayment.manualApprovalNotice', { defaultValue: 'Your appointment will be confirmed once the administration verifies your payment screenshot.' })}
               </p>
             </div>
           </div>
@@ -208,7 +208,7 @@ export default function FinalizePayment() {
             <div className="flex items-center gap-4 border-b border-slate-100 pb-6 mb-6">
               <img src={`https://ui-avatars.com/api/?name=${(i18n.language.startsWith('ar') ? selectedDoctor?.name_ar : selectedDoctor?.name_en) || 'Doc'}&background=f1f5f9`} className="w-12 h-12 rounded-lg object-cover" alt="Dr" />
               <div>
-                <h4 className="font-bold text-slate-900 text-sm">{(i18n.language.startsWith('ar') ? selectedDoctor?.name_ar : selectedDoctor?.name_en) || 'Medical Specialist'}</h4>
+                <h4 onClick={() => console.log(draft)} className="font-bold text-slate-900 text-sm">{(i18n.language.startsWith('ar') ? selectedDoctor?.name_ar : selectedDoctor?.name_en) || 'Medical Specialist'}</h4>
                 <p className="text-xs font-medium text-slate-500 mt-0.5">{selectedDoctor?.specialization || t('finalizePayment.specialistConsultation', { defaultValue: 'Consultation' })}</p>
                 <p className="text-[10px] font-bold text-primary-600 mt-1 uppercase tracking-widest">
                   {selectedDate && new Date(selectedDate).toLocaleDateString(i18n.language.startsWith('ar') ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric' })} • {selectedSlot?.start_time}
@@ -227,11 +227,11 @@ export default function FinalizePayment() {
               className={`w-full ${loading || isUploading ? 'bg-slate-400 cursor-not-allowed' : 'bg-primary-600 hover:bg-primary-700'} text-white text-base font-bold py-3.5 rounded-xl shadow-sm transition-all hover:shadow hover:-translate-y-0.5 flex items-center justify-center gap-2`}
             >
               {(loading || isUploading) && <Loader2 className="w-5 h-5 animate-spin" />}
-              {isUploading ? 'Waiting for upload...' : t('finalizePayment.confirmBooking', { defaultValue: 'Confirm & Book Appointment' })}
+              {isUploading ? t('finalizePayment.waitingForUpload', { defaultValue: 'Waiting for upload...' }) : t('finalizePayment.confirmBooking', { defaultValue: 'Confirm & Book Appointment' })}
             </button>
 
             <p className="text-[10px] text-center text-slate-400 font-bold uppercase tracking-widest mt-4">
-              Instant Confirmation
+              {t('finalizePayment.instantConfirmation', { defaultValue: 'Instant Confirmation' })}
             </p>
           </div>
         </div>
