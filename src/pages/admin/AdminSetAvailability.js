@@ -102,7 +102,7 @@ export default function AdminSetAvailability() {
     if (e) e.preventDefault();
     try {
       await dispatch(addAvailability({
-        doctor_id: doctorId,
+        doctor_user_id: parseInt(doctorId, 10),
         available_date: newSlot.available_date,
         start_time: newSlot.start_time,
         end_time: newSlot.end_time

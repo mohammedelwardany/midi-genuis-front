@@ -29,6 +29,7 @@ export default function EditDoctor() {
     name_ar: '',
     specialization: '',
     experience_years: '',
+    appointment_duration: '',
     bio: '',
     email: ''
   });
@@ -58,6 +59,7 @@ export default function EditDoctor() {
         name_ar: doctor.name_ar || '',
         specialization: isKnown ? doctor.specialization : 'other',
         experience_years: doctor.experience_years || '',
+        appointment_duration: doctor.appointment_duration || '',
         bio: doctor.bio || '',
         email: doctor.email || ''
       });
@@ -79,7 +81,8 @@ export default function EditDoctor() {
         name_ar: formData.name_ar,
         specialization: finalSpecialization,
         bio: formData.bio,
-        experience_years: formData.experience_years.toString()
+        experience_years: formData.experience_years.toString(),
+        appointment_duration: formData.appointment_duration.toString()
       }
     })).then((res) => {
       if (!res.error) {
@@ -195,6 +198,19 @@ export default function EditDoctor() {
                 type="number"
                 value={formData.experience_years}
                 onChange={(e) => setFormData({ ...formData, experience_years: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest flex items-center gap-2">
+                <Calendar className="w-3.5 h-3.5" /> {t('userManagement.thAppointmentDuration', { defaultValue: 'Duration (mins)' })}
+              </label>
+              <input
+                type="number"
+                value={formData.appointment_duration}
+                onChange={(e) => setFormData({ ...formData, appointment_duration: e.target.value })}
                 className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold"
                 required
               />

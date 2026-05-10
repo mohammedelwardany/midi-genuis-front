@@ -60,7 +60,7 @@ export default function AdminBookVisit() {
     setLoading(true);
     try {
       const payload = {
-        patient_id: patientId,
+        patient_user_id: parseInt(patientId, 10),
         doctor_id: selectedDoctor.id || selectedDoctor.user_id,
         availability_id: selectedSlot.id,
         scheduled_at: `${selectedDate} ${selectedSlot.start_time.substring(0, 5)}`,

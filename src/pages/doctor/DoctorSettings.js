@@ -18,6 +18,7 @@ export default function DoctorSettings() {
     name_ar: currentUser?.name_ar || '',
     specialization: currentUser?.specialization || '',
     experience_years: currentUser?.experience_years || '',
+    appointment_duration: currentUser?.appointment_duration || '',
     bio: currentUser?.bio || '',
     email: currentUser?.email || ''
   });
@@ -36,6 +37,7 @@ export default function DoctorSettings() {
         name_ar: doctor.name_ar || currentUser?.name_ar || '',
         specialization: doctor.specialization || currentUser?.specialization || '',
         experience_years: doctor.experience_years || currentUser?.experience_years || '',
+        appointment_duration: doctor.appointment_duration || currentUser?.appointment_duration || '',
         bio: doctor.bio || currentUser?.bio || '',
         email: doctor.email || currentUser?.email || ''
       });
@@ -45,6 +47,7 @@ export default function DoctorSettings() {
         name_ar: currentUser.name_ar || '',
         specialization: currentUser.specialization || '',
         experience_years: currentUser.experience_years || '',
+        appointment_duration: currentUser.appointment_duration || '',
         bio: currentUser.bio || '',
         email: currentUser.email || ''
       });
@@ -59,6 +62,7 @@ export default function DoctorSettings() {
       data: {
         specialization: formData.specialization,
         experience_years: parseInt(formData.experience_years),
+        appointment_duration: parseInt(formData.appointment_duration),
         bio: formData.bio
       }
     }));
@@ -141,6 +145,15 @@ export default function DoctorSettings() {
                       />
                    </div>
                    <div>
+                      <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-widest">Appointment Duration (mins)</label>
+                      <input 
+                        type="number" 
+                        value={formData.appointment_duration} 
+                        onChange={(e) => setFormData({...formData, appointment_duration: e.target.value})}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm" 
+                      />
+                   </div>
+                   <div className="md:col-span-2">
                       <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-widest">Profile Status</label>
                       <div className="relative">
                          <input type="text" value="Active Physician" disabled className="w-full bg-slate-100 border border-slate-200 rounded-xl ps-4 pe-12 py-3.5 text-slate-600 font-semibold focus:outline-none transition-all text-sm" />
