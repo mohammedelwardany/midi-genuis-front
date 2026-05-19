@@ -11,7 +11,7 @@ export default function AppointmentDetails() {
         <div>
           <div className="flex items-center text-sm font-medium text-slate-500 mb-2">
             <span className="hover:text-slate-900 cursor-pointer">{t('appointmentDetails.appointments', { defaultValue: 'Appointments' })}</span>
-            <ChevronRight className="w-4 h-4 mx-1" />
+            <ChevronRight className="w-4 h-4 mx-1 rtl:rotate-180" />
             <span className="text-slate-900 font-semibold">Cardiology Follow-up</span>
           </div>
         </div>

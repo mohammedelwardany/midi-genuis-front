@@ -60,6 +60,11 @@ function App() {
   const siteConfig = useSiteConfig();
   const isRtl = i18n.language.startsWith('ar');
 
+  React.useEffect(() => {
+    document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
+    document.documentElement.lang = i18n.language;
+  }, [isRtl, i18n.language]);
+
   const patientTitle = isRtl ? siteConfig.portals.patient.titleAr : siteConfig.portals.patient.title;
   const doctorTitle = isRtl ? siteConfig.portals.doctor.titleAr : siteConfig.portals.doctor.title;
   const adminTitle = isRtl ? siteConfig.portals.admin.titleAr : siteConfig.portals.admin.title;

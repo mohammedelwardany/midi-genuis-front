@@ -51,7 +51,7 @@ export default function DoctorProfilePage() {
       <div className="flex flex-col items-center justify-center min-h-screen text-slate-500">
         <p className="text-xl font-bold">Doctor not found</p>
         <button onClick={() => navigate(-1)} className="mt-4 text-primary-600 font-bold flex items-center gap-2">
-          <ChevronLeft className="w-4 h-4" /> Go Back
+          <ChevronLeft className="w-4 h-4 rtl:rotate-180" /> Go Back
         </button>
       </div>
     );
@@ -63,7 +63,7 @@ export default function DoctorProfilePage() {
         onClick={() => navigate(-1)}
         className="mb-8 flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors"
       >
-        <ChevronLeft className="w-4 h-4" /> Back to List
+        <ChevronLeft className="w-4 h-4 rtl:rotate-180" /> Back to List
       </button>
 
       <div className="bg-white rounded-[32px] p-8 md:p-12 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.02)] relative overflow-hidden">

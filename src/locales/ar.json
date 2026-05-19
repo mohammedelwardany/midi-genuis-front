@@ -454,6 +454,9 @@
     }
   },
   "doctorSchedule": {
+    "morningShift": "فترة صباحية",
+    "afternoonShift": "فترة مسائية",
+    "fullDay": "يوم كامل",
     "clinicalWorkHours": "مواعيد الطبيب",
     "weeklyWorkHours": "ساعات العمل الأسبوعية",
     "description": "قم بضبط توافرك الطبي القياسي لاستشارات المرضى.",

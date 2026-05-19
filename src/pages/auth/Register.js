@@ -308,7 +308,7 @@ export default function Register() {
               ) : (
                 <>
                   {t('auth.register.createAccountButton', { defaultValue: 'Create Account' })}
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform rtl:rotate-180" />
                 </>
               )}
             </button>

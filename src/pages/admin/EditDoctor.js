@@ -105,7 +105,7 @@ export default function EditDoctor() {
         onClick={() => navigate(-1)}
         className="mb-8 flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors"
       >
-        <ChevronLeft className="w-4 h-4" /> {t('adminEditDoctor.backToUsers')}
+        <ChevronLeft className="w-4 h-4 rtl:rotate-180" /> {t('adminEditDoctor.backToUsers')}
       </button>
 
       <div className="flex items-center justify-between mb-10">

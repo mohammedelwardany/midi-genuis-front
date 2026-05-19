@@ -167,13 +167,13 @@ export default function PatientDirectory() {
             </div>
             
             <div className="flex items-center gap-2">
-               <button className="w-9 h-9 flex items-center justify-center rounded-lg bg-slate-50 text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"><ChevronLeft className="w-4 h-4" /></button>
+               <button className="w-9 h-9 flex items-center justify-center rounded-lg bg-slate-50 text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"><ChevronLeft className="w-4 h-4 rtl:rotate-180" /></button>
                <button className="w-9 h-9 flex items-center justify-center rounded-lg bg-primary-600 text-white font-bold text-sm shadow-sm shadow-primary-600/20">1</button>
                <button className="w-9 h-9 flex items-center justify-center rounded-lg bg-transparent text-slate-700 font-bold text-sm hover:bg-slate-50 transition-colors">2</button>
                <button className="w-9 h-9 flex items-center justify-center rounded-lg bg-transparent text-slate-700 font-bold text-sm hover:bg-slate-50 transition-colors">3</button>
                <span className="w-9 h-9 flex items-center justify-center text-slate-400 font-bold">...</span>
                <button className="w-9 h-9 flex items-center justify-center rounded-lg bg-transparent text-slate-700 font-bold text-sm hover:bg-slate-50 transition-colors">312</button>
-               <button className="w-9 h-9 flex items-center justify-center rounded-lg bg-slate-50 text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"><ChevronRight className="w-4 h-4" /></button>
+               <button className="w-9 h-9 flex items-center justify-center rounded-lg bg-slate-50 text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"><ChevronRight className="w-4 h-4 rtl:rotate-180" /></button>
             </div>
          </div>
       </div>

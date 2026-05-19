@@ -213,7 +213,7 @@ export default function PatientInfo() {
         {/* Action Bar Local */}
         <div className="flex justify-between items-center pt-6 border-t border-slate-100">
            <button onClick={() => navigate('/patient/book/schedule')} className="font-bold text-slate-700 flex items-center hover:text-slate-900 transition-colors py-2 text-sm">
-              <ArrowLeft className="w-4 h-4 me-2" /> {t('patientInfo.backToSchedule', { defaultValue: 'Back to Schedule' })}
+              <ArrowLeft className="w-4 h-4 me-2 rtl:rotate-180" /> {t('patientInfo.backToSchedule', { defaultValue: 'Back to Schedule' })}
            </button>
            <button 
              onClick={() => {
@@ -222,7 +222,7 @@ export default function PatientInfo() {
              }} 
              className="bg-primary-600 hover:bg-primary-700 shadow-md shadow-primary-600/20 text-white font-bold py-3 px-8 rounded-xl transition-all hover:-translate-y-0.5 text-sm flex items-center"
            >
-              {t('patientInfo.continueToPayment', { defaultValue: 'Continue to Payment' })} <ArrowRight className="w-4 h-4 ms-2" />
+              {t('patientInfo.continueToPayment', { defaultValue: 'Continue to Payment' })} <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
            </button>
         </div>
 

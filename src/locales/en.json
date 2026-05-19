@@ -446,6 +446,9 @@
     }
   },
   "doctorSchedule": {
+    "morningShift": "Morning Shift",
+    "afternoonShift": "Afternoon Shift",
+    "fullDay": "Full Day",
     "clinicalWorkHours": "Clinical Work Hours",
     "weeklyWorkHours": "Weekly Work Hours",
     "description": "Configure your standard clinical availability for patient consultations.",

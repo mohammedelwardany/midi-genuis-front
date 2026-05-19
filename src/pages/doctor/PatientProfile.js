@@ -147,7 +147,7 @@ export default function PatientProfile() {
                         <div className="p-3 bg-blue-50 text-blue-600 rounded-xl"><FilePlus className="w-5 h-5" /></div>
                         <span className="font-extrabold text-[15px] text-slate-800 tracking-tight group-hover:text-blue-700 transition-colors text-start max-w-[150px]">{t('doctorPatientProfile.newPrescription', { defaultValue: 'New Prescription' })}</span>
                      </div>
-                     <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-blue-500 transition-colors" />
+                     <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-blue-500 transition-colors rtl:rotate-180" />
                   </button>
 
                   <button className="w-full bg-white rounded-2xl p-5 border border-slate-100 shadow-[0_2px_8px_rgb(0,0,0,0.02)] flex items-center justify-between hover:shadow-md hover:border-blue-200 transition-all group">
@@ -155,7 +155,7 @@ export default function PatientProfile() {
                         <div className="p-3 bg-blue-50 text-blue-600 rounded-xl"><Stethoscope className="w-5 h-5" /></div>
                         <span className="font-extrabold text-[15px] text-slate-800 tracking-tight group-hover:text-blue-700 transition-colors text-start max-w-[150px]">{t('doctorPatientProfile.orderLabWork', { defaultValue: 'Order Lab Work' })}</span>
                      </div>
-                     <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-blue-500 transition-colors" />
+                     <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-blue-500 transition-colors rtl:rotate-180" />
                   </button>
 
                   <button className="w-full bg-white rounded-2xl p-5 border border-slate-100 shadow-[0_2px_8px_rgb(0,0,0,0.02)] flex items-center justify-between hover:shadow-md hover:border-blue-200 transition-all group">
@@ -163,7 +163,7 @@ export default function PatientProfile() {
                         <div className="p-3 bg-blue-50 text-blue-600 rounded-xl"><LinkIcon className="w-5 h-5" /></div>
                         <span className="font-extrabold text-[15px] text-slate-800 tracking-tight group-hover:text-blue-700 transition-colors text-start max-w-[150px]">{t('doctorPatientProfile.referralLetter', { defaultValue: 'Referral Letter' })}</span>
                      </div>
-                     <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-blue-500 transition-colors" />
+                     <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-blue-500 transition-colors rtl:rotate-180" />
                   </button>
                </div>
             </div>

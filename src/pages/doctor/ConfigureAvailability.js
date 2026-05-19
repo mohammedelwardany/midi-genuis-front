@@ -114,7 +114,7 @@ export default function ConfigureAvailability() {
       <div className="animate-in fade-in duration-500 max-w-5xl mx-auto pb-24 font-sans">
 
          <button onClick={() => navigate('/doctor/schedule')} className="flex items-center gap-2 text-[11px] font-extrabold text-primary-600 uppercase tracking-widest hover:text-primary-800 transition-colors mb-6">
-            <ArrowLeft className="w-4 h-4" strokeWidth={3} /> {t('doctorConfigureAvailability.backToSchedule', { defaultValue: 'Back to Schedule' })}
+            <ArrowLeft className="w-4 h-4 rtl:rotate-180" strokeWidth={3} /> {t('doctorConfigureAvailability.backToSchedule', { defaultValue: 'Back to Schedule' })}
          </button>
 
          {/* Header */}

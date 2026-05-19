@@ -182,13 +182,13 @@ export default function DoctorSchedule() {
                                 onClick={() => navigateWeek(-1)}
                                 className="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-50 text-slate-600 hover:bg-slate-100 transition-colors border border-slate-100"
                               >
-                                 <ArrowLeft className="w-5 h-5" />
+                                 <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
                               </button>
                               <button 
                                 onClick={() => navigateWeek(1)}
                                 className="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-50 text-slate-600 hover:bg-slate-100 transition-colors border border-slate-100"
                               >
-                                 <ArrowRight className="w-5 h-5" />
+                                 <ArrowRight className="w-5 h-5 rtl:rotate-180" />
                               </button>
                            </div>
                            <div>
@@ -328,7 +328,7 @@ export default function DoctorSchedule() {
                                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                                  disabled={currentPage === 1}
                                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-[11px] font-black text-slate-600 hover:bg-slate-50 disabled:opacity-40 transition-all uppercase tracking-widest disabled:cursor-not-allowed">
-                                 <ArrowLeft className="w-3.5 h-3.5" strokeWidth={3} /> {t('pagination.prev', { defaultValue: 'Prev' })}
+                                 <ArrowLeft className="w-3.5 h-3.5 rtl:rotate-180" strokeWidth={3} /> {t('pagination.prev', { defaultValue: 'Prev' })}
                               </button>
                               
                               <div className="hidden sm:flex items-center gap-1.5 px-2">
@@ -377,9 +377,9 @@ export default function DoctorSchedule() {
                
                <div className="space-y-3">
                   {[
-                     { label: 'Morning Shift', start: '08:00', end: '12:00', color: 'bg-blue-600' },
-                     { label: 'Afternoon Shift', start: '13:00', end: '17:00', color: 'bg-orange-500' },
-                     { label: 'Full Day', start: '08:00', end: '18:00', color: 'bg-primary-600' }
+                     { label: t('doctorSchedule.morningShift', { defaultValue: 'Morning Shift' }), start: '08:00', end: '12:00', color: 'bg-blue-600' },
+                     { label: t('doctorSchedule.afternoonShift', { defaultValue: 'Afternoon Shift' }), start: '13:00', end: '17:00', color: 'bg-orange-500' },
+                     { label: t('doctorSchedule.fullDay', { defaultValue: 'Full Day' }), start: '08:00', end: '18:00', color: 'bg-primary-600' }
                   ].map((preset) => (
                      <div 
                         key={preset.label}
