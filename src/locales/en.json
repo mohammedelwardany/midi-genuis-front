@@ -271,6 +271,7 @@
     "highestRated": "Highest Rated",
     "nearestDate": "Nearest Date",
     "nextAvailable": "Next Available",
+    "noAvailability": "No upcoming slots",
     "bookNow": "Book Now",
     "viewMoreSpecialists": "View More Specialists"
   },
@@ -327,7 +328,8 @@
     "followupConsultation": "Follow-up Consultation",
     "newIllnessSymptom": "New Illness/Symptom",
     "uploadNewReport": "Upload New Report",
-    "selectExisting": "Select from existing records"
+    "selectExisting": "Select from existing records",
+    "hasInsurance": "I have health insurance"
   },
   "finalizePayment": {
     "secureBooking": "Secure Appointment Booking",
@@ -427,7 +429,19 @@
     "personalInfo": "Personal Info",
     "security": "Security",
     "insuranceDetails": "Insurance Details",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "insuranceDetailsTitle": "Insurance Details",
+    "insuranceDetailsDesc": "Manage your primary and secondary health insurance coverage files.",
+    "hasInsuranceCheckbox": "I have health insurance",
+    "primaryProviderLabel": "Primary Insurance Provider",
+    "policyNumberLabel": "Policy Number / Member ID",
+    "groupIdLabel": "Group ID",
+    "cardPhotosTitle": "Insurance Card Photos",
+    "uploadFrontLabel": "Upload Front",
+    "max5mbLabel": "Max 5MB",
+    "uploadBackLabel": "Upload Back",
+    "optionalLabel": "Optional",
+    "saveRecordsButton": "Save Records"
   },
   "doctorPatientDirectory": {
     "title": "Patient Directory",
@@ -651,6 +665,17 @@
     "errorToast": "Failed to book appointment",
     "step1": "Step 1: Select a Doctor",
     "step2": "Step 2: Pick an Available Slot",
-    "step3": "Step 3: Final Confirmation"
+    "step3": "Step 3: Final Confirmation",
+    "amountToPay": "Amount to Pay (EGP)",
+    "paymentMethod": "Payment Method",
+    "cash": "Cash",
+    "cashDesc": "Paid at clinic front desk",
+    "manualTransfer": "Manual Transfer",
+    "manualTransferDesc": "Upload payment receipt",
+    "uploadReceipt": "Upload Transaction Receipt",
+    "uploadPrompt": "Click or drag to upload receipt",
+    "uploadLimit": "JPG OR PNG (MAX 5MB)",
+    "tapToChange": "Tap to Change Image",
+    "uploadScreenshotError": "Please upload your payment screenshot first"
   }
 }

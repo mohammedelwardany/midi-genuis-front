@@ -66,4 +66,11 @@ export const ENDPOINTS = {
     thread: (id) => `/messages/thread/${id}`,
     send: '/messages',
   },
+
+  // ── Payments ──────────────────────────────────────
+  payments: {
+    initiate: '/payments/initiatePayment',
+    uploadReceipt: (id) => `/payments/uploadReceipt/${id}`,
+    review: '/payments/reviewPayment',
+  },
 };

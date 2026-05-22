@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { UserPlus, User, Search, Filter, MoreVertical, Mail, AlertCircle, CheckCircle2, Trash2, Edit, Loader2, Calendar, Plus } from 'lucide-react';
+import { UserPlus, User, Search, Filter, MoreVertical, Mail, AlertCircle, CheckCircle2, Trash2, Edit, Loader2, Calendar, Plus, Shield } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { cn } from '../../utils/cn';
@@ -27,7 +27,8 @@ export default function UserManagement() {
   const [activeTab, setActiveTab] = useState('doctors');
   const [showAddModal, setShowAddModal] = useState(false);
   const [openMenuId, setOpenMenuId] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+  const [hasInsurance, setHasInsurance] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterSpec, setFilterSpec] = useState('All');
 
@@ -49,7 +50,9 @@ export default function UserManagement() {
     appointment_duration: '',
     phone: '',
     date_of_birth: '',
-    gender: 'Male'
+    gender: 'Male',
+    insurance_provider: '',
+    policy_number: ''
   });
 
   useEffect(() => {
@@ -87,18 +90,22 @@ export default function UserManagement() {
           appointment_duration: parseInt(formData.appointment_duration) || 30
         })).unwrap();
         toast.success(t('userManagement.physicianSuccess'));
-      } else {
+            } else {
         await dispatch(addPatient({
-          ...formData
+          ...formData,
+          insurance_provider: hasInsurance ? formData.insurance_provider : '',
+          policy_number: hasInsurance ? formData.policy_number : ''
         })).unwrap();
         toast.success(t('userManagement.patientSuccess'));
       }
       
-      setShowAddModal(false);
+            setShowAddModal(false);
+      setHasInsurance(false);
       setFormData({
         email: '', password: '', name_en: '', name_ar: '',
         specialization: '', bio: '', experience_years: '', appointment_duration: '',
-        phone: '', date_of_birth: '', gender: 'Male'
+        phone: '', date_of_birth: '', gender: 'Male',
+        insurance_provider: '', policy_number: ''
       });
       
       if (activeTab === 'doctors') dispatch(fetchDoctors());
@@ -217,10 +224,18 @@ export default function UserManagement() {
                            <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm">
                              {(i18n.language.startsWith('ar') ? (user.name_ar || user.name_en || user.name || 'U') : (user.name_en || user.name || 'U')).charAt(0)}
                            </div>
-                           <div>
-                              <p className="text-sm font-bold text-slate-800">
-                                {i18n.language.startsWith('ar') ? (user.name_ar || user.name_en || user.name) : (user.name_en || user.name)}
-                              </p>
+                                                      <div>
+                              <div className="flex items-center gap-2">
+                                 <span className="text-sm font-bold text-slate-800">
+                                   {i18n.language.startsWith('ar') ? (user.name_ar || user.name_en || user.name) : (user.name_en || user.name)}
+                                 </span>
+                                 {activeTab === 'patients' && user.insurance_provider && (
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black bg-indigo-50 text-indigo-600 border border-indigo-100/50 uppercase tracking-widest leading-none">
+                                       <Shield className="w-2.5 h-2.5" />
+                                       {user.insurance_provider}
+                                    </span>
+                                 )}
+                              </div>
                               <p className="text-xs font-medium text-slate-500 flex items-center gap-1 mt-0.5"><Mail className="w-3 h-3" /> {user.email}</p>
                            </div>
                         </div>
@@ -372,6 +387,31 @@ export default function UserManagement() {
                      </div>
                    </div>
                    <div className="space-y-1.5">
+                                          <div className="flex items-center gap-2 pb-1.5">
+                       <input
+                         type="checkbox"
+                         id="adminHasInsurance"
+                         checked={hasInsurance}
+                         onChange={(e) => setHasInsurance(e.target.checked)}
+                         className="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 cursor-pointer"
+                       />
+                       <label htmlFor="adminHasInsurance" className="text-xs font-bold text-slate-700 cursor-pointer select-none">
+                         {t('patientInfo.hasInsurance', { defaultValue: 'Patient has health insurance' })}
+                       </label>
+                     </div>
+
+                     {hasInsurance && (
+                       <div className="grid grid-cols-2 gap-4 pb-1.5 animate-in fade-in slide-in-from-top-1 duration-150">
+                         <div className="space-y-1.5">
+                           <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('patientInfo.insuranceProvider', { defaultValue: 'Insurance Provider' })}</label>
+                           <input type="text" value={formData.insurance_provider} onChange={(e) => setFormData({...formData, insurance_provider: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold" placeholder="e.g. MetLife" />
+                         </div>
+                         <div className="space-y-1.5">
+                           <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('patientInfo.policyNumber', { defaultValue: 'Policy Number' })}</label>
+                           <input type="text" value={formData.policy_number} onChange={(e) => setFormData({...formData, policy_number: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold" placeholder="e.g. ABC-123" />
+                         </div>
+                       </div>
+                     )}
                      <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('patientInfo.gender')}</label>
                      <select value={formData.gender} onChange={(e) => setFormData({...formData, gender: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold">
                        <option value="Male">{t('userManagement.genderMale')}</option>

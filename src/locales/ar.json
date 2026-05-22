@@ -267,6 +267,7 @@
     "highestRated": "الأعلى تقييماً",
     "nearestDate": "أقرب موعد",
     "nextAvailable": "أقرب توفر",
+    "noAvailability": "لا توجد فترات قادمة",
     "bookNow": "احجز الآن",
     "viewMoreSpecialists": "عرض المزيد من الأخصائيين",
     "filters": "تصفية",
@@ -335,7 +336,8 @@
     "followupConsultation": "استشارة متابعة",
     "newIllnessSymptom": "مرض جديد / عرض",
     "uploadNewReport": "رفع تقرير جديد",
-    "selectExisting": "اختر من السجلات الموجودة"
+    "selectExisting": "اختر من السجلات الموجودة",
+    "hasInsurance": "لدي تأمين طبي"
   },
   "finalizePayment": {
     "secureBooking": "حجز موعد آمن",
@@ -435,7 +437,19 @@
     "personalInfo": "المعلومات الشخصية",
     "security": "الأمان",
     "insuranceDetails": "بيانات التأمين",
-    "notifications": "الإشعارات"
+    "notifications": "الإشعارات",
+    "insuranceDetailsTitle": "بيانات التأمين",
+    "insuranceDetailsDesc": "أدر ملفات تغطية التأمين الصحي الأساسي والثانوي الخاصة بك.",
+    "hasInsuranceCheckbox": "لدي تأمين طبي",
+    "primaryProviderLabel": "مزود التأمين الأساسي",
+    "policyNumberLabel": "رقم الوثيقة / معرف العضو",
+    "groupIdLabel": "رقم المجموعة",
+    "cardPhotosTitle": "صور بطاقة التأمين",
+    "uploadFrontLabel": "تحميل الوجه الأمامي",
+    "max5mbLabel": "الحد الأقصى 5 ميجابايت",
+    "uploadBackLabel": "تحميل الوجه الخلفي",
+    "optionalLabel": "اختياري",
+    "saveRecordsButton": "حفظ السجلات"
   },
   "doctorPatientDirectory": {
     "title": "دليل المرضى",
@@ -652,6 +666,17 @@
     "errorToast": "فشل حجز الموعد",
     "step1": "الخطوة 1: اختر الطبيب",
     "step2": "الخطوة 2: اختر موعداً متاحاً",
-    "step3": "الخطوة 3: التأكيد النهائي"
+    "step3": "الخطوة 3: التأكيد النهائي",
+    "amountToPay": "قيمة الدفع (جنيه مصري)",
+    "paymentMethod": "طريقة الدفع",
+    "cash": "نقداً",
+    "cashDesc": "يتم الدفع في مكتب استقبال العيادة",
+    "manualTransfer": "تحويل يدوي",
+    "manualTransferDesc": "رفع إيصال الدفع",
+    "uploadReceipt": "رفع إيصال المعاملة",
+    "uploadPrompt": "انقر أو اسحب لرفع الإيصال",
+    "uploadLimit": "صيغة JPG أو PNG (بحد أقصى 5 ميجابايت)",
+    "tapToChange": "انقر لتغيير الصورة",
+    "uploadScreenshotError": "يرجى رفع لقطة شاشة الدفع أولاً"
   }
 }

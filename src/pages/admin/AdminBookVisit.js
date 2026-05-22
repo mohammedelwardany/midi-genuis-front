@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
-import { Search, Star, Clock, ChevronDown, ChevronRight, ChevronLeft, Sun, Moon, Info, ArrowLeft, Loader2, User, UserCircle } from 'lucide-react';
+import { Search, Star, Clock, ChevronDown, ChevronRight, ChevronLeft, Sun, Moon, Info, ArrowLeft, Loader2, User, UserCircle, Coins, CreditCard, Camera, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { 
   fetchDoctors, 
@@ -17,6 +17,7 @@ import {
   selectSelectedPatient
 } from '../../store/slices/patientSlice';
 import { createAppointment } from '../../store/slices/appointmentSlice';
+import { initiatePayment, uploadReceipt, reviewPayment } from '../../store/slices/paymentSlice';
 
 export default function AdminBookVisit() {
   const { id: patientId } = useParams();
@@ -36,6 +37,10 @@ export default function AdminBookVisit() {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('cash');
+  const [paymentScreenshot, setPaymentScreenshot] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [amount, setAmount] = useState('250');
 
   useEffect(() => {
     if (patientId) {
@@ -47,8 +52,18 @@ export default function AdminBookVisit() {
   useEffect(() => {
     if (selectedDoctor) {
       dispatch(fetchDoctorAvailability(selectedDoctor.id || selectedDoctor.user_id));
+      const fee = selectedDoctor.consultationFee || selectedDoctor.consultation_fee || selectedDoctor.fee || selectedDoctor.price || selectedDoctor.vizita || 250;
+      setAmount(String(fee));
     }
   }, [dispatch, selectedDoctor]);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setPaymentScreenshot(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
 
   const handleSelectDoctor = (doc) => {
     setSelectedDoctor(doc);
@@ -57,8 +72,16 @@ export default function AdminBookVisit() {
 
   const handleConfirmBooking = async () => {
     if (!selectedDoctor || !selectedSlot || !selectedDate) return;
+    
+    if (paymentMethod === 'manual_transfer' && !paymentScreenshot) {
+      toast.error(t('adminBookVisit.uploadScreenshotError', { defaultValue: 'Please upload your payment screenshot first' }));
+      return;
+    }
+    
     setLoading(true);
     try {
+      toast.loading('Processing booking...', { id: 'booking' });
+      
       const payload = {
         patient_user_id: parseInt(patientId, 10),
         doctor_id: selectedDoctor.id || selectedDoctor.user_id,
@@ -68,11 +91,68 @@ export default function AdminBookVisit() {
         notes: `Admin booking for patient: ${selectedPatient?.name_en || selectedPatient?.name}`
       };
       
-      await dispatch(createAppointment(payload)).unwrap();
-      toast.success(t('adminBookVisit.successToast'));
-      navigate('/admin/dashboard'); // Changed from appointments to dashboard as requested by common pattern
+      const apptResult = await dispatch(createAppointment(payload)).unwrap();
+      const appointmentId =
+        apptResult?.id ||
+        apptResult?.appointment_id ||
+        apptResult?.appointmentId ||
+        apptResult?.appointment?.id ||
+        apptResult?.appointment?.appointment_id ||
+        apptResult?.appointment?.appointmentId ||
+        apptResult?.data?.id ||
+        apptResult?.data?.appointment_id ||
+        apptResult?.data?.appointmentId ||
+        apptResult?.data?.appointment?.id ||
+        apptResult?.data?.appointment?.appointment_id ||
+        apptResult?.data?.appointment?.appointmentId;
+
+      if (!appointmentId) {
+        throw new Error("Failed to get appointment ID.");
+      }
+
+      const paymentPayload = {
+        appointment_id: appointmentId,
+        amount: parseFloat(amount) || 0.00,
+        currency: "EGP",
+        paymentMethod: paymentMethod // 'cash' or 'manual_transfer'
+      };
+
+      const paymentResult = await dispatch(initiatePayment(paymentPayload)).unwrap();
+      const paymentId =
+        paymentResult?.id ||
+        paymentResult?.payment_id ||
+        paymentResult?.paymentId ||
+        paymentResult?.payment?.id ||
+        paymentResult?.payment?.payment_id ||
+        paymentResult?.payment?.paymentId ||
+        paymentResult?.data?.id ||
+        paymentResult?.data?.payment_id ||
+        paymentResult?.data?.paymentId ||
+        paymentResult?.data?.payment?.id ||
+        paymentResult?.data?.payment?.payment_id ||
+        paymentResult?.data?.payment?.paymentId;
+
+      if (!paymentId) {
+        throw new Error("Failed to initiate payment.");
+      }
+
+      if (paymentMethod === 'manual_transfer') {
+        const fd = new FormData();
+        fd.append('receipt', paymentScreenshot);
+        await dispatch(uploadReceipt({ id: paymentId, formData: fd })).unwrap();
+      }
+
+      await dispatch(reviewPayment({
+        paymentId: paymentId,
+        reviewStatus: 'approved',
+        notes: `Auto-approved by admin booking for patient: ${selectedPatient?.name_en || selectedPatient?.name}`
+      })).unwrap();
+
+      toast.success('Appointment and payment confirmed successfully!', { id: 'booking' });
+      navigate('/admin/dashboard');
     } catch (err) {
-      toast.error(err?.message || t('adminBookVisit.errorToast'));
+      console.error(err);
+      toast.error(err?.message || 'Failed to complete booking process', { id: 'booking' });
     } finally {
       setLoading(false);
     }
@@ -259,6 +339,84 @@ export default function AdminBookVisit() {
                     <span className="font-extrabold text-primary-700">{selectedSlot?.start_time.substring(0, 5)} - {selectedSlot?.end_time.substring(0, 5)}</span>
                  </div>
               </div>
+
+              {/* Payment Selection and optional Receipt upload */}
+              <div className="text-start mb-8 space-y-6">
+                  <div className="pt-2">
+                     <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">{t('adminBookVisit.amountToPay', { defaultValue: 'Amount to Pay (EGP)' })}</label>
+                     <input 
+                        type="text"
+                        readOnly
+                        value={amount}
+                        className="w-full bg-slate-100/80 border border-slate-200/60 rounded-2xl px-5 py-4 text-slate-500 font-extrabold cursor-not-allowed text-base select-none"
+                        placeholder="e.g. 250"
+                     />
+                  </div>
+
+                  <div className="pt-2">
+                     <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">{t('adminBookVisit.paymentMethod', { defaultValue: 'Payment Method' })}</label>
+                     <div className="grid grid-cols-2 gap-4">
+                        <button 
+                           type="button"
+                           onClick={() => setPaymentMethod('cash')}
+                           className={`p-4 rounded-xl border-2 flex flex-col items-center justify-center text-center transition-all ${paymentMethod === 'cash' ? 'border-primary-600 bg-primary-50/50 text-primary-700 font-bold' : 'border-slate-100 bg-slate-50 text-slate-600 hover:border-slate-200'}`}
+                        >
+                           <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm mb-2">
+                              <Coins className="w-4 h-4 text-emerald-600" />
+                           </div>
+                           <span className="font-extrabold text-xs">{t('adminBookVisit.cash', { defaultValue: 'Cash' })}</span>
+                           <span className="text-[9px] opacity-60 mt-0.5">{t('adminBookVisit.cashDesc', { defaultValue: 'Paid at clinic front desk' })}</span>
+                        </button>
+                        
+                        <button 
+                           type="button"
+                           onClick={() => setPaymentMethod('manual_transfer')}
+                           className={`p-4 rounded-xl border-2 flex flex-col items-center justify-center text-center transition-all ${paymentMethod === 'manual_transfer' ? 'border-primary-600 bg-primary-50/50 text-primary-700 font-bold' : 'border-slate-100 bg-slate-50 text-slate-600 hover:border-slate-200'}`}
+                        >
+                           <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm mb-2">
+                              <CreditCard className="w-4 h-4 text-indigo-600" />
+                           </div>
+                           <span className="font-extrabold text-xs">{t('adminBookVisit.manualTransfer', { defaultValue: 'Manual Transfer' })}</span>
+                           <span className="text-[9px] opacity-60 mt-0.5">{t('adminBookVisit.manualTransferDesc', { defaultValue: 'Upload payment receipt' })}</span>
+                        </button>
+                     </div>
+                  </div>
+
+                  {paymentMethod === 'manual_transfer' && (
+                     <div className="pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">{t('adminBookVisit.uploadReceipt', { defaultValue: 'Upload Transaction Receipt' })}</label>
+                        <div className="relative group">
+                           <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleFileChange}
+                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                           />
+                           <div className={`border-2 border-dashed rounded-[20px] p-6 flex flex-col items-center justify-center transition-all ${previewUrl ? 'border-primary-600 bg-primary-50/30' : 'border-slate-200 group-hover:border-primary-400 bg-slate-50'}`}>
+                              {previewUrl ? (
+                                 <div className="text-center">
+                                    <div className="relative inline-block">
+                                       <img src={previewUrl} className="max-h-40 rounded-xl shadow-md mb-2 border-2 border-white" alt="Preview" />
+                                    </div>
+                                    <p className="text-[10px] font-black text-primary-600 uppercase tracking-widest flex items-center justify-center gap-2">
+                                       <Camera className="w-3.5 h-3.5" />
+                                       {t('adminBookVisit.tapToChange', { defaultValue: 'Tap to Change Image' })}
+                                    </p>
+                                 </div>
+                              ) : (
+                                 <>
+                                    <div className="bg-white rounded-2xl p-4 shadow-sm mb-2 text-slate-300 group-hover:text-primary-600 group-hover:scale-110 transition-all">
+                                       <Camera className="w-8 h-8" />
+                                    </div>
+                                    <p className="text-xs font-bold text-slate-800 mb-1">{t('adminBookVisit.uploadPrompt', { defaultValue: 'Click or drag to upload receipt' })}</p>
+                                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">{t('adminBookVisit.uploadLimit', { defaultValue: 'JPG or PNG (Max 5MB)' })}</p>
+                                 </>
+                              )}
+                           </div>
+                        </div>
+                     </div>
+                  )}
+               </div>
 
               <div className="flex gap-4">
                  <button onClick={() => setStep(2)} className="flex-1 px-6 py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-slate-200 transition-all">{t('adminBookVisit.goBack')}</button>

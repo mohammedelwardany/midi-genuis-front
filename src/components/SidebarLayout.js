@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import TopNav from './TopNav';
 import { Calendar, UserCircle, CreditCard, CheckCircle, BriefcaseMedical, X } from 'lucide-react';
@@ -7,6 +7,7 @@ import { cn } from '../utils/cn';
 
 export default function SidebarLayout() {
   const { t, i18n } = useTranslation();
+  const location = useLocation();
   const isRtl = i18n.language.startsWith('ar');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -65,12 +66,15 @@ export default function SidebarLayout() {
                     <NavLink
                       to={step.disabled ? '#' : step.path}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className={({ isActive }) => cn(
-                        "flex items-center gap-3 px-6 py-3 font-medium transition-colors",
-                         isActive && !step.disabled
-                           ? "bg-slate-50 text-primary-600 border-s-2 border-primary-600"
-                           : "text-slate-600 hover:bg-slate-50"
-                      )}
+                      className={({ isActive }) => {
+                        const isCurrentActive = isActive || (step.path === '/patient/book/confirm' && /^\/patient\/book\/[^/]+\/confirm$/.test(location.pathname));
+                        return cn(
+                          "flex items-center gap-3 px-6 py-3 font-medium transition-colors",
+                           isCurrentActive && !step.disabled
+                             ? "bg-slate-50 text-primary-600 border-s-2 border-primary-600"
+                             : "text-slate-600 hover:bg-slate-50"
+                        );
+                      }}
                       style={step.disabled ? { pointerEvents: 'none' } : {}}
                     >
                       <Icon className="w-4 h-4" />

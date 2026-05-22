@@ -46,7 +46,7 @@ export default function Register() {
   const loading = useSelector(selectAuthLoading);
   const apiError = useSelector(selectAuthError);
 
-  const [form, setForm] = useState({
+    const [form, setForm] = useState({
     name_en:       '',
     name_ar:       '',
     email:         '',
@@ -54,10 +54,13 @@ export default function Register() {
     phone:         '',
     date_of_birth: '',
     gender:        '',
+    insurance_provider: '',
+    policy_number: '',
   });
   const [countryCode, setCountryCode] = useState(COUNTRY_CODES[0]);
   const [showCountryList, setShowCountryList] = useState(false);
-  const [errors, setErrors] = useState({});
+    const [errors, setErrors] = useState({});
+  const [hasInsurance, setHasInsurance] = useState(false);
 
   const set = (field) => (e) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
@@ -79,9 +82,11 @@ export default function Register() {
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
 
-    const payload = {
+        const payload = {
       ...form,
       phone: form.phone ? `${countryCode.code}${form.phone}` : '',
+      insurance_provider: hasInsurance ? form.insurance_provider : '',
+      policy_number: hasInsurance ? form.policy_number : '',
     };
     
     try {
@@ -294,6 +299,50 @@ export default function Register() {
               </div>
               {errors.gender && <p className="text-red-500 text-[11px] mt-1 font-semibold">{errors.gender}</p>}
             </div>
+          </div>
+
+                              {/* ── Insurance Details (Optional) ────────────── */}
+          <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <input
+                  type="checkbox"
+                  id="hasInsurance"
+                  checked={hasInsurance}
+                  onChange={(e) => setHasInsurance(e.target.checked)}
+                  className="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500 cursor-pointer"
+                />
+                <label htmlFor="hasInsurance" className="text-xs font-bold text-slate-700 cursor-pointer select-none">
+                  I have health insurance
+                </label>
+              </div>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-white border border-slate-200/50 px-2 py-0.5 rounded-full">Optional</span>
+            </div>
+            
+            {hasInsurance && (
+              <div className="grid grid-cols-2 gap-4 pt-3 border-t border-slate-200/50 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div>
+                  <label className={labelBase}>Provider</label>
+                  <input
+                    type="text"
+                    value={form.insurance_provider}
+                    onChange={set('insurance_provider')}
+                    placeholder="e.g. MetLife"
+                    className={`${inputBase} bg-white px-4`}
+                  />
+                </div>
+                <div>
+                  <label className={labelBase}>Policy Number</label>
+                  <input
+                    type="text"
+                    value={form.policy_number}
+                    onChange={set('policy_number')}
+                    placeholder="e.g. ABC-123"
+                    className={`${inputBase} bg-white px-4`}
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           {/* ── Submit ───────────────────────────────────── */}

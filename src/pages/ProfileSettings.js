@@ -26,31 +26,42 @@ export default function ProfileSettings() {
       return currentUser?.name_en || currentUser?.name || 'User';
    };
 
+         const [hasInsurance, setHasInsurance] = useState(false);
    const [formData, setFormData] = useState({
       name_en: '',
       name_ar: '',
       phone: '',
       gender: 'Male',
-      date_of_birth: ''
+      date_of_birth: '',
+      insurance_provider: '',
+      policy_number: ''
    });
 
    // Initialize form when user data is available
-   React.useEffect(() => {
+         React.useEffect(() => {
       if (currentUser) {
          setFormData({
             name_en: currentUser.name_en || '',
             name_ar: currentUser.name_ar || '',
             phone: currentUser.phone || '',
             gender: currentUser.gender || 'Male',
-            date_of_birth: formatDateForInput(currentUser.date_of_birth)
+            date_of_birth: formatDateForInput(currentUser.date_of_birth),
+            insurance_provider: currentUser.insurance_provider || '',
+            policy_number: currentUser.policy_number || ''
          });
-      }
-   }, [currentUser]);
+         setHasInsurance(!!(currentUser.insurance_provider || currentUser.policy_number));
+       }
+    }, [currentUser]);
 
-   const handleSaveChanges = async () => {
+      const handleSaveChanges = async () => {
       setLoading(true);
       try {
-         await dispatch(updateMe(formData)).unwrap();
+         const payload = {
+            ...formData,
+            insurance_provider: hasInsurance ? formData.insurance_provider : '',
+            policy_number: hasInsurance ? formData.policy_number : ''
+         };
+         await dispatch(updateMe(payload)).unwrap();
          toast.success('Profile updated successfully!');
       } catch (err) {
          toast.error(err?.message || 'Failed to update profile');
@@ -154,42 +165,74 @@ export default function ProfileSettings() {
             return (
                <div className="animate-in fade-in duration-300 space-y-8">
                   <div>
-                     <h3 className="text-xl font-extrabold text-slate-900 mb-1">Insurance Details</h3>
-                     <p className="text-sm font-medium text-slate-500 mb-6">Manage your primary and secondary health insurance coverage files.</p>
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="md:col-span-2">
-                           <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-widest">Primary Insurance Provider</label>
-                           <input type="text" defaultValue="Blue Cross Blue Shield" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm" />
-                        </div>
-                        <div>
-                           <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-widest">Policy Number / Member ID</label>
-                           <input type="text" defaultValue="BCB-987654321A" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 font-semibold font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm" />
-                        </div>
-                        <div>
-                           <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-widest">Group ID</label>
-                           <input type="text" defaultValue="GRP-4432X" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 font-semibold font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm" />
-                        </div>
+                     <h3 className="text-xl font-extrabold text-slate-900 mb-1">{t('profileSettings.insuranceDetailsTitle', { defaultValue: 'Insurance Details' })}</h3>
+                     <p className="text-sm font-medium text-slate-500 mb-6">{t('profileSettings.insuranceDetailsDesc', { defaultValue: 'Manage your primary and secondary health insurance coverage files.' })}</p>
+                                          <div className="flex items-center gap-2.5 pb-2.5">
+                        <input
+                           type="checkbox"
+                           id="settingsHasInsurance"
+                           checked={hasInsurance}
+                           onChange={(e) => setHasInsurance(e.target.checked)}
+                           className="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500 cursor-pointer"
+                        />
+                        <label htmlFor="settingsHasInsurance" className="text-xs font-bold text-slate-700 cursor-pointer select-none">
+                           {t('profileSettings.hasInsuranceCheckbox', { defaultValue: 'I have health insurance' })}
+                        </label>
                      </div>
+
+                     {hasInsurance && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-3 border-t border-slate-100 animate-in fade-in slide-in-from-top-2 duration-200">
+                           <div className="md:col-span-2">
+                              <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-widest">{t('profileSettings.primaryProviderLabel', { defaultValue: 'Primary Insurance Provider' })}</label>
+                              <input 
+                                 type="text" 
+                                 value={formData.insurance_provider} 
+                                 onChange={(e) => setFormData({ ...formData, insurance_provider: e.target.value })} 
+                                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm" 
+                              />
+                           </div>
+                           <div>
+                              <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-widest">{t('profileSettings.policyNumberLabel', { defaultValue: 'Policy Number / Member ID' })}</label>
+                              <input 
+                                 type="text" 
+                                 value={formData.policy_number} 
+                                 onChange={(e) => setFormData({ ...formData, policy_number: e.target.value })} 
+                                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 font-semibold font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm" 
+                              />
+                           </div>
+                           <div>
+                              <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-widest">{t('profileSettings.groupIdLabel', { defaultValue: 'Group ID' })}</label>
+                              <input type="text" defaultValue="GRP-4432X" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 font-semibold font-mono focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm" />
+                           </div>
+                        </div>
+                     )}
                   </div>
 
-                  <div className="pt-6 border-t border-slate-100">
-                     <h3 className="text-lg font-bold text-slate-900 mb-4">Insurance Card Photos</h3>
+                  {/* <div className="pt-6 border-t border-slate-100">
+                     <h3 className="text-lg font-bold text-slate-900 mb-4">{t('profileSettings.cardPhotosTitle', { defaultValue: 'Insurance Card Photos' })}</h3>
                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-6 flex flex-col items-center justify-center text-center hover:border-primary-400 hover:bg-primary-50/50 transition-colors cursor-pointer group min-h-[160px]">
                            <div className="bg-white p-2 rounded-full shadow-sm mb-3 group-hover:scale-110 transition-transform"><Camera className="w-5 h-5 text-primary-600" /></div>
-                           <div className="font-bold text-slate-700 text-sm">Upload Front</div>
-                           <div className="text-[10px] font-semibold text-slate-400 mt-1 uppercase tracking-widest">Max 5MB</div>
+                           <div className="font-bold text-slate-700 text-sm">{t('profileSettings.uploadFrontLabel', { defaultValue: 'Upload Front' })}</div>
+                           <div className="text-[10px] font-semibold text-slate-400 mt-1 uppercase tracking-widest">{t('profileSettings.max5mbLabel', { defaultValue: 'Max 5MB' })}</div>
                         </div>
                         <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-6 flex flex-col items-center justify-center text-center hover:border-primary-400 hover:bg-primary-50/50 transition-colors cursor-pointer group min-h-[160px]">
                            <div className="bg-white p-2 rounded-full shadow-sm mb-3 group-hover:scale-110 transition-transform"><Camera className="w-5 h-5 text-slate-400 group-hover:text-primary-600" /></div>
-                           <div className="font-bold text-slate-700 text-sm">Upload Back</div>
-                           <div className="text-[10px] font-semibold text-slate-400 mt-1 uppercase tracking-widest">Optional</div>
+                           <div className="font-bold text-slate-700 text-sm">{t('profileSettings.uploadBackLabel', { defaultValue: 'Upload Back' })}</div>
+                           <div className="text-[10px] font-semibold text-slate-400 mt-1 uppercase tracking-widest">{t('profileSettings.optionalLabel', { defaultValue: 'Optional' })}</div>
                         </div>
                      </div>
-                  </div>
+                  </div> */}
 
-                  <div className="pt-6 mt-6 border-t border-slate-100 flex justify-end gap-3">
-                     <button className="px-6 py-2.5 bg-primary-600 text-white font-bold text-sm rounded-xl shadow-sm shadow-primary-600/20 hover:bg-primary-700 hover:-translate-y-0.5 transition-all">Save Records</button>
+                                    <div className="pt-6 mt-6 border-t border-slate-100 flex justify-end gap-3">
+                     <button 
+                        onClick={handleSaveChanges} 
+                        disabled={loading}
+                        className="px-6 py-2.5 bg-primary-600 text-white font-bold text-sm rounded-xl shadow-sm shadow-primary-600/20 hover:bg-primary-700 hover:-translate-y-0.5 transition-all flex items-center gap-2 disabled:opacity-70"
+                     >
+                        {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+                        {t('profileSettings.saveRecordsButton', { defaultValue: 'Save Records' })}
+                     </button>
                   </div>
                </div>
             );

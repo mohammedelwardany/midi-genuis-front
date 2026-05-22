@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { createAppointment, selectAppointmentsLoading, selectBookingDraft, clearBookingDraft } from '../store/slices/appointmentSlice';
 import { selectSelectedDoctor } from '../store/slices/doctorSlice';
 import { uploadReport } from '../store/slices/patientSlice';
+import { initiatePayment, uploadReceipt } from '../store/slices/paymentSlice';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { selectCurrentUser } from '../store/slices/authSlice';
 import toast from 'react-hot-toast';
@@ -33,33 +34,6 @@ export default function FinalizePayment() {
     if (file) {
       setPaymentScreenshot(file);
       setPreviewUrl(URL.createObjectURL(file));
-
-      // Upload immediately to ensure it's in reports
-      const fd = new FormData();
-      fd.append('file', file);
-      const patientId = currentUser?.user_id || currentUser?.id;
-      if (patientId) fd.append('patient_id', patientId);
-
-      try {
-        setIsUploading(true);
-        toast.loading(t('finalizePayment.toastUploading', { defaultValue: 'Uploading payment proof...' }), { id: 'upload' });
-        const result = await dispatch(uploadReport(fd)).unwrap();
-
-        // Be robust about finding the ID
-        const reportId = result.id || result.report_id || result.data?.id || result.data?.report_id || result.report?.id || (typeof result === 'number' ? result : null);
-
-        if (reportId) {
-          setPaymentScreenshotId(reportId);
-          toast.success(t('finalizePayment.toastUploadSuccess', { defaultValue: 'Payment proof uploaded successfully' }), { id: 'upload' });
-        } else {
-          console.error('Upload succeeded but no ID found in response:', result);
-          toast.error(t('finalizePayment.errorNoRefId', { defaultValue: 'Upload succeeded but failed to get reference ID' }), { id: 'upload' });
-        }
-      } catch (err) {
-        toast.error(t('finalizePayment.errorUploadFail', { defaultValue: 'Failed to upload screenshot' }), { id: 'upload' });
-      } finally {
-        setIsUploading(false);
-      }
     }
   };
 
@@ -69,34 +43,90 @@ export default function FinalizePayment() {
       return;
     }
 
-    // if (!paymentScreenshotId) {
-    //   toast.error('Please upload your payment screenshot first');
-    //   return;
-    // }
+    if (!paymentScreenshot) {
+      toast.error(t('finalizePayment.errorMissingScreenshot', { defaultValue: 'Please upload your payment screenshot first' }));
+      return;
+    }
 
     try {
+      setIsUploading(true);
+      toast.loading(t('finalizePayment.toastBooking', { defaultValue: 'Processing booking...' }), { id: 'booking' });
+
       const payload = {
         doctor_id: parseInt(doctorId),
         availability_id: selectedSlot.id,
         scheduled_at: `${selectedDate} ${selectedSlot.start_time.substring(0, 5)}`,
-        notes: `${reason || symptoms || "Patient booking"} (Payment Ref: ${paymentScreenshotId})`
+        notes: `${reason || symptoms || "Patient booking"}`
       };
 
-      await dispatch(createAppointment(payload)).unwrap();
+      const apptResult = await dispatch(createAppointment(payload)).unwrap();
+      console.log(apptResult);
+      const appointmentId =
+        apptResult?.id ||
+        apptResult?.appointment_id ||
+        apptResult?.appointmentId ||
+        apptResult?.appointment?.id ||
+        apptResult?.appointment?.appointment_id ||
+        apptResult?.appointment?.appointmentId ||
+        apptResult?.data?.id ||
+        apptResult?.data?.appointment_id ||
+        apptResult?.data?.appointmentId ||
+        apptResult?.data?.appointment?.id ||
+        apptResult?.data?.appointment?.appointment_id ||
+        apptResult?.data?.appointment?.appointmentId;
+
+      if (!appointmentId) {
+        throw new Error("Failed to get appointment ID. Response: " + JSON.stringify(apptResult));
+      }
+
+      const paymentPayload = {
+        appointment_id: appointmentId,
+        amount: 250.00, // Matching the UI value
+        currency: "EGP",
+        paymentMethod: "manual_transfer"
+      };
+
+      const paymentResult = await dispatch(initiatePayment(paymentPayload)).unwrap();
+      const paymentId =
+        paymentResult?.id ||
+        paymentResult?.payment_id ||
+        paymentResult?.paymentId ||
+        paymentResult?.payment?.id ||
+        paymentResult?.payment?.payment_id ||
+        paymentResult?.payment?.paymentId ||
+        paymentResult?.data?.id ||
+        paymentResult?.data?.payment_id ||
+        paymentResult?.data?.paymentId ||
+        paymentResult?.data?.payment?.id ||
+        paymentResult?.data?.payment?.payment_id ||
+        paymentResult?.data?.payment?.paymentId;
+
+      if (!paymentId) {
+        throw new Error("Failed to initiate payment. Response: " + JSON.stringify(paymentResult));
+      }
+
+      const fd = new FormData();
+      fd.append('receipt', paymentScreenshot);
+
+      await dispatch(uploadReceipt({ id: paymentId, formData: fd })).unwrap();
+
       dispatch(clearBookingDraft());
+      toast.success(t('finalizePayment.toastSuccess', { defaultValue: 'Appointment booked successfully!' }), { id: 'booking' });
 
-      toast.success(t('finalizePayment.toastSuccess', { defaultValue: 'Appointment booked successfully!' }));
-
-      navigate('/patient/book/confirm', {
+      navigate(`/patient/book/${appointmentId}/confirm`, {
         state: {
           doctorName: i18n.language.startsWith('ar') ? (selectedDoctor?.name_ar || selectedDoctor?.name) : (selectedDoctor?.name_en || selectedDoctor?.name || 'Specialist'),
           date: selectedDate,
           time: `${selectedSlot.start_time} - ${selectedSlot.end_time}`,
-          pending: true
+          pending: true,
+          appointmentId: appointmentId
         }
       });
     } catch (err) {
-      toast.error(err?.message || t('finalizePayment.toastError', { defaultValue: 'Failed to book appointment' }));
+      console.error(err);
+      toast.error(err?.message || t('finalizePayment.toastError', { defaultValue: 'Failed to complete booking process' }), { id: 'booking' });
+    } finally {
+      setIsUploading(false);
     }
   };
 
