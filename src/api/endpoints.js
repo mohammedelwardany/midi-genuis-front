@@ -30,6 +30,8 @@ export const ENDPOINTS = {
     getPatientReports: (id) => `/patients/getPatientReports/${id}`,
     deletePatientReport: (pid, rid) => `/patients/deletePatientReport/${pid}/${rid}`,
     getDoctorAvailability: (id) => `/patients/getDoctorAvailability/${id}`,
+    getNextAppointment: '/patients/getNextAppointment',
+    getPatientAppointments: '/patients/getPatientAppointments',
   },
 
   // ── Doctors ───────────────────────────────────────
@@ -44,11 +46,15 @@ export const ENDPOINTS = {
     addAvailability: '/doctors/addAvailability',
     upcomingAvailability: (id) => `/doctors/getUpcomingAvailability/${id}`,
     getTopDoctors: '/doctors/getTopDoctors',
+    getDoctorAppointments: '/doctors/getDoctorAppointments',
+    getMyPatientsByDate: (date) => `/doctors/getMyPatientsByDate/${date}`,
   },
 
   // ── Appointments ──────────────────────────────────
   appointments: {
     list: '/appointments',
+    getAllAppointments: '/appointments/getAllAppointments',
+    getAppointmentById: (id) => `/appointments/getAppointmentById/${id}`,
     byId: (id) => `/appointments/${id}`,
     create: '/appointments/book',
     cancel: (id) => `/appointments/${id}/cancel`,
@@ -58,6 +64,13 @@ export const ENDPOINTS = {
   admin: {
     stats: '/admin/stats',
     settings: '/admin/settings',
+  },
+
+  // ── Admin Dashboard ────────────────────────────────
+  adminDashboard: {
+    metrics: '/adminDashboard/metrics',
+    doctorRevenues: '/adminDashboard/doctorRevenues',
+    monthlyRevenues: '/adminDashboard/monthlyRevenues',
   },
 
   // ── Messages ──────────────────────────────────────
@@ -72,5 +85,8 @@ export const ENDPOINTS = {
     initiate: '/payments/initiatePayment',
     uploadReceipt: (id) => `/payments/uploadReceipt/${id}`,
     review: '/payments/reviewPayment',
+    getAllPayments: '/payments/getAllPayments',
+    getMyPayments: '/payments/getMyPayments',
+    getPaymentById: (id) => `/payments/getPaymentById/${id}`,
   },
 };

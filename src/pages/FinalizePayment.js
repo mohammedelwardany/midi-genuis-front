@@ -223,7 +223,7 @@ export default function FinalizePayment() {
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="font-bold text-primary-900 mb-1">{t('finalizePayment.manualApproval', { defaultValue: 'Manual Approval Required' })}</h4>
+              <h4 className="font-bold text-primary-900 mb-1">{t('finalizePayment.manualApproval', { defaultValue: 'Manual Approval' })}</h4>
               <p className="text-sm text-primary-700 leading-relaxed">
                 {t('finalizePayment.manualApprovalNotice', { defaultValue: 'Your appointment will be confirmed once the administration verifies your payment screenshot.' })}
               </p>

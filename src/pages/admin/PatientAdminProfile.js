@@ -75,9 +75,10 @@ export default function PatientAdminProfile() {
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     setSubmitting(true);
+    console.log(patient)
     try {
       await dispatch(updatePatient({
-        id,
+        id: patient.user_id,
         data: {
           ...editData,
           insurance_provider: hasInsurance ? editData.insurance_provider : '',

@@ -9,7 +9,9 @@
     "patients": "المرضى",
     "schedule": "الجدول",
     "performance": "الأداء",
-    "userManagement": "إدارة المستخدمين"
+    "userManagement": "إدارة المستخدمين",
+    "payments": "المدفوعات",
+    "appointments": "المواعيد"
   },
   "topNav": {
     "search": "البحث في السجلات...",
@@ -89,7 +91,15 @@
     "systemStatusDesc": "جميع الأنظمة تعمل حالياً بكفاءة تامة.",
     "dbLoad": "حمل قاعدة البيانات",
     "storage": "سعة التخزين",
-    "viewInfra": "عرض البنية التحتية"
+    "viewInfra": "عرض البنية التحتية",
+    "patientSatisfaction": "رضا المرضى",
+    "totalAppointments": "إجمالي المواعيد",
+    "monthlyRevenueOverview": "نظرة عامة على الإيرادات الشهرية",
+    "doctorLeaderboard": "الأطباء الأكثر تحقيقاً للإيرادات",
+    "satisfaction": "نسبة الرضا",
+    "rating": "التقييم",
+    "revenue": "الإيرادات",
+    "specialization": "التخصص"
   },
   "admin": {
     "manageAvailability": "إدارة توافر الأخصائيين",
@@ -202,12 +212,53 @@
     "lastPaymentReceived": "آخر دفعة مستلمة",
     "newServiceCharges": "رسوم خدمات جديدة",
     "paymentHistory": "سجل المدفوعات",
+    "totalPaid": "إجمالي المدفوعات المعتمدة",
+    "approvedTrans": "مدفوعات موثقة",
+    "pendingVerification": "قيد التدقيق",
+    "pendingTrans": "في انتظار مراجعة المسؤول",
+    "support": "دعم الفوترة",
+    "supportDescription": "هل تحتاج إلى تفاصيل حول رسوم العيادة المستحقة، أو تفاصيل التحويل اليدوي؟ تواصل مع مكتبنا.",
+    "standardConsultationFee": "رسوم الاستشارة القياسية",
+    "fetchingStatements": "جاري تحميل كشف الحساب...",
+    "na": "غير متوفر",
     "table": {
       "invoiceId": "رقم الفاتورة",
       "date": "التاريخ",
       "serviceDoctor": "الخدمة/الطبيب",
       "amount": "المبلغ",
-      "status": "الحالة"
+      "status": "الحالة",
+      "action": "الإجراء",
+      "details": "التفاصيل"
+    },
+    "status": {
+      "pending": "قيد الانتظار",
+      "approved": "مقبول",
+      "rejected": "مرفوض",
+      "failed": "فاشل"
+    },
+    "paymentMethod": {
+      "manualTransfer": "تحويل يدوي",
+      "cash": "نقداً"
+    },
+    "secure": "آمن",
+    "manualTransferAudit": "تدقيق التحويل اليدوي",
+    "manualTransferAuditDesc": "تتطلب جميع التحويلات اليدوية للمحفظة والإيداعات البنكية إيصالات بالمعاملات. يكمل مكتبنا المالي عمليات التدقيق في غضون ساعة إلى ساعتين من ساعات العمل.",
+    "invoiceCopiesDesc": "البيانات المؤسسية الرسمية المعتمدة أو تقارير التأمين قابلة للتنزيل بسهولة. اتصل بمكتب الاستقبال على (555) 012-3456.",
+    "drawer": {
+      "title": "سجل تدقيق المعاملات",
+      "referenceId": "الرقم المرجعي: #PAY-{{id}}",
+      "loading": "جاري استرداد بيانات التدقيق...",
+      "verificationStatus": "حالة التحقق من التدقيق",
+      "amountSummary": "ملخص المبلغ",
+      "paymentMethodLabel": "طريقة الدفع",
+      "paymentDate": "تاريخ الدفع",
+      "appointmentId": "رقم الموعد",
+      "adminNotes": "ملاحظات إدارية",
+      "noNotes": "لا توجد ملاحظات مراجعة من قبل المسؤول.",
+      "submittedScreenshot": "لقطة الشاشة المقدمة",
+      "viewFullscreen": "عرض بالكامل",
+      "noScreenshot": "لم يتم رفع لقطة شاشة",
+      "close": "إغلاق العرض"
     },
     "paymentMethods": "طرق الدفع",
     "addNew": "إضافة جديد",
@@ -346,7 +397,7 @@
     "uploadScreenshot": "رفع صورة معاملة الدفع",
     "confirmBooking": "تأكيد وحجز الموعد",
     "waitingForUpload": "جاري الرفع...",
-    "manualApproval": "يتطلب موافقة يدوية",
+    "manualApproval": "يتطلب موافقة",
     "manualApprovalNotice": "سيتم تأكيد موعدك بمجرد مراجعة الإدارة لصورة الدفع.",
     "bookingSummary": "ملخص الحجز",
     "specialistConsultation": "استشارة اختصاصي",
@@ -379,10 +430,53 @@
     "labServices": "خدمات المختبر",
     "totalAmountPaid": "إجمالي المبلغ المدفوع",
     "clinicalGuidance": "إرشادات العيادة",
-    "guidance1": "يرجى الحضور قبل الموعد بـ 15 دقيقة لإجراء الفحوصات الحيوية وإنهاء إجراءات الدخول.",
+    "guidance1": "يرجى الحضور قبل الموعد بـ 15 دقيقة",
     "guidance2": "يرجى إحضار جميع الأدوية الحالية أو قائمة رقمية ليقوم الطبيب بمراجعتها.",
     "scheduleAnother": "جدولة موعد آخر",
     "returnToDashboard": "العودة للوحة التحكم"
+  },
+  "appointmentDetails": {
+    "appointments": "المواعيد",
+    "printSummary": "طباعة الملخص",
+    "contactClinic": "التواصل مع العيادة",
+    "viewFullProfile": "عرض الملف الكامل",
+    "viewPreviousNotes": "عرض الملاحظات السابقة",
+    "consultation": "استشارة",
+    "reasonForVisit": "سبب الزيارة / ملاحظات المريض",
+    "noReason": "لم يتم تقديم سبب إضافي أو ملاحظات استشارة.",
+    "preVisitInstructions": "تعليمات ما قبل الزيارة",
+    "checkInTitle": "تسجيل الدخول في العيادة",
+    "checkInDesc": "يرجى الحضور أو تسجيل الدخول في مكتب الاستقبال قبل 10 دقائق من الفترة المحددة.",
+    "medicationPrepTitle": "تحضير الأدوية",
+    "medicationPrepDesc": "يرجى تجهيز قائمة أدويتك المعتادة أو الحبوب معك أثناء الاستشارة.",
+    "yourCareProvider": "مقدم الرعاية الخاص بك",
+    "mainMedicalCenter": "المركز الطبي الرئيسي",
+    "appointmentTimeline": "الخط الزمني للموعد",
+    "location": "الموقع",
+    "status": {
+      "confirmed": "مؤكد",
+      "pending": "قيد الانتظار",
+      "completed": "مكتمل",
+      "cancelled": "ملغي"
+    },
+    "type": {
+      "telehealth": "زيارة عن بعد",
+      "telehealth_visit": "زيارة عن بعد",
+      "inperson": "زيارة حضورية",
+      "inperson_visit": "زيارة حضورية"
+    },
+    "timeline": {
+      "requestSubmitted": "تم تقديم الطلب",
+      "verifiedBySystem": "تم التحقق بواسطة النظام",
+      "confirmedByClinic": "تم التأكيد من العيادة",
+      "cancelled": "ملغي",
+      "awaitingConfirmation": "في انتظار التأكيد",
+      "clinicApproval": "موافقة إدارة العيادة",
+      "sessionCompleted": "اكتملت الجلسة",
+      "consultationFinished": "انتهت الاستشارة الطبية"
+    },
+    "pendingDate": "تاريخ معلق",
+    "pendingTime": "وقت معلق"
   },
   "messages": {
     "title": "المراسلة الآمنة",
@@ -407,18 +501,6 @@
     "searchPlaceholder": "ابحث عن طبيب أو ملاحظة...",
     "filterBy": "تصفية حسب:",
     "loadOlderVisits": "تحميل زيارات أقدم"
-  },
-  "appointmentDetails": {
-    "appointments": "المواعيد",
-    "printSummary": "طباعة الملخص",
-    "contactClinic": "التواصل مع العيادة",
-    "reasonForVisit": "سبب الزيارة",
-    "preVisitInstructions": "تعليمات قبل الزيارة",
-    "yourCareProvider": "مقدم الرعاية الخاص بك",
-    "viewFullProfile": "عرض الملف الكامل",
-    "viewPreviousNotes": "عرض الملاحظات السابقة",
-    "appointmentTimeline": "الخط الزمني للموعد",
-    "location": "الموقع"
   },
   "emergency": {
     "title": "اتصال الطوارئ",
@@ -678,5 +760,61 @@
     "uploadLimit": "صيغة JPG أو PNG (بحد أقصى 5 ميجابايت)",
     "tapToChange": "انقر لتغيير الصورة",
     "uploadScreenshotError": "يرجى رفع لقطة شاشة الدفع أولاً"
+  },
+  "adminPayments": {
+    "title": "لوحة تدقيق الحسابات المالية",
+    "subtitle": "مراجعة المعاملات اليدوية، والتحقق من إيصالات الدفع، وإصدار تأكيدات الحجز.",
+    "reloaded": "تم تحديث المدفوعات",
+    "refreshLedger": "تحديث السجل",
+    "totalApprovedVolume": "إجمالي حجم المدفوعات المعتمدة",
+    "verifiedSettlements": "{{count}} تسوية معتمدة",
+    "pendingVerification": "في انتظار التحقق",
+    "awaitingAction": "في انتظار الإجراء",
+    "totalStatements": "إجمالي الكشوفات",
+    "ledgerSize": "حجم السجل",
+    "searchPlaceholder": "ابحث في السجل برقم المعاملة، المريض، أو القيمة...",
+    "allLedgers": "كل السجلات",
+    "pendingAudit": "قيد التدقيق",
+    "approved": "معتمد",
+    "rejected": "مرفوض",
+    "allAppointments": "كل المواعيد",
+    "nextAppointments": "المواعيد القادمة",
+    "pastAppointments": "المواعيد السابقة",
+    "next": "قادم",
+    "past": "سابق",
+    "records": "سجلات",
+    "transactions": "معاملات",
+    "table": {
+      "txnId": "رقم المعاملة",
+      "submissionDate": "تاريخ التقديم",
+      "patientProfile": "ملف المريض",
+      "associatedAppointment": "الموعد المرتبط",
+      "amount": "القيمة",
+      "verificationStatus": "حالة التحقق",
+      "reviewAction": "إجراء المراجعة"
+    },
+    "queryingRecords": "جاري الاستعلام عن السجلات المالية...",
+    "auditTxn": "تدقيق المعاملة",
+    "noTransactions": "لا توجد معاملات تطابق معايير البحث أو الفلاتر المحددة.",
+    "modal": {
+      "receiptProof": "إثبات إيصال التحويل اليدوي",
+      "noReceipt": "لم يقم المريض برفع صورة الإيصال",
+      "openFullscreen": "فتح الإيصال بالدقة الكاملة",
+      "verifyLedger": "التحقق من سجل المعاملة",
+      "referenceId": "الرقم المرجعي: #PAY-{{id}}",
+      "patientName": "اسم المريض",
+      "paymentAmount": "قيمة الدفع",
+      "transferMode": "طريقة التحويل",
+      "paymentDate": "تاريخ الدفع",
+      "auditDetermination": "قرار التدقيق",
+      "approveLedger": "اعتماد السجل",
+      "rejectProof": "رفض الإثبات",
+      "auditorComments": "ملاحظات المدقق",
+      "placeholderComments": "أدخل تفاصيل تدقيق التحويل، مثل: الرقم المرجعي لـ Instapay متطابق، أو عدم وضوح الإيصال يمنع التحقق...",
+      "discardChanges": "تجاهل التغييرات",
+      "confirmDecision": "تأكيد القرار",
+      "updateSuccess": "تم تحديث الدفعة رقم #{{id}} إلى {{status}}",
+      "updateError": "فشل مراجعة الدفعة"
+    }
   }
 }

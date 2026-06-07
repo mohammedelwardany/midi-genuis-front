@@ -2,9 +2,11 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { Heart, Activity, Scale, PlusCircle, MessageSquare, Pill, ChevronRight, FileText, Download, Calendar, Loader2 } from 'lucide-react';
-import { fetchAppointments, selectAppointments, selectAppointmentsLoading } from '../store/slices/appointmentSlice';
+import { Activity, PlusCircle, FileText, Download, Calendar, Loader2 } from 'lucide-react';
+import { fetchNextAppointment, selectNextAppointment } from '../store/slices/appointmentSlice';
 import { selectCurrentUser } from '../store/slices/authSlice';
+import { fetchMyReports, selectMyReports, selectPatientsLoading } from '../store/slices/patientSlice';
+import { BASE_URL } from '../api/endpoints';
 
 export default function PatientDashboard() {
    const navigate = useNavigate();
@@ -12,14 +14,44 @@ export default function PatientDashboard() {
    const { t, i18n } = useTranslation();
 
    const user = useSelector(selectCurrentUser);
-   const appointments = useSelector(selectAppointments);
-   const loading = useSelector(selectAppointmentsLoading);
+   const nextAppt = useSelector(selectNextAppointment);
+   const reports = useSelector(selectMyReports) || [];
+   const reportsLoading = useSelector(selectPatientsLoading);
 
    useEffect(() => {
-      dispatch(fetchAppointments());
+      dispatch(fetchNextAppointment());
+      dispatch(fetchMyReports());
    }, [dispatch]);
 
-   const nextAppt = appointments.find(a => a.status === 'confirmed' || a.status === 'pending');
+   const isRtl = i18n.language.startsWith('ar');
+
+   const getFullUrl = (path) => {
+      if (!path) return '#';
+      if (path.startsWith('http')) return path;
+      const origin = BASE_URL.split('/backend/api')[0];
+      return `${origin}${path}`;
+   };
+
+   const nextApptDoctorName = nextAppt
+      ? (isRtl 
+         ? (nextAppt.doctor?.name_ar || nextAppt.doctor_name_ar || nextAppt.doctor?.name || nextAppt.doctor_name || 'طبيب متخصص')
+         : (nextAppt.doctor?.name_en || nextAppt.doctor_name_en || nextAppt.doctor?.name || nextAppt.doctor_name || 'Medical Specialist'))
+      : '';
+
+   const nextApptSpecialization = nextAppt
+      ? (isRtl
+         ? (nextAppt.doctor?.specialization_ar || nextAppt.doctor_specialization_ar || t('specializations.' + String(nextAppt.doctor?.specialization || '').toLowerCase().replace(' ', '_'), { defaultValue: nextAppt.doctor?.specialization || 'طبيب استشاري' }))
+         : (nextAppt.doctor?.specialization_en || nextAppt.doctor_specialization_en || t('specializations.' + String(nextAppt.doctor?.specialization || '').toLowerCase().replace(' ', '_'), { defaultValue: nextAppt.doctor?.specialization || 'Clinical Specialist' })))
+      : '';
+
+   const scheduledDate = nextAppt?.scheduledAt || nextAppt?.scheduled_at || nextAppt?.date;
+   const nextApptDate = scheduledDate
+      ? new Date(scheduledDate).toLocaleDateString(isRtl ? 'ar-EG' : 'en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+      : '';
+
+   const nextApptTime = scheduledDate
+      ? new Date(scheduledDate).toLocaleTimeString(isRtl ? 'ar-EG' : 'en-US', { hour: '2-digit', minute: '2-digit' })
+      : '';
 
    return (
       <div className="animate-in fade-in duration-500 max-w-6xl mx-auto flex flex-col lg:flex-row gap-8">
@@ -35,7 +67,7 @@ export default function PatientDashboard() {
                <p className="text-slate-600 font-medium text-sm md:text-[15px]">
                   {nextAppt ? (
                      <>
-                        {t('patientDashboard.subtitle')} <span className="font-bold text-primary-600 cursor-pointer hover:underline">{nextAppt.doctor_name || 'Your Doctor'}</span> on {nextAppt.date} at {nextAppt.time}.
+                        {t('patientDashboard.subtitle')} <span onClick={() => navigate(`/patient/appointments/${nextAppt.id}`)} className="font-bold text-primary-600 cursor-pointer hover:underline">{nextApptDoctorName}</span> on {nextApptDate} at {nextApptTime}.
                      </>
                   ) : (
                      t('patientDashboard.noUpcoming')
@@ -56,15 +88,15 @@ export default function PatientDashboard() {
                      <div className="text-[10px] font-bold uppercase tracking-widest text-primary-200 mb-3 md:mb-4 opacity-80">{t('patientDashboard.nextAppt')}</div>
                      {nextAppt ? (
                         <>
-                           <h3 className="text-2xl md:text-3xl font-extrabold mb-1 tracking-tight">{nextAppt.doctor_name || 'Physician Appt'}</h3>
-                           <p className="text-xs md:text-sm font-medium text-primary-200 mb-6 md:mb-8 opacity-90">{nextAppt.specialization || 'Clinical Consult'}</p>
+                           <h3 className="text-2xl md:text-3xl font-extrabold mb-1 tracking-tight">{nextApptDoctorName}</h3>
+                           <p className="text-xs md:text-sm font-medium text-primary-200 mb-6 md:mb-8 opacity-90">{nextApptSpecialization}</p>
 
                            <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">
                               <div className="flex items-center gap-3 text-xs md:text-sm font-semibold opacity-90">
-                                 <Calendar className="w-4 h-4 text-primary-300" /> {nextAppt.date}
+                                 <Calendar className="w-4 h-4 text-primary-300" /> {nextApptDate}
                               </div>
                               <div className="flex items-center gap-3 text-xs md:text-sm font-semibold opacity-90">
-                                 <Activity className="w-4 h-4 text-primary-300" /> {nextAppt.time}
+                                 <Activity className="w-4 h-4 text-primary-300" /> {nextApptTime}
                               </div>
                            </div>
                         </>
@@ -72,7 +104,7 @@ export default function PatientDashboard() {
                         <div className="py-8 md:py-12">
                            <p className="text-primary-100 font-medium opacity-80 italic">{t('patientDashboard.noUpcoming')}</p>
                         </div>
-                     )}
+                      )}
                   </div>
  
                   <button
@@ -107,25 +139,53 @@ export default function PatientDashboard() {
                            </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50 text-sm">
-                           {loading ? (
-                              <tr><td colSpan="5" className="py-10 text-center text-slate-400 font-bold"><Loader2 className="w-5 h-5 animate-spin mx-auto me-2 inline" /> {t('patientDashboard.loadingRecords')}</td></tr>
-                           ) : appointments.filter(a => a.status === 'completed').length > 0 ? (
-                              appointments.filter(a => a.status === 'completed').slice(0, 3).map(appt => (
-                                 <tr key={appt.id} className="hover:bg-slate-50/50 transition-colors">
-                                    <td className="py-4 md:py-5 px-4 ps-6 flex items-center gap-3">
-                                       <FileText className="w-5 h-5 text-primary-500 stroke-[1.5] shrink-0" />
-                                       <span className="font-bold text-slate-800 truncate max-w-[120px] md:max-w-none">{appt.service || 'Clinical Consultation'}</span>
-                                    </td>
-                                    <td className="py-4 md:py-5 px-4 font-semibold text-slate-600 whitespace-nowrap">{appt.date}</td>
-                                    <td className="py-4 md:py-5 px-4 font-medium text-slate-500 hidden sm:table-cell">{appt.specialization || 'General'}</td>
-                                    <td className="py-4 md:py-5 px-4 hidden md:table-cell">
-                                       <span className="bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full text-[10px] font-bold border border-emerald-100/50">Reviewed</span>
-                                    </td>
-                                    <td className="py-4 md:py-5 px-4 text-center">
-                                       <button className="text-primary-600 hover:text-primary-800 p-2 rounded-full hover:bg-primary-50 transition-colors"><Download className="w-4 h-4" /></button>
-                                    </td>
-                                 </tr>
-                              ))
+                           {reportsLoading ? (
+                              <tr>
+                                 <td colSpan="5" className="py-10 text-slate-400 font-bold">
+                                    <div className="flex items-center justify-center gap-2">
+                                       <Loader2 className="w-5 h-5 animate-spin text-primary-600 shrink-0" />
+                                       <span>{t('patientDashboard.loadingRecords')}</span>
+                                    </div>
+                                 </td>
+                              </tr>
+                           ) : reports && reports.length > 0 ? (
+                              reports.slice(0, 3).map(report => {
+                                 const formattedDate = report.created_at
+                                    ? new Date(report.created_at).toLocaleDateString(isRtl ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                                    : 'N/A';
+                                 
+                                 const department = report.type || (isRtl ? 'عام' : 'General');
+
+                                 return (
+                                    <tr key={report.id || report.report_id} className="hover:bg-slate-50/50 transition-colors">
+                                       <td className="py-4 md:py-5 px-4 ps-6 text-start">
+                                          <div className="flex items-center gap-3">
+                                             <FileText className="w-5 h-5 text-primary-500 stroke-[1.5] shrink-0" />
+                                             <span className="font-bold text-slate-800 truncate max-w-[120px] md:max-w-none">
+                                                {report.file_name || report.file_url?.split('/').pop() || (isRtl ? 'تقرير طبي' : 'Untitled Document')}
+                                             </span>
+                                          </div>
+                                       </td>
+                                       <td className="py-4 md:py-5 px-4 font-semibold text-slate-600 whitespace-nowrap text-start">{formattedDate}</td>
+                                       <td className="py-4 md:py-5 px-4 font-medium text-slate-500 hidden sm:table-cell text-start">{department}</td>
+                                       <td className="py-4 md:py-5 px-4 hidden md:table-cell text-start">
+                                          <span className="bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full text-[10px] font-bold border border-emerald-100/50">
+                                             {isRtl ? 'تمت مراجعته' : 'Reviewed'}
+                                          </span>
+                                       </td>
+                                       <td className="py-4 md:py-5 px-4 text-center">
+                                          <a 
+                                             href={getFullUrl(report.file_url)}
+                                             target="_blank" 
+                                             rel="noopener noreferrer" 
+                                             className="text-primary-600 hover:text-primary-800 p-2 rounded-full hover:bg-primary-50 transition-colors inline-block"
+                                          >
+                                             <Download className="w-4 h-4" />
+                                          </a>
+                                       </td>
+                                    </tr>
+                                 );
+                              })
                            ) : (
                               <tr><td colSpan="5" className="py-10 text-center text-slate-400 font-bold italic">{t('patientDashboard.noRecords')}</td></tr>
                            )}

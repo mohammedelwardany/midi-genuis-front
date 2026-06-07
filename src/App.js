@@ -49,6 +49,9 @@ import EditDoctor from './pages/admin/EditDoctor';
 import PatientAdminProfile from './pages/admin/PatientAdminProfile';
 import AdminSetAvailability from './pages/admin/AdminSetAvailability';
 import AdminBookVisit from './pages/admin/AdminBookVisit';
+import AdminPayments from './pages/admin/AdminPayments';
+import AdminAppointments from './pages/admin/AdminAppointments';
+import AdminAppointmentDetails from './pages/admin/AdminAppointmentDetails';
 
 // Global Route
 import EmergencyContact from './pages/EmergencyContact';
@@ -72,10 +75,10 @@ function App() {
   const patientPortalTabs = [
     { name: t('nav.dashboard'), href: '/patient/dashboard' },
     { name: t('nav.bookVisit'), href: '/patient/book/doctors' },
-    // { name: t('nav.bookingsHistory'), href: '/patient/bookings' },
+    { name: t('nav.bookingsHistory'), href: '/patient/bookings' },
     { name: t('nav.records'), href: '/patient/records' },
     // { name: t('nav.messages'), href: '/patient/messages' },
-    // { name: t('nav.billing'), href: '/patient/billing' }
+    { name: t('nav.billing'), href: '/patient/billing' }
   ];
 
   const doctorPortalTabs = [
@@ -88,7 +91,9 @@ function App() {
 
   const adminPortalTabs = [
     { name: t('nav.dashboard'), href: '/admin/dashboard' },
-    { name: t('nav.userManagement'), href: '/admin/users' }
+    { name: t('nav.userManagement'), href: '/admin/users' },
+    { name: t('nav.payments'), href: '/admin/payments' },
+    { name: t('nav.appointments'), href: '/admin/appointments' }
   ];
 
   return (
@@ -138,6 +143,9 @@ function App() {
         <Route element={<AdminLayout title={adminTitle} tabs={adminPortalTabs} />}>
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/users" element={<UserManagement />} />
+          <Route path="/admin/payments" element={<AdminPayments />} />
+          <Route path="/admin/appointments" element={<AdminAppointments />} />
+          <Route path="/admin/appointments/:id" element={<AdminAppointmentDetails />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
           <Route path="/admin/doctors/edit/:id" element={<EditDoctor />} />
           <Route path="/admin/doctors/availability/:id" element={<AdminSetAvailability />} />

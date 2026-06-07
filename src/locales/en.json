@@ -9,7 +9,9 @@
     "patients": "Patients",
     "schedule": "Schedule",
     "performance": "Performance",
-    "userManagement": "User Management"
+    "userManagement": "User Management",
+    "payments": "Payments",
+    "appointments": "Appointments"
   },
   "topNav": {
     "search": "Search records...",
@@ -89,7 +91,15 @@
     "systemStatusDesc": "All systems are currently operational and handling peak traffic.",
     "dbLoad": "Database Load",
     "storage": "Storage Capacity",
-    "viewInfra": "View Infrastructure"
+    "viewInfra": "View Infrastructure",
+    "patientSatisfaction": "Patient Satisfaction",
+    "totalAppointments": "Total Appointments",
+    "monthlyRevenueOverview": "Monthly Revenue Overview",
+    "doctorLeaderboard": "Top Performing Clinicians",
+    "satisfaction": "Satisfaction",
+    "rating": "Rating",
+    "revenue": "Revenue",
+    "specialization": "Specialization"
   },
   "admin": {
     "manageAvailability": "Manage Clinician Availability",
@@ -202,12 +212,53 @@
     "lastPaymentReceived": "Last Payment Received",
     "newServiceCharges": "New Service Charges",
     "paymentHistory": "Payment History",
+    "totalPaid": "Total Approved Paid",
+    "approvedTrans": "verified payments",
+    "pendingVerification": "Pending Audit",
+    "pendingTrans": "awaiting admin review",
+    "support": "Billing Support",
+    "supportDescription": "Need details about outstanding clinic charges or manual wire details? Get in touch with our desk.",
+    "standardConsultationFee": "Standard Consultation Fee",
+    "fetchingStatements": "Fetching statements...",
+    "na": "N/A",
     "table": {
       "invoiceId": "Invoice ID",
       "date": "Date",
       "serviceDoctor": "Service/Doctor",
       "amount": "Amount",
-      "status": "Status"
+      "status": "Status",
+      "action": "Action",
+      "details": "Details"
+    },
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "failed": "Failed"
+    },
+    "paymentMethod": {
+      "manualTransfer": "Manual Transfer",
+      "cash": "Cash"
+    },
+    "secure": "SECURE",
+    "manualTransferAudit": "Manual Transfer Audit",
+    "manualTransferAuditDesc": "All manual wallet transfers and bank deposits require transaction receipts. Our financial desk completes audits within 1-2 operational hours.",
+    "invoiceCopiesDesc": "Official stamped corporate statements or insurance reports are readily downloadable. Contact the reception desk at (555) 012-3456.",
+    "drawer": {
+      "title": "Transaction Audit Log",
+      "referenceId": "Reference ID: #PAY-{{id}}",
+      "loading": "Retrieving audit data...",
+      "verificationStatus": "Audit Verification Status",
+      "amountSummary": "Amount Summary",
+      "paymentMethodLabel": "Payment Method",
+      "paymentDate": "Payment Date",
+      "appointmentId": "Appointment ID",
+      "adminNotes": "Administrative Notes",
+      "noNotes": "No review notes left by the administrator.",
+      "submittedScreenshot": "Submitted Screenshot",
+      "viewFullscreen": "View Fullscreen",
+      "noScreenshot": "No Screenshot Uploaded",
+      "close": "Close View"
     },
     "paymentMethods": "Payment Methods",
     "addNew": "Add New",
@@ -338,7 +389,7 @@
     "uploadScreenshot": "Upload Transaction Screenshot",
     "confirmBooking": "Confirm & Book Appointment",
     "waitingForUpload": "Waiting for upload...",
-    "manualApproval": "Manual Approval Required",
+    "manualApproval": "Manual Approval",
     "manualApprovalNotice": "Your appointment will be confirmed once the administration verifies your payment screenshot.",
     "bookingSummary": "Booking Summary",
     "specialistConsultation": "Specialist Consultation",
@@ -371,10 +422,53 @@
     "labServices": "Lab Services",
     "totalAmountPaid": "Total Amount Paid",
     "clinicalGuidance": "Clinical Guidance",
-    "guidance1": "Please arrive 15 minutes early for vital checks and check-in documentation.",
+    "guidance1": "Please arrive 15 minutes early",
     "guidance2": "Bring all current medications or a digital list for the doctor to review.",
     "scheduleAnother": "Schedule Another Appointment",
     "returnToDashboard": "Return to Dashboard"
+  },
+  "appointmentDetails": {
+    "appointments": "Appointments",
+    "printSummary": "Print Summary",
+    "contactClinic": "Contact Clinic",
+    "viewFullProfile": "View Full Profile",
+    "viewPreviousNotes": "View Previous Notes",
+    "consultation": "Consultation",
+    "reasonForVisit": "Reason / Patient Notes",
+    "noReason": "No additional reason or consultation notes provided.",
+    "preVisitInstructions": "Pre-Visit Instructions",
+    "checkInTitle": "Clinic Check-in",
+    "checkInDesc": "Please connect or check-in at the desk 10 minutes prior to scheduled slot.",
+    "medicationPrepTitle": "Medication Prep",
+    "medicationPrepDesc": "Have your regular prescription list or pills available during consult.",
+    "yourCareProvider": "Your Care Provider",
+    "mainMedicalCenter": "Main Medical Center",
+    "appointmentTimeline": "Appointment Timeline",
+    "location": "Location",
+    "status": {
+      "confirmed": "Confirmed",
+      "pending": "Pending",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "type": {
+      "telehealth": "Telehealth Visit",
+      "telehealth_visit": "Telehealth Visit",
+      "inperson": "In-Person Visit",
+      "inperson_visit": "In-Person Visit"
+    },
+    "timeline": {
+      "requestSubmitted": "Request Submitted",
+      "verifiedBySystem": "Verified by system",
+      "confirmedByClinic": "Confirmed by Clinic",
+      "cancelled": "Cancelled",
+      "awaitingConfirmation": "Awaiting Confirmation",
+      "clinicApproval": "Clinic administration approval",
+      "sessionCompleted": "Session Completed",
+      "consultationFinished": "Clinical consultation finished"
+    },
+    "pendingDate": "Pending Date",
+    "pendingTime": "Pending Time"
   },
   "messages": {
     "title": "Secure Messaging",
@@ -399,18 +493,6 @@
     "searchPlaceholder": "Search doctor or note...",
     "filterBy": "Filter By:",
     "loadOlderVisits": "Load Older Visits"
-  },
-  "appointmentDetails": {
-    "appointments": "Appointments",
-    "printSummary": "Print Summary",
-    "contactClinic": "Contact Clinic",
-    "reasonForVisit": "Reason for Visit",
-    "preVisitInstructions": "Pre-Visit Instructions",
-    "yourCareProvider": "Your Care Provider",
-    "viewFullProfile": "View Full Profile",
-    "viewPreviousNotes": "View Previous Notes",
-    "appointmentTimeline": "Appointment Timeline",
-    "location": "Location"
   },
   "emergency": {
     "title": "Emergency Contact",
@@ -677,5 +759,61 @@
     "uploadLimit": "JPG OR PNG (MAX 5MB)",
     "tapToChange": "Tap to Change Image",
     "uploadScreenshotError": "Please upload your payment screenshot first"
+  },
+  "adminPayments": {
+    "title": "Financial Audits Dashboard",
+    "subtitle": "Review manual transactions, verify payment receipts, and issue booking confirmations.",
+    "reloaded": "Payments reloaded",
+    "refreshLedger": "Refresh Ledger",
+    "totalApprovedVolume": "Total Approved Volume",
+    "verifiedSettlements": "{{count}} Verified Settlements",
+    "pendingVerification": "Pending Verification",
+    "awaitingAction": "Awaiting Action",
+    "totalStatements": "Total Statements",
+    "ledgerSize": "Ledger Size",
+    "searchPlaceholder": "Search ledger by transaction reference, patient, or amount...",
+    "allLedgers": "All Ledgers",
+    "pendingAudit": "Pending Audit",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "allAppointments": "All Appointments",
+    "nextAppointments": "Next Appointments",
+    "pastAppointments": "Past Appointments",
+    "next": "Next",
+    "past": "Past",
+    "records": "Records",
+    "transactions": "Transactions",
+    "table": {
+      "txnId": "Txn ID",
+      "submissionDate": "Submission Date",
+      "patientProfile": "Patient Profile",
+      "associatedAppointment": "Associated Appointment",
+      "amount": "Amount",
+      "verificationStatus": "Verification Status",
+      "reviewAction": "Review Action"
+    },
+    "queryingRecords": "Querying financial records...",
+    "auditTxn": "Audit Txn",
+    "noTransactions": "No transactions match search criteria or selected filters.",
+    "modal": {
+      "receiptProof": "Manual Transfer Receipt Proof",
+      "noReceipt": "No receipt image uploaded by patient",
+      "openFullscreen": "Open Receipt In Full Resolution",
+      "verifyLedger": "Verify Transaction Ledger",
+      "referenceId": "Reference ID: #PAY-{{id}}",
+      "patientName": "Patient Name",
+      "paymentAmount": "Payment Amount",
+      "transferMode": "Transfer Mode",
+      "paymentDate": "Payment Date",
+      "auditDetermination": "Audit Determination",
+      "approveLedger": "Approve Ledger",
+      "rejectProof": "Reject Proof",
+      "auditorComments": "Auditor Comments",
+      "placeholderComments": "Input transfer audit details, e.g. Instapay reference matches record, or receipt blur prevents verification...",
+      "discardChanges": "Discard Changes",
+      "confirmDecision": "Confirm Decision",
+      "updateSuccess": "Payment #{{id}} updated to {{status}}",
+      "updateError": "Failed to review payment"
+    }
   }
 }

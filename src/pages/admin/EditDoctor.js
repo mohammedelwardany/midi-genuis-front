@@ -73,9 +73,9 @@ export default function EditDoctor() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const finalSpecialization = formData.specialization === 'other' ? customSpecialization : formData.specialization;
-
+    console.log(doctor)
     dispatch(updateDoctor({
-      id: id,
+      id: doctor.user_id,
       data: {
         name_en: formData.name_en,
         name_ar: formData.name_ar,

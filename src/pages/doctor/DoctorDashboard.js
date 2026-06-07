@@ -1,11 +1,103 @@
-import { Users, Timer, MessageSquare, MoreVertical, Eye } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
+import { Eye, Loader2, Calendar } from 'lucide-react';
 import { selectCurrentUser } from '../../store/slices/authSlice';
+import { 
+  fetchDoctorAppointments, 
+  fetchMyPatientsByDate, 
+  selectDoctorAppointments,
+  selectPatientsByDate, 
+  selectAppointmentsLoading 
+} from '../../store/slices/appointmentSlice';
 
 export default function DoctorDashboard() {
+   const navigate = useNavigate();
+   const dispatch = useDispatch();
    const { t, i18n } = useTranslation();
    const currentUser = useSelector(selectCurrentUser);
+   const patientsByDate = useSelector(selectPatientsByDate);
+   const doctorAppointments = useSelector(selectDoctorAppointments);
+   const loading = useSelector(selectAppointmentsLoading);
+
+   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+   const [viewMode, setViewMode] = useState('all'); // default is 'all'
+   const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'pending', 'confirmed'
+   const [genderFilter, setGenderFilter] = useState('all'); // 'all', 'Male', 'Female'
+
+   useEffect(() => {
+      dispatch(fetchDoctorAppointments());
+   }, [dispatch]);
+
+   useEffect(() => {
+      dispatch(fetchMyPatientsByDate(selectedDate));
+   }, [dispatch, selectedDate]);
+
+   const isRtl = i18n.language.startsWith('ar');
+
+   const getPatientName = (appt) => {
+     const nameAr = appt.name_ar || appt.patient?.name_ar || appt.patient_name_ar || appt.patient?.name || appt.patient_name || appt.name;
+     const nameEn = appt.name_en || appt.patient?.name_en || appt.patient_name_en || appt.patient?.name || appt.patient_name || appt.name;
+     return isRtl 
+       ? (nameAr || (appt.patient_id ? `مريض #${appt.patient_id}` : 'مريض'))
+       : (nameEn || (appt.patient_id ? `Patient #${appt.patient_id}` : 'Patient'));
+   };
+
+   const getPatientAge = (dob) => {
+     if (!dob) return '';
+     const birthDate = new Date(dob);
+     if (isNaN(birthDate.getTime())) return '';
+     const today = new Date();
+     let age = today.getFullYear() - birthDate.getFullYear();
+     const m = today.getMonth() - birthDate.getMonth();
+     if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+         age--;
+     }
+     return `${age}y`;
+   };
+
+    const getApptDateTime = (appt) => {
+      const scheduledDate = appt.scheduledAt || appt.scheduled_at || appt.date;
+      if (!scheduledDate) return 'Pending';
+      const datePart = new Date(scheduledDate).toLocaleDateString(isRtl ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric' });
+      const timePart = new Date(scheduledDate).toLocaleTimeString(isRtl ? 'ar-EG' : 'en-US', { hour: '2-digit', minute: '2-digit' });
+      return `${datePart}, ${timePart}`;
+    };
+
+   const getStatusBadgeClass = (status) => {
+     switch (String(status).toLowerCase()) {
+       case 'confirmed':
+       case 'active':
+         return 'bg-emerald-50 text-emerald-600 border border-emerald-100/50';
+       case 'pending':
+         return 'bg-amber-50 text-amber-600 border border-amber-100/50';
+       case 'completed':
+         return 'bg-blue-50 text-blue-700 border border-blue-100/50';
+       case 'cancelled':
+         return 'bg-rose-50 text-rose-600 border border-rose-100/50';
+       default:
+         return 'bg-slate-50 text-slate-600 border border-slate-100/50';
+     }
+   };
+
+   const activeAppointments = (() => {
+      if (viewMode === 'all') {
+         return doctorAppointments;
+      }
+      return (patientsByDate || []).filter(appt => {
+         if (statusFilter !== 'all') {
+            const status = String(appt.status).toLowerCase();
+            if (status !== statusFilter) return false;
+         }
+         if (genderFilter !== 'all') {
+            const gender = appt.gender || appt.patient?.gender || 'Unknown';
+            if (gender.toLowerCase() !== genderFilter.toLowerCase()) return false;
+         }
+         return true;
+      });
+   })();
+
    return (
       <div className="animate-in fade-in duration-500 pb-20 relative">
 
@@ -19,40 +111,69 @@ export default function DoctorDashboard() {
                   {currentUser?.specialization || t('doctorDashboard.desc')}
                </p>
             </div>
-
-            {/* <div className="flex gap-4">
-
-           <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-[0_2px_12px_rgb(0,0,0,0.03)] min-w-[180px]">
-              <div className="flex justify-between items-start mb-3">
-                 <div className="bg-blue-50 p-2 rounded-xl text-blue-600">
-                    <Users className="w-5 h-5" />
-                 </div>
-                 <span className="bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-widest">+12%</span>
-              </div>
-              <div className="text-xs font-bold text-slate-500 mb-0.5">{t('doctorDashboard.totalPatients')}</div>
-              <div className="text-3xl font-extrabold text-slate-900 tracking-tight">42</div>
-           </div>
-
-           <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-[0_2px_12px_rgb(0,0,0,0.03)] min-w-[180px]">
-              <div className="flex justify-between items-start mb-3">
-                 <div className="bg-orange-50 p-2 rounded-xl text-orange-600">
-                    <Timer className="w-5 h-5" />
-                 </div>
-                 <span className="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-widest">{t('doctorDashboard.normal', { defaultValue: 'Normal' })}</span>
-              </div>
-              <div className="text-xs font-bold text-slate-500 mb-0.5">{t('doctorDashboard.avgWait')}</div>
-              <div className="text-3xl font-extrabold text-slate-900 tracking-tight flex items-baseline gap-1">18 <span className="text-sm font-semibold text-slate-400">{t('doctorDashboard.min')}</span></div>
-           </div>
-        </div> */}
          </div>
 
          {/* Active Queue Table */}
          <div>
-            <div className="flex justify-between items-center mb-6">
-               <h3 className="text-[17px] font-bold text-slate-900 tracking-tight">{t('doctorDashboard.activeQueue')}</h3>
-               <div className="flex gap-3">
-                  <button className="text-sm font-bold text-primary-600 hover:bg-primary-50 px-4 py-2 rounded-xl transition-colors">{t('doctorDashboard.exportLog')}</button>
-                  <button className="text-sm font-bold bg-primary-600 hover:bg-primary-700 text-white px-5 py-2 rounded-xl shadow-sm transition-all shadow-primary-600/20">{t('doctorDashboard.fullSchedule')}</button>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+               <div className="flex flex-wrap items-center gap-3">
+                  <h3 className="text-[17px] font-bold text-slate-900 tracking-tight">{t('doctorDashboard.activeQueue')}</h3>
+                  {viewMode === 'date' && (
+                     <>
+                        <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100/80 shadow-[0_1px_2px_rgb(0,0,0,0.01)] animate-in fade-in duration-200">
+                           <Calendar className="w-4 h-4 text-slate-400" />
+                           <input 
+                              type="date" 
+                              value={selectedDate} 
+                              onChange={(e) => setSelectedDate(e.target.value)}
+                              className="bg-transparent text-xs font-bold text-slate-600 outline-none border-none cursor-pointer"
+                           />
+                        </div>
+
+                        {/* Status Filter */}
+                        <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100/80 shadow-[0_1px_2px_rgb(0,0,0,0.01)] animate-in fade-in duration-200">
+                           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t('doctorDashboard.status', { defaultValue: 'Status' })}:</span>
+                           <select 
+                              value={statusFilter} 
+                              onChange={(e) => setStatusFilter(e.target.value)}
+                              className="bg-transparent text-xs font-extrabold text-slate-700 outline-none border-none cursor-pointer pr-1"
+                           >
+                              <option value="all">{isRtl ? 'الكل' : 'All'}</option>
+                              <option value="pending">{isRtl ? 'قيد الانتظار' : 'Pending'}</option>
+                              <option value="confirmed">{isRtl ? 'مؤكدة' : 'Confirmed'}</option>
+                           </select>
+                        </div>
+
+                        {/* Gender Filter */}
+                        <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100/80 shadow-[0_1px_2px_rgb(0,0,0,0.01)] animate-in fade-in duration-200">
+                           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t('doctorDashboard.gender', { defaultValue: 'Gender' })}:</span>
+                           <select 
+                              value={genderFilter} 
+                              onChange={(e) => setGenderFilter(e.target.value)}
+                              className="bg-transparent text-xs font-extrabold text-slate-700 outline-none border-none cursor-pointer pr-1"
+                           >
+                              <option value="all">{isRtl ? 'الكل' : 'All'}</option>
+                              <option value="Male">{isRtl ? 'ذكر' : 'Male'}</option>
+                              <option value="Female">{isRtl ? 'أنثى' : 'Female'}</option>
+                           </select>
+                        </div>
+                     </>
+                  )}
+               </div>
+               
+               <div className="flex gap-2">
+                  <button 
+                     onClick={() => setViewMode('date')}
+                     className={`text-xs font-black px-4 py-2.5 rounded-xl transition-all ${viewMode === 'date' ? 'bg-primary-600 text-white shadow-sm shadow-primary-600/20' : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+                  >
+                     {t('doctorDashboard.byDate', { defaultValue: 'By Selected Date' })}
+                  </button>
+                  <button 
+                     onClick={() => setViewMode('all')}
+                     className={`text-xs font-black px-4 py-2.5 rounded-xl transition-all ${viewMode === 'all' ? 'bg-primary-600 text-white shadow-sm shadow-primary-600/20' : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+                  >
+                     {t('doctorDashboard.allAppts', { defaultValue: 'All Appointments' })}
+                  </button>
                </div>
             </div>
 
@@ -69,97 +190,68 @@ export default function DoctorDashboard() {
                   </thead>
                   <tbody className="divide-y divide-slate-50 text-sm">
 
-                     {/* Status: In Consultation */}
-                     <tr className="hover:bg-slate-50/50 transition-colors">
-                        <td className="px-8 py-6">
-                           <div className="font-extrabold text-[15px] text-primary-600">09:30 AM</div>
-                           <div className="text-[11px] font-semibold text-slate-400">Scheduled</div>
-                        </td>
-                        <td className="px-4 py-6">
-                           <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-sm shadow-sm border border-blue-200/50">EK</div>
-                              <div>
-                                 <div className="font-bold text-[15px] text-slate-900">Eleanor Kade</div>
-                                 <div className="text-[12px] font-medium text-slate-500">Female, 42y</div>
-                              </div>
-                           </div>
-                        </td>
-                        <td className="px-4 py-6 font-bold text-slate-700">Hypertension Follow-up</td>
-                        <td className="px-4 py-6">
-                           <span className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 font-bold text-xs px-3 py-1.5 rounded-lg border border-blue-100/50">
-                              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
-                              {t('doctorDashboard.inConsultation', { defaultValue: 'In Consultation' })}
-                           </span>
-                        </td>
-                        <td className="px-4 py-6 text-center">
-                           <button className="text-slate-400 hover:text-slate-800 p-2 transition-colors"><MoreVertical className="w-5 h-5" /></button>
-                        </td>
-                     </tr>
-
-                     {/* Status: Waiting */}
-                     <tr className="hover:bg-slate-50/50 transition-colors">
-                        <td className="px-8 py-6">
-                           <div className="font-extrabold text-[15px] text-slate-900">10:00 AM</div>
-                           <div className="text-[11px] font-semibold text-slate-400">Arrived 09:52</div>
-                        </td>
-                        <td className="px-4 py-6">
-                           <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-600 font-bold flex items-center justify-center text-sm shadow-sm border border-slate-200/50">RM</div>
-                              <div>
-                                 <div className="font-bold text-[15px] text-slate-900">Robert Miller</div>
-                                 <div className="text-[12px] font-medium text-slate-500">Male, 68y</div>
-                              </div>
-                           </div>
-                        </td>
-                        <td className="px-4 py-6 font-bold text-slate-700">Post-Op Review</td>
-                        <td className="px-4 py-6">
-                           <span className="inline-flex items-center gap-2 bg-orange-50 text-orange-600 font-bold text-xs px-3 py-1.5 rounded-lg border border-orange-100/50">
-                              <span className="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
-                              {t('doctorDashboard.waiting', { defaultValue: 'Waiting' })}
-                           </span>
-                        </td>
-                        <td className="px-4 py-6 text-center">
-                           <button className="text-slate-400 hover:text-slate-800 p-2 transition-colors"><MoreVertical className="w-5 h-5" /></button>
-                        </td>
-                     </tr>
-
-                     {/* Status: Completed */}
-                     <tr className="bg-slate-50/30">
-                        <td className="px-8 py-6 opacity-50">
-                           <div className="font-extrabold text-[15px] text-slate-900">09:00 AM</div>
-                           <div className="text-[11px] font-semibold text-slate-400">Finished</div>
-                        </td>
-                        <td className="px-4 py-6 opacity-50">
-                           <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 font-bold flex items-center justify-center text-sm shadow-sm border border-slate-200/50">AS</div>
-                              <div>
-                                 <div className="font-bold text-[15px] text-slate-900">Alice Smith</div>
-                                 <div className="text-[12px] font-medium text-slate-500">Female, 29y</div>
-                              </div>
-                           </div>
-                        </td>
-                        <td className="px-4 py-6 font-bold text-slate-500 opacity-80">Routine Checkup</td>
-                        <td className="px-4 py-6">
-                           <span className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-600 font-bold text-xs px-3 py-1.5 rounded-lg border border-emerald-100/50">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                              {t('doctorDashboard.completed', { defaultValue: 'Completed' })}
-                           </span>
-                        </td>
-                        <td className="px-4 py-6 text-center opacity-50">
-                           <button className="text-slate-400 hover:text-slate-800 p-2 transition-colors"><Eye className="w-5 h-5" /></button>
-                        </td>
-                     </tr>
+                     {loading ? (
+                        <tr>
+                           <td colSpan="5" className="px-8 py-16 text-center text-slate-400 font-bold">
+                              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2 text-primary-500" />
+                              {t('common.loading', { defaultValue: 'Loading clinical records...' })}
+                           </td>
+                        </tr>
+                     ) : activeAppointments.length > 0 ? (
+                        activeAppointments.map((appt) => {
+                           const pName = getPatientName(appt);
+                           const initial = pName.charAt(0).toUpperCase();
+                           const gender = appt.gender || appt.patient?.gender || 'Unknown';
+                           const ageStr = getPatientAge(appt.date_of_birth || appt.dob || appt.patient?.date_of_birth || appt.patient?.dob);
+                           return (
+                              <tr key={appt.id} className="hover:bg-slate-50/50 transition-colors">
+                                 <td className="px-8 py-6">
+                                    <div className="font-extrabold text-[15px] text-primary-600">{getApptDateTime(appt)}</div>
+                                    <div className="text-[11px] font-semibold text-slate-400">Scheduled</div>
+                                 </td>
+                                 <td className="px-4 py-6">
+                                    <div className="flex items-center gap-3">
+                                       <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-600 font-bold flex items-center justify-center text-sm shadow-sm border border-slate-200/50">{initial}</div>
+                                       <div>
+                                          <div onClick={() => navigate(`/doctor/patients/${appt.patient_id}`)} className="font-bold text-[15px] text-slate-900 cursor-pointer hover:text-primary-600 hover:underline">{pName}</div>
+                                          <div className="text-[12px] font-medium text-slate-500">
+                                             {gender}{ageStr ? `, ${ageStr}` : ''}
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </td>
+                                 <td className="px-4 py-6 font-bold text-slate-700">{appt.notes || appt.reason || 'Clinical consultation'}</td>
+                                 <td className="px-4 py-6">
+                                    <span className={`inline-flex items-center gap-2 font-bold text-xs px-3 py-1.5 rounded-lg ${getStatusBadgeClass(appt.status)}`}>
+                                       <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
+                                       {appt.status}
+                                    </span>
+                                 </td>
+                                 <td className="px-4 py-6 text-center">
+                                    <button 
+                                       onClick={() => navigate(`/doctor/patients/${appt.patient_id}`)}
+                                       className="text-slate-400 hover:text-primary-600 p-2 transition-colors flex items-center justify-center gap-1.5 bg-slate-50 hover:bg-primary-50 rounded-lg border border-slate-100 hover:border-primary-100 px-3 py-1.5 font-bold text-xs"
+                                       title={t('doctorDashboard.viewProfile', { defaultValue: 'View Profile' })}
+                                    >
+                                       <Eye className="w-3.5 h-3.5" />
+                                       <span>{t('doctorDashboard.viewProfile', { defaultValue: 'View Profile' })}</span>
+                                    </button>
+                                 </td>
+                              </tr>
+                           );
+                        })
+                     ) : (
+                        <tr>
+                           <td colSpan="5" className="px-8 py-16 text-center text-slate-400 font-bold italic">
+                              {t('doctorDashboard.noAppointments', { defaultValue: 'No clinical appointments scheduled.' })}
+                           </td>
+                        </tr>
+                     )}
 
                   </tbody>
                </table>
             </div>
          </div>
-
-         {/* Floating Chat Button */}
-         {/* <button className="fixed bottom-8 end-8 bg-primary-600 hover:bg-primary-700 text-white p-4 rounded-2xl shadow-xl shadow-primary-600/30 transition-transform hover:-translate-y-1 z-50">
-            <MessageSquare className="w-6 h-6" />
-         </button> */}
-
       </div>
-   )
+   );
 }
