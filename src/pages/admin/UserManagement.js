@@ -259,8 +259,8 @@ export default function UserManagement() {
                   </div>
                 </td>
                 <td className="p-4 text-sm font-medium text-slate-700 text-start">
-                  {activeTab === 'doctors' 
-                    ? t('specializations.' + user.specialization, { defaultValue: user.specialization }) 
+                  {activeTab === 'doctors'
+                    ? t('specializations.' + user.specialization, { defaultValue: user.specialization })
                     : (user.date_of_birth || user.dob ? new Date(user.date_of_birth || user.dob).toLocaleDateString(i18n.language.startsWith('ar') ? 'ar-EG' : 'en-US', { dateStyle: 'medium' }) : '---')}
                 </td>
                 {activeTab === 'patients' && (
@@ -305,14 +305,17 @@ export default function UserManagement() {
                       ) : (
                         <>
                           <button
-                            onClick={() => navigate(`/admin/doctors/edit/${user.id || user.id}`)}
+                            onClick={() => navigate(`/admin/doctors/edit/${user.id}`)}
 
                             className="w-full flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
                           >
                             <Edit className="w-3.5 h-3.5" /> {t('userManagement.editDoctor')}
                           </button>
                           <button
-                            onClick={() => navigate(`/admin/doctors/availability/${user.user_id || user.id}`)}
+                            // onClick={() => console.log(user)}
+                            onClick={() => navigate(`/admin/doctors/availability/${user.id}`)}
+
+
                             className="w-full flex items-center gap-2 px-4 py-2 text-xs font-bold text-indigo-600 hover:bg-indigo-50 transition-colors"
                           >
                             <Calendar className="w-3.5 h-3.5" /> {t('userManagement.setAvailability', { defaultValue: 'Set Availability' })}

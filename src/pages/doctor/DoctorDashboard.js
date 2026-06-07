@@ -4,12 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Eye, Loader2, Calendar } from 'lucide-react';
 import { selectCurrentUser } from '../../store/slices/authSlice';
-import { 
-  fetchDoctorAppointments, 
-  fetchMyPatientsByDate, 
-  selectDoctorAppointments,
-  selectPatientsByDate, 
-  selectAppointmentsLoading 
+import {
+   fetchDoctorAppointments,
+   fetchMyPatientsByDate,
+   selectDoctorAppointments,
+   selectPatientsByDate,
+   selectAppointmentsLoading
 } from '../../store/slices/appointmentSlice';
 
 export default function DoctorDashboard() {
@@ -37,48 +37,48 @@ export default function DoctorDashboard() {
    const isRtl = i18n.language.startsWith('ar');
 
    const getPatientName = (appt) => {
-     const nameAr = appt.name_ar || appt.patient?.name_ar || appt.patient_name_ar || appt.patient?.name || appt.patient_name || appt.name;
-     const nameEn = appt.name_en || appt.patient?.name_en || appt.patient_name_en || appt.patient?.name || appt.patient_name || appt.name;
-     return isRtl 
-       ? (nameAr || (appt.patient_id ? `مريض #${appt.patient_id}` : 'مريض'))
-       : (nameEn || (appt.patient_id ? `Patient #${appt.patient_id}` : 'Patient'));
+      const nameAr = appt.name_ar || appt.patient?.name_ar || appt.patient_name_ar || appt.patient?.name || appt.patient_name || appt.name;
+      const nameEn = appt.name_en || appt.patient?.name_en || appt.patient_name_en || appt.patient?.name || appt.patient_name || appt.name;
+      return isRtl
+         ? (nameAr || (appt.patient_id ? `مريض #${appt.patient_id}` : 'مريض'))
+         : (nameEn || (appt.patient_id ? `Patient #${appt.patient_id}` : 'Patient'));
    };
 
    const getPatientAge = (dob) => {
-     if (!dob) return '';
-     const birthDate = new Date(dob);
-     if (isNaN(birthDate.getTime())) return '';
-     const today = new Date();
-     let age = today.getFullYear() - birthDate.getFullYear();
-     const m = today.getMonth() - birthDate.getMonth();
-     if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      if (!dob) return '';
+      const birthDate = new Date(dob);
+      if (isNaN(birthDate.getTime())) return '';
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
          age--;
-     }
-     return `${age}y`;
+      }
+      return `${age}y`;
    };
 
-    const getApptDateTime = (appt) => {
+   const getApptDateTime = (appt) => {
       const scheduledDate = appt.scheduledAt || appt.scheduled_at || appt.date;
       if (!scheduledDate) return 'Pending';
       const datePart = new Date(scheduledDate).toLocaleDateString(isRtl ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric' });
       const timePart = new Date(scheduledDate).toLocaleTimeString(isRtl ? 'ar-EG' : 'en-US', { hour: '2-digit', minute: '2-digit' });
       return `${datePart}, ${timePart}`;
-    };
+   };
 
    const getStatusBadgeClass = (status) => {
-     switch (String(status).toLowerCase()) {
-       case 'confirmed':
-       case 'active':
-         return 'bg-emerald-50 text-emerald-600 border border-emerald-100/50';
-       case 'pending':
-         return 'bg-amber-50 text-amber-600 border border-amber-100/50';
-       case 'completed':
-         return 'bg-blue-50 text-blue-700 border border-blue-100/50';
-       case 'cancelled':
-         return 'bg-rose-50 text-rose-600 border border-rose-100/50';
-       default:
-         return 'bg-slate-50 text-slate-600 border border-slate-100/50';
-     }
+      switch (String(status).toLowerCase()) {
+         case 'confirmed':
+         case 'active':
+            return 'bg-emerald-50 text-emerald-600 border border-emerald-100/50';
+         case 'pending':
+            return 'bg-amber-50 text-amber-600 border border-amber-100/50';
+         case 'completed':
+            return 'bg-blue-50 text-blue-700 border border-blue-100/50';
+         case 'cancelled':
+            return 'bg-rose-50 text-rose-600 border border-rose-100/50';
+         default:
+            return 'bg-slate-50 text-slate-600 border border-slate-100/50';
+      }
    };
 
    const activeAppointments = (() => {
@@ -122,9 +122,9 @@ export default function DoctorDashboard() {
                      <>
                         <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100/80 shadow-[0_1px_2px_rgb(0,0,0,0.01)] animate-in fade-in duration-200">
                            <Calendar className="w-4 h-4 text-slate-400" />
-                           <input 
-                              type="date" 
-                              value={selectedDate} 
+                           <input
+                              type="date"
+                              value={selectedDate}
                               onChange={(e) => setSelectedDate(e.target.value)}
                               className="bg-transparent text-xs font-bold text-slate-600 outline-none border-none cursor-pointer"
                            />
@@ -133,8 +133,8 @@ export default function DoctorDashboard() {
                         {/* Status Filter */}
                         <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100/80 shadow-[0_1px_2px_rgb(0,0,0,0.01)] animate-in fade-in duration-200">
                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t('doctorDashboard.status', { defaultValue: 'Status' })}:</span>
-                           <select 
-                              value={statusFilter} 
+                           <select
+                              value={statusFilter}
                               onChange={(e) => setStatusFilter(e.target.value)}
                               className="bg-transparent text-xs font-extrabold text-slate-700 outline-none border-none cursor-pointer pr-1"
                            >
@@ -147,8 +147,8 @@ export default function DoctorDashboard() {
                         {/* Gender Filter */}
                         <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100/80 shadow-[0_1px_2px_rgb(0,0,0,0.01)] animate-in fade-in duration-200">
                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t('doctorDashboard.gender', { defaultValue: 'Gender' })}:</span>
-                           <select 
-                              value={genderFilter} 
+                           <select
+                              value={genderFilter}
                               onChange={(e) => setGenderFilter(e.target.value)}
                               className="bg-transparent text-xs font-extrabold text-slate-700 outline-none border-none cursor-pointer pr-1"
                            >
@@ -160,15 +160,15 @@ export default function DoctorDashboard() {
                      </>
                   )}
                </div>
-               
+
                <div className="flex gap-2">
-                  <button 
+                  <button
                      onClick={() => setViewMode('date')}
                      className={`text-xs font-black px-4 py-2.5 rounded-xl transition-all ${viewMode === 'date' ? 'bg-primary-600 text-white shadow-sm shadow-primary-600/20' : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
                   >
                      {t('doctorDashboard.byDate', { defaultValue: 'By Selected Date' })}
                   </button>
-                  <button 
+                  <button
                      onClick={() => setViewMode('all')}
                      className={`text-xs font-black px-4 py-2.5 rounded-xl transition-all ${viewMode === 'all' ? 'bg-primary-600 text-white shadow-sm shadow-primary-600/20' : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
                   >
@@ -201,7 +201,7 @@ export default function DoctorDashboard() {
                         activeAppointments.map((appt) => {
                            const pName = getPatientName(appt);
                            const initial = pName.charAt(0).toUpperCase();
-                           const gender = appt.gender || appt.patient?.gender || 'Unknown';
+                           const gender = appt.patient_gender || appt.gender || 'Unknown';
                            const ageStr = getPatientAge(appt.date_of_birth || appt.dob || appt.patient?.date_of_birth || appt.patient?.dob);
                            return (
                               <tr key={appt.id} className="hover:bg-slate-50/50 transition-colors">
@@ -228,7 +228,7 @@ export default function DoctorDashboard() {
                                     </span>
                                  </td>
                                  <td className="px-4 py-6 text-center">
-                                    <button 
+                                    <button
                                        onClick={() => navigate(`/doctor/patients/${appt.patient_id}`)}
                                        className="text-slate-400 hover:text-primary-600 p-2 transition-colors flex items-center justify-center gap-1.5 bg-slate-50 hover:bg-primary-50 rounded-lg border border-slate-100 hover:border-primary-100 px-3 py-1.5 font-bold text-xs"
                                        title={t('doctorDashboard.viewProfile', { defaultValue: 'View Profile' })}

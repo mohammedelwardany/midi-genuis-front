@@ -18,7 +18,7 @@
   "branding": {
     "colors": {
       "primary": {
-        "50":  "#eff6ff",
+        "50": "#eff6ff",
         "100": "#dbeafe",
         "200": "#bfdbfe",
         "300": "#93c5fd",
@@ -47,7 +47,7 @@
     },
     "doctor": {
       "title": "MediGenius Clinical Portal",
-      "titleAr": "البوابة السريرية MediGenius"
+      "titleAr": "البوابة ال MediGenius"
     },
     "admin": {
       "title": "MediGenius Admin Console",
