@@ -104,7 +104,11 @@ export default function BookingsDashboard() {
               <p className="text-slate-500 font-bold">Synchronizing your schedule...</p>
             </div>
           ) : upcoming.length > 0 ? upcoming.map(appt => (
-            <div key={appt.id || appt.appointment_id} className="bg-white rounded-[24px] p-6 shadow-sm border border-slate-100 relative overflow-hidden group hover:shadow-md transition-shadow w-full">
+            <div 
+              key={appt.id || appt.appointment_id} 
+              onClick={() => navigate(`/patient/appointments/${appt.id || appt.appointment_id}`)}
+              className="bg-white rounded-[24px] p-6 shadow-sm border border-slate-100 relative overflow-hidden group hover:shadow-md transition-shadow w-full cursor-pointer"
+            >
               <div className={cn("absolute top-0 start-0 w-1.5 h-full rounded-s-full", appt.status === 'confirmed' ? "bg-primary-600" : "bg-orange-500")}></div>
 
               <div className="flex justify-between items-start mb-6">
@@ -170,7 +174,11 @@ export default function BookingsDashboard() {
               {loading ? (
                 <tr><td colSpan="5" className="py-20 text-center"><Loader2 className="w-6 h-6 animate-spin mx-auto text-primary-400" /></td></tr>
               ) : history.length > 0 ? history.map(appt => (
-                <tr key={appt.id || appt.appointment_id} className="hover:bg-slate-50/50 transition-colors">
+                <tr 
+                  key={appt.id || appt.appointment_id} 
+                  onClick={() => navigate(`/patient/appointments/${appt.id || appt.appointment_id}`)}
+                  className="hover:bg-slate-50/50 transition-colors cursor-pointer"
+                >
                   <td className="p-4 ps-6 text-start">
                     <div className="flex items-center gap-3">
                       <img src={`https://ui-avatars.com/api/?name=${getApptDoctorName(appt)}&size=80&background=f1f5f9`} className="w-8 h-8 rounded-full border border-slate-200" alt="avatar" />
@@ -191,7 +199,10 @@ export default function BookingsDashboard() {
                   </td>
                   <td className="p-4 text-end pe-8">
                     {appt.status === 'completed' ? (
-                      <button className="inline-flex items-center text-primary-600 font-bold text-sm hover:text-primary-700">
+                      <button 
+                        onClick={(e) => e.stopPropagation()} 
+                        className="inline-flex items-center text-primary-600 font-bold text-sm hover:text-primary-700"
+                      >
                         <FileText className="w-4 h-4 me-1.5" /> Report
                       </button>
                     ) : (

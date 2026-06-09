@@ -33,7 +33,7 @@ export default function PatientDashboard() {
    };
 
    const nextApptDoctorName = nextAppt
-      ? (isRtl 
+      ? (isRtl
          ? (nextAppt.doctor?.name_ar || nextAppt.doctor_name_ar || nextAppt.doctor?.name || nextAppt.doctor_name || 'طبيب متخصص')
          : (nextAppt.doctor?.name_en || nextAppt.doctor_name_en || nextAppt.doctor?.name || nextAppt.doctor_name || 'Medical Specialist'))
       : '';
@@ -67,7 +67,7 @@ export default function PatientDashboard() {
                <p className="text-slate-600 font-medium text-sm md:text-[15px]">
                   {nextAppt ? (
                      <>
-                        {t('patientDashboard.subtitle')} <span onClick={() => navigate(`/patient/appointments/${nextAppt.id}`)} className="font-bold text-primary-600 cursor-pointer hover:underline">{nextApptDoctorName}</span> on {nextApptDate} at {nextApptTime}.
+                        {t('patientDashboard.subtitle')} <span onClick={() => navigate(`/patient/appointments/${nextAppt.appointment_id}`)} className="font-bold text-primary-600 cursor-pointer hover:underline">{nextApptDoctorName}</span> on {nextApptDate} at {nextApptTime}.
                      </>
                   ) : (
                      t('patientDashboard.noUpcoming')
@@ -77,7 +77,7 @@ export default function PatientDashboard() {
 
             {/* Hero & Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-               
+
                {/* Next Appointment Hero */}
                <div className="md:col-span-2 bg-primary-700 rounded-[24px] p-6 md:p-8 text-white relative overflow-hidden shadow-lg shadow-primary-700/20 flex flex-col justify-between min-h-[300px]">
                   {/* Decorative elements */}
@@ -104,11 +104,11 @@ export default function PatientDashboard() {
                         <div className="py-8 md:py-12">
                            <p className="text-primary-100 font-medium opacity-80 italic">{t('patientDashboard.noUpcoming')}</p>
                         </div>
-                      )}
+                     )}
                   </div>
- 
+
                   <button
-                     onClick={() => nextAppt ? navigate(`/patient/appointments/${nextAppt.id}`) : navigate('/patient/book/doctors')}
+                     onClick={() => nextAppt ? navigate(`/patient/appointments/${nextAppt.appointment_id}`) : navigate('/patient/book/doctors')}
                      className="w-full bg-primary-600/50 hover:bg-primary-600 backdrop-blur-sm border border-primary-500/50 transition-colors py-3 md:py-3.5 rounded-xl font-bold text-sm relative z-10"
                   >
                      {nextAppt ? t('patientDashboard.viewDetails') : t('patientDashboard.bookAppt')}
@@ -153,7 +153,7 @@ export default function PatientDashboard() {
                                  const formattedDate = report.created_at
                                     ? new Date(report.created_at).toLocaleDateString(isRtl ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })
                                     : 'N/A';
-                                 
+
                                  const department = report.type || (isRtl ? 'عام' : 'General');
 
                                  return (
@@ -174,10 +174,10 @@ export default function PatientDashboard() {
                                           </span>
                                        </td>
                                        <td className="py-4 md:py-5 px-4 text-center">
-                                          <a 
+                                          <a
                                              href={getFullUrl(report.file_url)}
-                                             target="_blank" 
-                                             rel="noopener noreferrer" 
+                                             target="_blank"
+                                             rel="noopener noreferrer"
                                              className="text-primary-600 hover:text-primary-800 p-2 rounded-full hover:bg-primary-50 transition-colors inline-block"
                                           >
                                              <Download className="w-4 h-4" />

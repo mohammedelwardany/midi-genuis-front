@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { ChevronRight, Printer, AlertTriangle, Calendar as CalendarIcon, Clock, Video, CheckCircle2, Circle, MapPin, Loader2, XCircle, ArrowLeft } from 'lucide-react';
+import { ChevronRight, Printer, AlertTriangle, Calendar as CalendarIcon, Clock, CheckCircle2, Circle, MapPin, Loader2, XCircle, ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { fetchAppointmentById, selectSelectedAppt, selectAppointmentsLoading, selectAppointmentsError } from '../store/slices/appointmentSlice';
+import { fetchDoctorById, selectSelectedDoctor, clearSelectedDoctor } from '../store/slices/doctorSlice';
 import { useSiteConfig } from '../context/SiteConfigContext';
 
 export default function AppointmentDetails() {
@@ -14,15 +15,32 @@ export default function AppointmentDetails() {
   const isRtl = i18n.language.startsWith('ar');
   const siteConfig = useSiteConfig();
 
-  const appointment = useSelector(selectSelectedAppt);
+  const rawAppointment = useSelector(selectSelectedAppt);
   const loading = useSelector(selectAppointmentsLoading);
   const error = useSelector(selectAppointmentsError);
+  const doctor = useSelector(selectSelectedDoctor);
+
+  const appointment = rawAppointment?.appointment ?? rawAppointment?.data ?? rawAppointment;
+  const doctorData = doctor?.doctor ?? doctor?.data ?? doctor;
 
   useEffect(() => {
     if (id) {
+      dispatch(clearSelectedDoctor());
       dispatch(fetchAppointmentById(id));
     }
+    return () => {
+      dispatch(clearSelectedDoctor());
+    };
   }, [id, dispatch]);
+
+  useEffect(() => {
+    if (appointment) {
+      const docId = appointment.doctor_id || appointment.doctor?.id || appointment.doctorId;
+      if (docId) {
+        dispatch(fetchDoctorById(docId));
+      }
+    }
+  }, [appointment, dispatch]);
 
   if (loading) {
     return (
@@ -65,14 +83,14 @@ export default function AppointmentDetails() {
   };
 
   const doctorName = isRtl
-    ? (appointment.doctor?.name_ar || appointment.doctor_name_ar || appointment.doctor?.name || appointment.doctor_name || 'طبيب متخصص')
-    : (appointment.doctor?.name_en || appointment.doctor_name_en || appointment.doctor?.name || appointment.doctor_name || 'Medical Specialist');
+    ? (doctorData?.name_ar || appointment?.doctor?.name_ar || appointment?.doctor_name_ar || doctorData?.name || appointment?.doctor?.name || appointment?.doctor_name || 'طبيب متخصص')
+    : (doctorData?.name_en || appointment?.doctor?.name_en || appointment?.doctor_name_en || doctorData?.name || appointment?.doctor?.name || appointment?.doctor_name || 'Medical Specialist');
 
   const rawSpecialization = isRtl
-    ? (appointment.doctor?.specialization_ar || appointment.doctor_specialization_ar)
-    : (appointment.doctor?.specialization_en || appointment.doctor_specialization_en);
+    ? (doctorData?.specialization_ar || appointment?.doctor?.specialization_ar || appointment?.doctor_specialization_ar)
+    : (doctorData?.specialization_en || appointment?.doctor?.specialization_en || appointment?.doctor_specialization_en);
 
-  const specializationFallback = appointment.doctor?.specialization || appointment.doctor_specialization;
+  const specializationFallback = doctorData?.specialization || appointment?.doctor?.specialization || appointment?.doctor_specialization;
   const specKey = String(specializationFallback || '').toLowerCase().replace(' ', '_');
   const specialization = rawSpecialization || t('specializations.' + specKey, { defaultValue: specializationFallback || (isRtl ? 'طبيب استشاري' : 'Clinical Specialist') });
 
@@ -120,7 +138,7 @@ export default function AppointmentDetails() {
               {specialization} {t('appointmentDetails.consultation', { defaultValue: 'Consultation' })}
             </h1>
             
-            <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-10 text-slate-700">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-10 pb-8 border-b border-slate-100 text-slate-700">
                <div className="flex items-center gap-2 font-medium">
                   <CalendarIcon className="w-5 h-5 text-primary-600" />
                   {formattedDate}
@@ -131,10 +149,6 @@ export default function AppointmentDetails() {
                </div>
             </div>
 
-            <div className="flex items-center gap-2 text-slate-600 font-medium mb-10 pb-8 border-b border-slate-100">
-               <Video className="w-5 h-5 text-primary-600" />
-               {t(`appointmentDetails.type.${String(appointment.type || appointment.bookingType || 'telehealth').toLowerCase().replace(' ', '_')}`, { defaultValue: appointment.type || appointment.bookingType || 'Telehealth Visit' })}
-            </div>
 
             <div>
               <h3 className="text-lg font-bold text-slate-900 mb-3">{t('appointmentDetails.reasonForVisit', { defaultValue: 'Reason / Patient Notes' })}</h3>
@@ -173,14 +187,14 @@ export default function AppointmentDetails() {
             
             <div className="flex items-center gap-4 mb-6">
               <img 
-                src={appointment.doctor?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(doctorName)}&background=eff6ff&color=1d4ed8&size=100`} 
+                src={doctorData?.avatar || appointment?.doctor?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(doctorName)}&background=eff6ff&color=1d4ed8&size=100`} 
                 alt={doctorName} 
                 className="w-14 h-14 rounded-full border border-slate-100 object-cover" 
               />
               <div>
                 <div className="font-bold text-slate-900 text-base leading-tight">{doctorName}</div>
                 <div className="text-primary-600 font-bold text-xs mt-1">{specialization}</div>
-                <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">{appointment.doctor?.clinic || t('appointmentDetails.mainMedicalCenter', { defaultValue: 'Main Medical Center' })}</div>
+                <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">{doctorData?.clinic || appointment?.doctor?.clinic || t('appointmentDetails.mainMedicalCenter', { defaultValue: 'Main Medical Center' })}</div>
               </div>
             </div>
           </div>
