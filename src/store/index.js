@@ -5,6 +5,7 @@ import doctorReducer      from './slices/doctorSlice';
 import adminReducer       from './slices/adminSlice';
 import appointmentReducer from './slices/appointmentSlice';
 import paymentReducer     from './slices/paymentSlice';
+import platformReducer    from './slices/platformSlice';
 
 const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ const store = configureStore({
     admin:        adminReducer,
     appointments: appointmentReducer,
     payments:     paymentReducer,
+    platform:     platformReducer,
   },
   devTools: process.env.NODE_ENV !== 'production',
 });

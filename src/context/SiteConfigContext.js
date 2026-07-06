@@ -1,9 +1,43 @@
-import React, { createContext, useContext, useEffect } from 'react';
-import config from '../config/site.config.json';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import defaultConfig from '../config/site.config.json';
+import apiClient from '../api/apiClient';
+import { ENDPOINTS } from '../api/endpoints';
 
-const SiteConfigContext = createContext(config);
+const SiteConfigContext = createContext(defaultConfig);
+
+// Merges a clinic's branding override (from the backend, resolved by
+// subdomain) over the static default config. A clinic that hasn't
+// customized anything still gets its own name/subdomain reflected.
+function mergeBranding(base, override) {
+  if (!override) return base;
+  return {
+    ...base,
+    ...override,
+    clinic: { ...base.clinic, ...override.clinic, ...(override.name ? { name: override.name } : {}) },
+    branding: {
+      ...base.branding,
+      ...override.branding,
+      colors: { ...base.branding.colors, ...override.branding?.colors },
+    },
+    portals: { ...base.portals, ...override.portals },
+  };
+}
 
 export function SiteConfigProvider({ children }) {
+  const [config, setConfig] = useState(defaultConfig);
+
+  useEffect(() => {
+    let cancelled = false;
+    apiClient.get(ENDPOINTS.clinic.branding)
+      .then((data) => {
+        if (!cancelled) setConfig((prev) => mergeBranding(prev, data));
+      })
+      .catch(() => {
+        // No resolvable clinic (e.g. local dev without a subdomain) - keep defaults
+      });
+    return () => { cancelled = true; };
+  }, []);
+
   // Inject color scheme as CSS custom properties on :root
   useEffect(() => {
     const colors = config.branding.colors.primary;
@@ -23,7 +57,7 @@ export function SiteConfigProvider({ children }) {
     // Font families
     root.style.setProperty('--font-ltr', `'${config.branding.fontFamily.ltr}', sans-serif`);
     root.style.setProperty('--font-rtl', `'${config.branding.fontFamily.rtl}', sans-serif`);
-  }, []);
+  }, [config]);
 
   return (
     <SiteConfigContext.Provider value={config}>

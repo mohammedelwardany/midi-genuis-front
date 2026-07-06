@@ -5,7 +5,7 @@ import { X, BriefcaseMedical } from 'lucide-react';
 import TopNav from './TopNav';
 import { cn } from '../utils/cn';
 
-export default function AdminLayout({ title, tabs }) {
+export default function AdminLayout({ title, tabs, mobileBrandLabel = 'Admin Portal' }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { i18n } = useTranslation();
   const isRtl = i18n.language.startsWith('ar');
@@ -34,7 +34,7 @@ export default function AdminLayout({ title, tabs }) {
               <div className="bg-primary-600 rounded flex items-center justify-center p-2">
                   <BriefcaseMedical className="w-5 h-5 text-white" />
               </div>
-              <span className="font-bold text-primary-700 tracking-tight text-sm">Admin Portal</span>
+              <span className="font-bold text-primary-700 tracking-tight text-sm">{mobileBrandLabel}</span>
             </div>
             <button onClick={toggleMobileMenu} className="p-2 text-slate-400 hover:text-slate-600">
               <X className="w-5 h-5" />

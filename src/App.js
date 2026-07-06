@@ -50,6 +50,11 @@ import AdminPayments from './pages/admin/AdminPayments';
 import AdminAppointments from './pages/admin/AdminAppointments';
 import AdminAppointmentDetails from './pages/admin/AdminAppointmentDetails';
 
+// Platform Pages (owner-level, cross-clinic)
+import PlatformDashboard from './pages/platform/PlatformDashboard';
+import ClinicManagement from './pages/platform/ClinicManagement';
+import ClinicDetails from './pages/platform/ClinicDetails';
+
 // Global Route
 import EmergencyContact from './pages/EmergencyContact';
 
@@ -88,6 +93,11 @@ function App() {
     { name: t('nav.userManagement'), href: '/admin/users' },
     { name: t('nav.payments'), href: '/admin/payments' },
     { name: t('nav.appointments'), href: '/admin/appointments' }
+  ];
+
+  const platformPortalTabs = [
+    { name: isRtl ? 'لوحة التحكم' : 'Dashboard', href: '/platform/dashboard' },
+    { name: isRtl ? 'العيادات' : 'Clinics', href: '/platform/clinics' },
   ];
 
   return (
@@ -142,6 +152,13 @@ function App() {
           <Route path="/admin/doctors/availability/:id" element={<AdminSetAvailability />} />
           <Route path="/admin/book-for-patient/:id" element={<AdminBookVisit />} />
           <Route path="/admin/patients/:id" element={<PatientAdminProfile />} />
+        </Route>
+
+        {/* Platform Portal Main Layout (owner-level, cross-clinic) */}
+        <Route element={<AdminLayout title={isRtl ? 'وحدة إدارة المنصة' : 'Platform Console'} tabs={platformPortalTabs} mobileBrandLabel="Platform Console" />}>
+          <Route path="/platform/dashboard" element={<PlatformDashboard />} />
+          <Route path="/platform/clinics" element={<ClinicManagement />} />
+          <Route path="/platform/clinics/:id" element={<ClinicDetails />} />
         </Route>
 
         <Route path="/emergency" element={<EmergencyContact />} />

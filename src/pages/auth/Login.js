@@ -22,7 +22,8 @@ export default function Login() {
 
   useEffect(() => {
     if (isLoggedIn && userRole) {
-      if (userRole === 'admin') navigate('/admin/dashboard');
+      if (userRole === 'platform_admin') navigate('/platform/dashboard');
+      else if (userRole === 'admin') navigate('/admin/dashboard');
       else if (userRole === 'doctor') navigate('/doctor/dashboard');
       else navigate('/patient/dashboard');
     }

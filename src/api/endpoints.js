@@ -89,4 +89,19 @@ export const ENDPOINTS = {
     getMyPayments: '/payments/getMyPayments',
     getPaymentById: (id) => `/payments/getPaymentById/${id}`,
   },
+
+  // ── Platform (owner-level, cross-clinic) ───────────
+  platform: {
+    metrics: '/platform/metrics',
+    clinics: '/platform/clinics',
+    clinicById: (id) => `/platform/clinics/${id}`,
+    addClinicAdmin: (id) => `/platform/clinics/${id}/admins`,
+    updateSubscription: (id) => `/platform/clinics/${id}/subscription`,
+    updateClinicStatus: (id) => `/platform/clinics/${id}/status`,
+  },
+
+  // ── Clinic (public, pre-auth) ──────────────────────
+  clinic: {
+    branding: '/clinics/branding',
+  },
 };
