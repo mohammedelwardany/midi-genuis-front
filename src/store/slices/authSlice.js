@@ -43,6 +43,51 @@ export const registerUser = createAsyncThunk(
   }
 );
 
+// Platform admin "support login" as a specific clinic's admin. Stashes the
+// platform admin's own session in sessionStorage so returnFromImpersonation
+// can restore it later.
+export const impersonateClinicAdmin = createAsyncThunk(
+  'auth/impersonate',
+  async ({ clinicId, adminId, clinicName }, { rejectWithValue }) => {
+    try {
+      const data = await apiClient.post(
+        ENDPOINTS.platform.impersonate(clinicId),
+        adminId ? { admin_id: adminId } : {}
+      );
+
+      const currentToken = localStorage.getItem('auth_token');
+      const currentUser = localStorage.getItem('user_data');
+      if (currentToken) sessionStorage.setItem('platform_return_token', currentToken);
+      if (currentUser) sessionStorage.setItem('platform_return_user', currentUser);
+      sessionStorage.setItem('platform_return_clinic_name', clinicName || '');
+
+      localStorage.setItem('auth_token', data.token);
+      localStorage.setItem('user_data', JSON.stringify(data.userData));
+      return data;
+    } catch (err) {
+      return rejectWithValue({ message: err.message, status: err.status });
+    }
+  }
+);
+
+// Restores the platform admin's own session after an impersonation session.
+export const returnFromImpersonation = createAsyncThunk(
+  'auth/returnFromImpersonation',
+  async (_, { rejectWithValue }) => {
+    const token = sessionStorage.getItem('platform_return_token');
+    const userStr = sessionStorage.getItem('platform_return_user');
+    if (!token || !userStr) {
+      return rejectWithValue({ message: 'No platform session to return to' });
+    }
+    localStorage.setItem('auth_token', token);
+    localStorage.setItem('user_data', userStr);
+    sessionStorage.removeItem('platform_return_token');
+    sessionStorage.removeItem('platform_return_user');
+    sessionStorage.removeItem('platform_return_clinic_name');
+    return { token, userData: JSON.parse(userStr) };
+  }
+);
+
 // ─── Slice ────────────────────────────────────────────────────────────────────
 
 const storedUser = localStorage.getItem('user_data');
@@ -82,6 +127,19 @@ const authSlice = createSlice({
       s.token = null;
       s.role = null;
     });
+
+    // Impersonation start/end - same shape as login
+    builder
+      .addCase(impersonateClinicAdmin.fulfilled, (s, { payload }) => {
+        s.token = payload.token;
+        s.user = payload.userData;
+        s.role = payload.userData?.role;
+      })
+      .addCase(returnFromImpersonation.fulfilled, (s, { payload }) => {
+        s.token = payload.token;
+        s.user = payload.userData;
+        s.role = payload.userData?.role;
+      });
 
     // Register
     builder

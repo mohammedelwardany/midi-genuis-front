@@ -92,6 +92,61 @@ export const updateClinicStatus = createAsyncThunk(
   }
 );
 
+export const updateClinicBranding = createAsyncThunk(
+  'platform/updateClinicBranding',
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      return await apiClient.put(ENDPOINTS.platform.updateClinicBranding(id), data);
+    } catch (err) {
+      return rejectWithValue({ message: err.message, status: err.status });
+    }
+  }
+);
+
+export const fetchPlatformAdmins = createAsyncThunk(
+  'platform/fetchPlatformAdmins',
+  async (_, { rejectWithValue }) => {
+    try {
+      return await apiClient.get(ENDPOINTS.platform.platformAdmins);
+    } catch (err) {
+      return rejectWithValue({ message: err.message, status: err.status });
+    }
+  }
+);
+
+export const createPlatformAdmin = createAsyncThunk(
+  'platform/createPlatformAdmin',
+  async (adminData, { rejectWithValue }) => {
+    try {
+      return await apiClient.post(ENDPOINTS.platform.platformAdmins, adminData);
+    } catch (err) {
+      return rejectWithValue({ message: err.message, status: err.status });
+    }
+  }
+);
+
+export const updatePlatformAdminStatus = createAsyncThunk(
+  'platform/updatePlatformAdminStatus',
+  async ({ id, active }, { rejectWithValue }) => {
+    try {
+      return await apiClient.put(ENDPOINTS.platform.platformAdminStatus(id), { active });
+    } catch (err) {
+      return rejectWithValue({ message: err.message, status: err.status });
+    }
+  }
+);
+
+export const fetchAuditLogs = createAsyncThunk(
+  'platform/fetchAuditLogs',
+  async (clinicId, { rejectWithValue }) => {
+    try {
+      return await apiClient.get(ENDPOINTS.platform.auditLogs, clinicId ? { params: { clinic_id: clinicId } } : {});
+    } catch (err) {
+      return rejectWithValue({ message: err.message, status: err.status });
+    }
+  }
+);
+
 // ─── Slice ────────────────────────────────────────────────────────────────────
 
 const platformSlice = createSlice({
@@ -100,6 +155,8 @@ const platformSlice = createSlice({
     metrics: null,
     clinics: [],
     selectedClinic: null,
+    platformAdmins: [],
+    auditLogs: [],
     loading: false,
     error: null,
   },
@@ -195,6 +252,53 @@ const platformSlice = createSlice({
       .addCase(updateClinicStatus.rejected, (s, { payload }) => {
         s.error = payload?.message || 'Failed to update clinic status';
       });
+
+    builder
+      .addCase(updateClinicBranding.fulfilled, (s, { payload }) => {
+        if (s.selectedClinic) s.selectedClinic = { ...s.selectedClinic, branding: payload.clinic.branding };
+      })
+      .addCase(updateClinicBranding.rejected, (s, { payload }) => {
+        s.error = payload?.message || 'Failed to update clinic branding';
+      });
+
+    builder
+      .addCase(fetchPlatformAdmins.pending, (s) => { s.loading = true; s.error = null; })
+      .addCase(fetchPlatformAdmins.fulfilled, (s, { payload }) => {
+        s.loading = false;
+        s.platformAdmins = payload;
+      })
+      .addCase(fetchPlatformAdmins.rejected, (s, { payload }) => {
+        s.loading = false;
+        s.error = payload?.message || 'Failed to load platform admins';
+      });
+
+    builder
+      .addCase(createPlatformAdmin.fulfilled, (s, { payload }) => {
+        s.platformAdmins.unshift(payload.admin);
+      })
+      .addCase(createPlatformAdmin.rejected, (s, { payload }) => {
+        s.error = payload?.message || 'Failed to create platform admin';
+      });
+
+    builder
+      .addCase(updatePlatformAdminStatus.fulfilled, (s, { payload }) => {
+        const idx = s.platformAdmins.findIndex((a) => a.id === payload.admin.id);
+        if (idx !== -1) s.platformAdmins[idx] = { ...s.platformAdmins[idx], active: payload.admin.active };
+      })
+      .addCase(updatePlatformAdminStatus.rejected, (s, { payload }) => {
+        s.error = payload?.message || 'Failed to update platform admin status';
+      });
+
+    builder
+      .addCase(fetchAuditLogs.pending, (s) => { s.loading = true; s.error = null; })
+      .addCase(fetchAuditLogs.fulfilled, (s, { payload }) => {
+        s.loading = false;
+        s.auditLogs = payload;
+      })
+      .addCase(fetchAuditLogs.rejected, (s, { payload }) => {
+        s.loading = false;
+        s.error = payload?.message || 'Failed to load audit logs';
+      });
   },
 });
 
@@ -204,6 +308,8 @@ export const { clearPlatformError, clearSelectedClinic } = platformSlice.actions
 export const selectPlatformMetrics = (state) => state.platform.metrics;
 export const selectClinics = (state) => state.platform.clinics;
 export const selectSelectedClinic = (state) => state.platform.selectedClinic;
+export const selectPlatformAdmins = (state) => state.platform.platformAdmins;
+export const selectAuditLogs = (state) => state.platform.auditLogs;
 export const selectPlatformLoading = (state) => state.platform.loading;
 export const selectPlatformError = (state) => state.platform.error;
 

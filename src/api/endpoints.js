@@ -98,6 +98,11 @@ export const ENDPOINTS = {
     addClinicAdmin: (id) => `/platform/clinics/${id}/admins`,
     updateSubscription: (id) => `/platform/clinics/${id}/subscription`,
     updateClinicStatus: (id) => `/platform/clinics/${id}/status`,
+    updateClinicBranding: (id) => `/platform/clinics/${id}/branding`,
+    impersonate: (id) => `/platform/clinics/${id}/impersonate`,
+    platformAdmins: '/platform/platform-admins',
+    platformAdminStatus: (id) => `/platform/platform-admins/${id}/status`,
+    auditLogs: '/platform/audit-logs',
   },
 
   // ── Clinic (public, pre-auth) ──────────────────────

@@ -54,11 +54,14 @@ import AdminAppointmentDetails from './pages/admin/AdminAppointmentDetails';
 import PlatformDashboard from './pages/platform/PlatformDashboard';
 import ClinicManagement from './pages/platform/ClinicManagement';
 import ClinicDetails from './pages/platform/ClinicDetails';
+import PlatformAdmins from './pages/platform/PlatformAdmins';
+import AuditLog from './pages/platform/AuditLog';
 
 // Global Route
 import EmergencyContact from './pages/EmergencyContact';
 
 import { Toaster } from 'react-hot-toast';
+import ImpersonationBanner from './components/ImpersonationBanner';
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -98,11 +101,14 @@ function App() {
   const platformPortalTabs = [
     { name: isRtl ? 'لوحة التحكم' : 'Dashboard', href: '/platform/dashboard' },
     { name: isRtl ? 'العيادات' : 'Clinics', href: '/platform/clinics' },
+    { name: isRtl ? 'مسؤولو المنصة' : 'Platform Admins', href: '/platform/admins' },
+    { name: isRtl ? 'سجل التدقيق' : 'Audit Log', href: '/platform/audit-log' },
   ];
 
   return (
     <BrowserRouter>
       <Toaster position="top-center" reverseOrder={false} />
+      <ImpersonationBanner />
       <Routes>
         {/* Core Auth & Entry */}
         <Route path="/" element={<Navigate to="/login" />} />
@@ -159,6 +165,8 @@ function App() {
           <Route path="/platform/dashboard" element={<PlatformDashboard />} />
           <Route path="/platform/clinics" element={<ClinicManagement />} />
           <Route path="/platform/clinics/:id" element={<ClinicDetails />} />
+          <Route path="/platform/admins" element={<PlatformAdmins />} />
+          <Route path="/platform/audit-log" element={<AuditLog />} />
         </Route>
 
         <Route path="/emergency" element={<EmergencyContact />} />

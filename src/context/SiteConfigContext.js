@@ -17,7 +17,13 @@ function mergeBranding(base, override) {
     branding: {
       ...base.branding,
       ...override.branding,
-      colors: { ...base.branding.colors, ...override.branding?.colors },
+      colors: {
+        ...base.branding.colors,
+        ...override.branding?.colors,
+        // Merge shade-by-shade so overriding just one shade (e.g. 600)
+        // doesn't blow away the rest of the primary palette (50-900).
+        primary: { ...base.branding.colors.primary, ...override.branding?.colors?.primary },
+      },
     },
     portals: { ...base.portals, ...override.portals },
   };
