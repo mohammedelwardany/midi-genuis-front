@@ -94,7 +94,7 @@ export default function SidebarLayout() {
               {/* Footer / Copyright */}
               <div className="mt-20 border-t border-slate-100 pt-8 pb-12">
                 <div className="flex flex-col lg:flex-row justify-between items-center gap-4 text-xs text-slate-400 text-center lg:text-start">
-                  <span>{t('footer.copyright', { defaultValue: '© 2023 ClinicFlow Medical Systems. All rights reserved.' })}</span>
+                  <span>{t('footer.copyright', { defaultValue: '© 2026 ClinicFlow Medical Systems. All rights reserved.' })}</span>
                   <div className="flex flex-wrap justify-center gap-4 md:gap-6">
                       <a href="#" className="hover:text-slate-600 transition-colors">{t('footer.privacyPolicy', { defaultValue: 'Privacy Policy' })}</a>
                       <a href="#" className="hover:text-slate-600 transition-colors">{t('footer.termsOfService', { defaultValue: 'Terms of Service' })}</a>
