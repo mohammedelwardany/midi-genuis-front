@@ -19,7 +19,6 @@ import BillingDashboard from './pages/BillingDashboard';
 import BookingsDashboard from './pages/BookingsDashboard';
 import AppointmentDetails from './pages/AppointmentDetails';
 import BookVisit from './pages/BookVisit';
-import Messages from './pages/Messages';
 import MedicalRecords from './pages/MedicalRecords';
 import ProfileSettings from './pages/ProfileSettings';
 import VisitHistory from './pages/VisitHistory';
@@ -36,8 +35,6 @@ import PatientDirectory from './pages/doctor/PatientDirectory';
 import DoctorSchedule from './pages/doctor/DoctorSchedule';
 import ConfigureAvailability from './pages/doctor/ConfigureAvailability';
 import DoctorSettings from './pages/doctor/DoctorSettings';
-import DoctorMessages from './pages/doctor/DoctorMessages';
-import PerformanceAnalytics from './pages/doctor/PerformanceAnalytics';
 import PatientProfile from './pages/doctor/PatientProfile';
 import DoctorProfilePage from './pages/doctor/DoctorProfilePage';
 
@@ -77,7 +74,6 @@ function App() {
     { name: t('nav.bookVisit'), href: '/patient/book/doctors' },
     { name: t('nav.bookingsHistory'), href: '/patient/bookings' },
     { name: t('nav.records'), href: '/patient/records' },
-    // { name: t('nav.messages'), href: '/patient/messages' },
     { name: t('nav.billing'), href: '/patient/billing' }
   ];
 
@@ -85,8 +81,6 @@ function App() {
     { name: t('nav.dashboard'), href: '/doctor/dashboard' },
     // { name: t('nav.patients'), href: '/doctor/patients' },
     { name: t('nav.schedule'), href: '/doctor/schedule' },
-    // { name: t('nav.messages'), href: '/doctor/messages' },
-    // { name: t('nav.performance'), href: '/doctor/performance' }
   ];
 
   const adminPortalTabs = [
@@ -113,7 +107,6 @@ function App() {
           <Route path="/patient/history" element={<VisitHistory />} />
           <Route path="/patient/billing" element={<BillingDashboard />} />
           <Route path="/patient/appointments/:id" element={<AppointmentDetails />} />
-          <Route path="/patient/messages" element={<Messages />} />
           <Route path="/patient/records" element={<MedicalRecords />} />
           <Route path="/patient/settings" element={<ProfileSettings />} />
         </Route>
@@ -132,9 +125,7 @@ function App() {
           <Route path="/doctor/patients" element={<PatientDirectory />} />
           <Route path="/doctor/schedule" element={<DoctorSchedule />} />
           <Route path="/doctor/schedule/configure" element={<ConfigureAvailability />} />
-          <Route path="/doctor/performance" element={<PerformanceAnalytics />} />
           <Route path="/doctor/settings" element={<DoctorSettings />} />
-          <Route path="/doctor/messages" element={<DoctorMessages />} />
           <Route path="/doctor/patients/:id" element={<PatientProfile />} />
           <Route path="/doctor/profile/:id" element={<DoctorProfilePage />} />
         </Route>
