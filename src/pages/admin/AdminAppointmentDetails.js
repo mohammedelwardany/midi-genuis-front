@@ -24,6 +24,9 @@ import {
   selectSelectedPatient,
   clearSelectedPatient
 } from '../../store/slices/patientSlice';
+import { getAppointmentStatusColor } from '../../utils/statusColors';
+import { formatCurrency } from '../../utils/currencyFormatter';
+import { formatDate, formatTime } from '../../utils/dateFormatter';
 
 export default function AdminAppointmentDetails() {
   const { id } = useParams();
@@ -109,20 +112,7 @@ export default function AdminAppointmentDetails() {
     );
   }
 
-  const getStatusBadge = (status) => {
-    switch (String(status).toLowerCase()) {
-      case 'confirmed':
-        return 'bg-emerald-50 text-emerald-600 border border-emerald-100';
-      case 'pending':
-        return 'bg-amber-50 text-amber-600 border border-amber-100';
-      case 'completed':
-        return 'bg-indigo-50 text-indigo-600 border border-indigo-100';
-      case 'cancelled':
-        return 'bg-rose-50 text-rose-600 border border-rose-100';
-      default:
-        return 'bg-slate-50 text-slate-600 border border-slate-100';
-    }
-  };
+  const getStatusBadge = getAppointmentStatusColor;
 
   const apptData = appointment.appointment ?? appointment;
 
@@ -151,19 +141,13 @@ export default function AdminAppointmentDetails() {
 
   const scheduledDate = apptData.scheduledAt || apptData.scheduled_at || apptData.date;
   const formattedDate = scheduledDate
-    ? new Date(scheduledDate).toLocaleDateString(isRtl ? 'ar-EG' : 'en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+    ? formatDate(scheduledDate, isRtl, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
     : t('appointmentDetails.pendingDate', { defaultValue: 'Pending Date' });
 
   const formattedTime = scheduledDate
-    ? new Date(scheduledDate).toLocaleTimeString(isRtl ? 'ar-EG' : 'en-US', { hour: '2-digit', minute: '2-digit' })
+    ? formatTime(scheduledDate, isRtl)
     : t('appointmentDetails.pendingTime', { defaultValue: 'Pending Time' });
 
-  const formatCurrency = (val) => {
-    const num = parseFloat(val || 0);
-    return isRtl
-      ? `${num.toLocaleString('ar-EG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ج.م`
-      : `EGP ${num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  };
 
   return (
     <div id="appointment-details-container" className="animate-in fade-in duration-500 max-w-6xl mx-auto pb-20">
@@ -459,7 +443,7 @@ export default function AdminAppointmentDetails() {
                   <div className="text-xs text-slate-500 font-bold mt-2 space-y-1">
                     <div>{isRtl ? 'رقم الإيصال' : 'Receipt No'}: <span className="font-extrabold text-slate-800 font-mono">#REC-{apptData.id}</span></div>
                     <div>{isRtl ? 'رقم الحجز' : 'Appointment No'}: <span className="font-extrabold text-slate-800 font-mono">#APT-{apptData.id}</span></div>
-                    <div>{isRtl ? 'تاريخ الإصدار' : 'Issue Date'}: <span className="font-extrabold text-slate-800">{new Date(scheduledDate || Date.now()).toLocaleDateString(isRtl ? 'ar-EG' : 'en-US')}</span></div>
+                    <div>{isRtl ? 'تاريخ الإصدار' : 'Issue Date'}: <span className="font-extrabold text-slate-800">{formatDate(scheduledDate || Date.now(), isRtl)}</span></div>
                     <div>{isRtl ? 'طريقة الدفع' : 'Payment Method'}: <span className="font-extrabold text-slate-800">{isRtl ? (apptData.paymentMethod === 'Cash' || apptData.payment_method === 'cash' ? 'نقداً' : 'تحويل يدوي') : (apptData.paymentMethod || apptData.payment_method || 'Cash')}</span></div>
                   </div>
                 </div>
@@ -511,7 +495,7 @@ export default function AdminAppointmentDetails() {
                           {isRtl ? 'مؤكد ومدفوع' : 'Paid / Confirmed'}
                         </span>
                       </td>
-                      <td className="p-3 text-end font-extrabold">{formatCurrency(doctorData?.consultationFee || doctorData?.consultation_fee || doctorData?.fee || doctorData?.price || 250)}</td>
+                      <td className="p-3 text-end font-extrabold">{formatCurrency(doctorData?.consultationFee || doctorData?.consultation_fee || doctorData?.fee || doctorData?.price || 250, isRtl)}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -522,16 +506,16 @@ export default function AdminAppointmentDetails() {
                 <div className="w-64 space-y-2 text-xs font-bold text-slate-600">
                   <div className="flex justify-between">
                     <span>{isRtl ? 'المجموع الفرعي' : 'Subtotal'}:</span>
-                    <span className="text-slate-800">{formatCurrency(doctorData?.consultationFee || doctorData?.consultation_fee || doctorData?.fee || doctorData?.price || 250)}</span>
+                    <span className="text-slate-800">{formatCurrency(doctorData?.consultationFee || doctorData?.consultation_fee || doctorData?.fee || doctorData?.price || 250, isRtl)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>{isRtl ? 'الضريبة المضافة (0٪)' : 'VAT (0%)'}:</span>
-                    <span className="text-slate-800">{formatCurrency(0)}</span>
+                    <span className="text-slate-800">{formatCurrency(0, isRtl)}</span>
                   </div>
                   <hr className="border-slate-200 my-1" />
                   <div className="flex justify-between text-sm font-black">
                     <span className="text-slate-900">{isRtl ? 'الإجمالي المدفوع' : 'Total Amount Paid'}:</span>
-                    <span className="text-indigo-600">{formatCurrency(doctorData?.consultationFee || doctorData?.consultation_fee || doctorData?.fee || doctorData?.price || 250)}</span>
+                    <span className="text-indigo-600">{formatCurrency(doctorData?.consultationFee || doctorData?.consultation_fee || doctorData?.fee || doctorData?.price || 250, isRtl)}</span>
                   </div>
                 </div>
               </div>
@@ -591,7 +575,7 @@ export default function AdminAppointmentDetails() {
                 </div>
                 <div className="text-start">
                   <span className="text-slate-400 block mb-0.5 text-[9px] uppercase tracking-wider">{isRtl ? 'التاريخ' : 'Date'}</span>
-                  <span className="text-slate-800 text-sm block">{new Date(scheduledDate || Date.now()).toLocaleDateString(isRtl ? 'ar-EG' : 'en-US')}</span>
+                  <span className="text-slate-800 text-sm block">{formatDate(scheduledDate || Date.now(), isRtl)}</span>
                 </div>
               </div>
 

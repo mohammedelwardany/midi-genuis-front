@@ -14,6 +14,7 @@ import {
   selectAdminError
 } from '../../store/slices/adminSlice';
 import toast from 'react-hot-toast';
+import { formatCurrency as formatCurrencyShared } from '../../utils/currencyFormatter';
 
 export default function AdminDashboard() {
   const { t, i18n } = useTranslation();
@@ -43,13 +44,7 @@ export default function AdminDashboard() {
     toast.success(isRtl ? 'تم تحديث لوحة التحكم' : 'Dashboard updated successfully');
   };
 
-  // Helper to format currency
-  const formatCurrency = (val) => {
-    const num = parseFloat(val || 0);
-    return isRtl 
-      ? `${num.toLocaleString('ar-EG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ج.م`
-      : `EGP ${num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  };
+  const formatCurrency = (val) => formatCurrencyShared(val, isRtl);
 
   // Helper to format month strings e.g. "2026-05"
   const formatMonth = (yearMonthStr) => {

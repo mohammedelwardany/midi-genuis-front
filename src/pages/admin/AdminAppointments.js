@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { Calendar, CheckCircle2, XCircle, AlertCircle, Search, Loader2, Eye, RefreshCw, Clock } from 'lucide-react';
 import { fetchAllAppointments, selectAppointments, selectAppointmentsLoading, selectAppointmentsError } from '../../store/slices/appointmentSlice';
 import toast from 'react-hot-toast';
+import { getAppointmentStatusColor } from '../../utils/statusColors';
+import { formatDate, formatTime } from '../../utils/dateFormatter';
 
 
 const ensureArray = (val) => {
@@ -40,20 +42,7 @@ export default function AdminAppointments() {
     toast.success(isRtl ? 'تم تحديث المواعيد' : 'Appointments reloaded');
   };
 
-  const getStatusBadge = (status) => {
-    switch (String(status).toLowerCase()) {
-      case 'confirmed':
-        return 'bg-emerald-50 text-emerald-600 border border-emerald-100';
-      case 'pending':
-        return 'bg-amber-50 text-amber-600 border border-amber-100';
-      case 'completed':
-        return 'bg-indigo-50 text-indigo-600 border border-indigo-100';
-      case 'cancelled':
-        return 'bg-rose-50 text-rose-600 border border-rose-100';
-      default:
-        return 'bg-slate-50 text-slate-600 border border-slate-100';
-    }
-  };
+  const getStatusBadge = getAppointmentStatusColor;
 
   // Filter & Search Logic
   const filteredAppointments = (Array.isArray(appointments) && typeof appointments.filter === 'function')
@@ -303,10 +292,10 @@ export default function AdminAppointments() {
 
                   const scheduledDate = appt.scheduledAt || appt.scheduled_at || appt.date;
                   const formattedDate = scheduledDate
-                    ? new Date(scheduledDate).toLocaleDateString(isRtl ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                    ? formatDate(scheduledDate, isRtl, { month: 'short', day: 'numeric', year: 'numeric' })
                     : 'N/A';
                   const formattedTime = scheduledDate
-                    ? new Date(scheduledDate).toLocaleTimeString(isRtl ? 'ar-EG' : 'en-US', { hour: '2-digit', minute: '2-digit' })
+                    ? formatTime(scheduledDate, isRtl)
                     : 'N/A';
 
                   return (

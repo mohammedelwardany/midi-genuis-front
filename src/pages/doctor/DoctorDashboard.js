@@ -11,6 +11,7 @@ import {
    selectPatientsByDate,
    selectAppointmentsLoading
 } from '../../store/slices/appointmentSlice';
+import { formatDate, formatTime } from '../../utils/dateFormatter';
 
 export default function DoctorDashboard() {
    const navigate = useNavigate();
@@ -60,8 +61,8 @@ export default function DoctorDashboard() {
    const getApptDateTime = (appt) => {
       const scheduledDate = appt.scheduledAt || appt.scheduled_at || appt.date;
       if (!scheduledDate) return 'Pending';
-      const datePart = new Date(scheduledDate).toLocaleDateString(isRtl ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric' });
-      const timePart = new Date(scheduledDate).toLocaleTimeString(isRtl ? 'ar-EG' : 'en-US', { hour: '2-digit', minute: '2-digit' });
+      const datePart = formatDate(scheduledDate, isRtl, { month: 'short', day: 'numeric' });
+      const timePart = formatTime(scheduledDate, isRtl);
       return `${datePart}, ${timePart}`;
    };
 

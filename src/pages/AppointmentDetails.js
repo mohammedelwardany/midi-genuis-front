@@ -6,6 +6,8 @@ import { useTranslation } from 'react-i18next';
 import { fetchAppointmentById, selectSelectedAppt, selectAppointmentsLoading, selectAppointmentsError } from '../store/slices/appointmentSlice';
 import { fetchDoctorById, selectSelectedDoctor, clearSelectedDoctor } from '../store/slices/doctorSlice';
 import { useSiteConfig } from '../context/SiteConfigContext';
+import { getAppointmentStatusColor } from '../utils/statusColors';
+import { formatDate, formatTime } from '../utils/dateFormatter';
 
 export default function AppointmentDetails() {
   const { id } = useParams();
@@ -67,20 +69,7 @@ export default function AppointmentDetails() {
     );
   }
 
-  const getStatusBadge = (status) => {
-    switch (String(status).toLowerCase()) {
-      case 'confirmed':
-        return 'bg-emerald-50 text-emerald-600 border border-emerald-100';
-      case 'pending':
-        return 'bg-amber-50 text-amber-600 border border-amber-100';
-      case 'completed':
-        return 'bg-indigo-50 text-indigo-600 border border-indigo-100';
-      case 'cancelled':
-        return 'bg-rose-50 text-rose-600 border border-rose-100';
-      default:
-        return 'bg-slate-50 text-slate-600 border border-slate-100';
-    }
-  };
+  const getStatusBadge = getAppointmentStatusColor;
 
   const doctorName = isRtl
     ? (doctorData?.name_ar || appointment?.doctor?.name_ar || appointment?.doctor_name_ar || doctorData?.name || appointment?.doctor?.name || appointment?.doctor_name || 'طبيب متخصص')
@@ -96,11 +85,11 @@ export default function AppointmentDetails() {
 
   const scheduledDate = appointment.scheduledAt || appointment.scheduled_at || appointment.date;
   const formattedDate = scheduledDate
-    ? new Date(scheduledDate).toLocaleDateString(isRtl ? 'ar-EG' : 'en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+    ? formatDate(scheduledDate, isRtl, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
     : t('appointmentDetails.pendingDate', { defaultValue: 'Pending Date' });
 
   const formattedTime = scheduledDate
-    ? new Date(scheduledDate).toLocaleTimeString(isRtl ? 'ar-EG' : 'en-US', { hour: '2-digit', minute: '2-digit' })
+    ? formatTime(scheduledDate, isRtl)
     : t('appointmentDetails.pendingTime', { defaultValue: 'Pending Time' });
 
   return (

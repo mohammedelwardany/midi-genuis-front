@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { CalendarDays, Clock, MapPin, History, FileText, ChevronDown, Loader2 } from 'lucide-react';
 import { fetchAppointments, selectAppointments, selectAppointmentsLoading } from '../store/slices/appointmentSlice';
 import { cn } from '../utils/cn';
+import { formatDate, formatTime } from '../utils/dateFormatter';
 
 export default function BookingsDashboard() {
   const navigate = useNavigate();
@@ -31,13 +32,13 @@ export default function BookingsDashboard() {
   const getApptDate = (appt) => {
     const scheduledDate = appt.scheduledAt || appt.scheduled_at || appt.date;
     if (!scheduledDate) return t('appointmentDetails.pendingDate', { defaultValue: 'Pending Date' });
-    return new Date(scheduledDate).toLocaleDateString(isRtl ? 'ar-EG' : 'en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+    return formatDate(scheduledDate, isRtl, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
   };
 
   const getApptTime = (appt) => {
     const scheduledDate = appt.scheduledAt || appt.scheduled_at || appt.date;
     if (!scheduledDate) return t('appointmentDetails.pendingTime', { defaultValue: 'Pending Time' });
-    return new Date(scheduledDate).toLocaleTimeString(isRtl ? 'ar-EG' : 'en-US', { hour: '2-digit', minute: '2-digit' });
+    return formatTime(scheduledDate, isRtl);
   };
 
   const appointments = useSelector(selectAppointments);

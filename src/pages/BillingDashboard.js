@@ -4,6 +4,8 @@ import { Download, Wallet, Calendar as CalendarIcon, MoreVertical, Verified, Inf
 import { useTranslation } from 'react-i18next';
 import { fetchMyPayments, fetchPaymentById, selectAllPayments, selectPaymentsLoading, selectSelectedPayment } from '../store/slices/paymentSlice';
 import { BASE_URL } from '../api/endpoints';
+import { getPaymentStatusColor } from '../utils/statusColors';
+import { formatDate } from '../utils/dateFormatter';
 
 export default function BillingDashboard() {
   const { t, i18n } = useTranslation();
@@ -37,22 +39,7 @@ export default function BillingDashboard() {
     setShowDrawer(true);
   };
 
-  const getStatusStyle = (status) => {
-    switch (String(status).toLowerCase()) {
-      case 'approved':
-      case 'success':
-      case 'completed':
-        return 'bg-emerald-50 text-emerald-600 border border-emerald-100';
-      case 'pending':
-      case 'pending_review':
-        return 'bg-amber-50 text-amber-600 border border-amber-100';
-      case 'rejected':
-      case 'failed':
-        return 'bg-rose-50 text-rose-600 border border-rose-100';
-      default:
-        return 'bg-slate-50 text-slate-600 border border-slate-100';
-    }
-  };
+  const getStatusStyle = getPaymentStatusColor;
 
   const getNormalizedStatus = (p) => {
     const raw = String(p.reviewStatus || p.status || 'pending').toLowerCase();
@@ -192,7 +179,7 @@ export default function BillingDashboard() {
                             <span dir="ltr">#PAY-{pId}</span>
                           </td>
                           <td className="p-4 text-slate-500 font-medium text-start">
-                            {pDate ? new Date(pDate).toLocaleDateString(i18n.language.startsWith('ar') ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : t('billing.na', { defaultValue: 'N/A' })}
+                            {pDate ? formatDate(pDate, i18n.language.startsWith('ar'), { month: 'short', day: 'numeric', year: 'numeric' }) : t('billing.na', { defaultValue: 'N/A' })}
                           </td>
                           <td className="p-4 font-semibold text-slate-700 capitalize text-start">
                             {getTranslatedPaymentMethod(payment.payment_method || payment.paymentMethod)}

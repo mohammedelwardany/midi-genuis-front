@@ -7,6 +7,8 @@ import { fetchPatients, selectPatients } from '../../store/slices/patientSlice';
 import { fetchAllAppointments, selectAppointments } from '../../store/slices/appointmentSlice';
 import { BASE_URL } from '../../api/endpoints';
 import toast from 'react-hot-toast';
+import { getPaymentStatusColor } from '../../utils/statusColors';
+import { formatDate } from '../../utils/dateFormatter';
 
 const ensureArray = (val) => {
   if (Array.isArray(val)) return val;
@@ -126,22 +128,7 @@ export default function AdminPayments() {
     }
   };
 
-  const getStatusBadge = (status) => {
-    switch (String(status).toLowerCase()) {
-      case 'approved':
-      case 'success':
-      case 'completed':
-        return 'bg-emerald-50 text-emerald-600 border border-emerald-100';
-      case 'pending':
-      case 'pending_review':
-        return 'bg-amber-50 text-amber-600 border border-amber-100';
-      case 'rejected':
-      case 'failed':
-        return 'bg-rose-50 text-rose-600 border border-rose-100';
-      default:
-        return 'bg-slate-50 text-slate-600 border border-slate-100';
-    }
-  };
+  const getStatusBadge = getPaymentStatusColor;
 
   // Filter & Search Logic
   const filteredPayments = payments
@@ -405,7 +392,7 @@ export default function AdminPayments() {
                         <span dir="ltr">#PAY-{pId}</span>
                       </td>
                       <td className="p-4 text-slate-500 font-medium text-start">
-                        {pDate ? new Date(pDate).toLocaleDateString(i18n.language.startsWith('ar') ? 'ar-EG' : 'en-US', { dateStyle: 'medium' }) : 'N/A'}
+                        {pDate ? formatDate(pDate, isRtl, { dateStyle: 'medium' }) : 'N/A'}
                       </td>
                       <td className="p-4 text-start">
                         <div className="font-bold text-slate-800 text-start">{patName}</div>
@@ -571,7 +558,7 @@ export default function AdminPayments() {
                         {t('adminPayments.modal.paymentDate')}
                       </span>
                       <span className="text-sm font-bold text-slate-700 block">
-                        {selectedPayment.created_at || selectedPayment.createdAt ? new Date(selectedPayment.created_at || selectedPayment.createdAt).toLocaleDateString(i18n.language.startsWith('ar') ? 'ar-EG' : 'en-US', { dateStyle: 'medium' }) : 'N/A'}
+                        {selectedPayment.created_at || selectedPayment.createdAt ? formatDate(selectedPayment.created_at || selectedPayment.createdAt, isRtl, { dateStyle: 'medium' }) : 'N/A'}
                       </span>
                     </div>
                   </div>
