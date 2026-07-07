@@ -57,6 +57,7 @@ import ClinicDetails from './pages/platform/ClinicDetails';
 import PlatformAdmins from './pages/platform/PlatformAdmins';
 import AuditLog from './pages/platform/AuditLog';
 import SubscriptionPlans from './pages/platform/SubscriptionPlans';
+import PlatformSettings from './pages/platform/PlatformSettings';
 
 // Global Route
 import EmergencyContact from './pages/EmergencyContact';
@@ -170,6 +171,7 @@ function App() {
           <Route path="/platform/subscription-plans" element={<SubscriptionPlans />} />
           <Route path="/platform/admins" element={<PlatformAdmins />} />
           <Route path="/platform/audit-log" element={<AuditLog />} />
+          <Route path="/platform/settings" element={<PlatformSettings />} />
         </Route>
 
         <Route path="/emergency" element={<EmergencyContact />} />

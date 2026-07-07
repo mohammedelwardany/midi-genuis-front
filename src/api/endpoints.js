@@ -107,6 +107,7 @@ export const ENDPOINTS = {
     subscriptionPlans: '/platform/subscription-plans',
     subscriptionPlanById: (id) => `/platform/subscription-plans/${id}`,
     subscriptionPlanStatus: (id) => `/platform/subscription-plans/${id}/status`,
+    changeOwnPassword: '/platform/account/password',
   },
 
   // ── Clinic (public, pre-auth) ──────────────────────

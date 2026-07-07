@@ -136,6 +136,17 @@ export const updatePlatformAdminStatus = createAsyncThunk(
   }
 );
 
+export const changeOwnPassword = createAsyncThunk(
+  'platform/changeOwnPassword',
+  async ({ current_password, new_password }, { rejectWithValue }) => {
+    try {
+      return await apiClient.put(ENDPOINTS.platform.changeOwnPassword, { current_password, new_password });
+    } catch (err) {
+      return rejectWithValue({ message: err.message, status: err.status });
+    }
+  }
+);
+
 export const fetchAuditLogs = createAsyncThunk(
   'platform/fetchAuditLogs',
   async (clinicId, { rejectWithValue }) => {

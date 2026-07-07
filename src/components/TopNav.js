@@ -24,6 +24,7 @@ export default function TopNav({ title = "MediGenius Patient Portal", tabs = [],
 
   const getSettingsPath = () => {
     if (location.pathname.startsWith('/doctor')) return '/doctor/settings';
+    if (location.pathname.startsWith('/platform')) return '/platform/settings';
     if (location.pathname.startsWith('/admin')) return '/admin/settings';
     return '/patient/settings';
   };
