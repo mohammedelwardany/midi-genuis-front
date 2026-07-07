@@ -37,6 +37,17 @@ export const fetchMonthlyRevenues = createAsyncThunk(
   }
 );
 
+export const fetchSubscriptionInfo = createAsyncThunk(
+  'admin/fetchSubscriptionInfo',
+  async (_, { rejectWithValue }) => {
+    try {
+      return await apiClient.get(ENDPOINTS.adminDashboard.subscription);
+    } catch (err) {
+      return rejectWithValue({ message: err.message, status: err.status });
+    }
+  }
+);
+
 export const fetchAdminStats = createAsyncThunk(
   'admin/fetchStats',
   async (_, { rejectWithValue }) => {
@@ -107,6 +118,7 @@ const adminSlice = createSlice({
     dashboardMetrics: null,
     doctorRevenues:   [],
     monthlyRevenues:  [],
+    subscriptionInfo: null,
   },
   reducers: {
     clearAdminError: (state) => { state.error = null; },
@@ -143,6 +155,17 @@ const adminSlice = createSlice({
       .addCase(fetchMonthlyRevenues.rejected,  (s, { payload }) => {
         s.loading = false;
         s.error   = payload?.message || 'Failed to load monthly revenues';
+      });
+
+    builder
+      .addCase(fetchSubscriptionInfo.pending,   (s) => { s.loading = true;  s.error = null; })
+      .addCase(fetchSubscriptionInfo.fulfilled, (s, { payload }) => {
+        s.loading = false;
+        s.subscriptionInfo = payload;
+      })
+      .addCase(fetchSubscriptionInfo.rejected,  (s, { payload }) => {
+        s.loading = false;
+        s.error   = payload?.message || 'Failed to load subscription info';
       });
 
     builder
@@ -201,5 +224,6 @@ export const selectAdminError            = (state) => state.admin.error;
 export const selectAdminDashboardMetrics = (state) => state.admin.dashboardMetrics;
 export const selectDoctorRevenues        = (state) => state.admin.doctorRevenues;
 export const selectMonthlyRevenues       = (state) => state.admin.monthlyRevenues;
+export const selectSubscriptionInfo      = (state) => state.admin.subscriptionInfo;
 
 export default adminSlice.reducer;

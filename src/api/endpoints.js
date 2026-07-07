@@ -71,6 +71,7 @@ export const ENDPOINTS = {
     metrics: '/adminDashboard/metrics',
     doctorRevenues: '/adminDashboard/doctorRevenues',
     monthlyRevenues: '/adminDashboard/monthlyRevenues',
+    subscription: '/adminDashboard/subscription',
   },
 
   // ── Messages ──────────────────────────────────────

@@ -197,15 +197,6 @@ export default function TopNav({ title = "MediGenius Patient Portal", tabs = [],
                   }}
                   className="w-full text-start px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-lg transition-colors flex items-center gap-2"
                 >
-                  <User className="w-4 h-4 text-slate-400" /> {t('topNav.myProfile')}
-                </button>
-                <button
-                  onClick={() => {
-                    setShowProfileMenu(false);
-                    navigate(getSettingsPath());
-                  }}
-                  className="w-full text-start px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-lg transition-colors flex items-center gap-2"
-                >
                   <Settings className="w-4 h-4 text-slate-400" /> {t('topNav.accountSettings')}
                 </button>
               </div>
