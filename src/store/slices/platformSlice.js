@@ -293,9 +293,9 @@ const platformSlice = createSlice({
 
     builder
       .addCase(updateClinicStatus.fulfilled, (s, { payload }) => {
-        if (s.selectedClinic) s.selectedClinic = { ...s.selectedClinic, status: payload.clinic.status };
+        if (s.selectedClinic) s.selectedClinic = { ...s.selectedClinic, subscription_status: payload.clinic.subscription_status };
         const idx = s.clinics.findIndex((c) => c.id === payload.clinic.id);
-        if (idx !== -1) s.clinics[idx] = { ...s.clinics[idx], status: payload.clinic.status };
+        if (idx !== -1) s.clinics[idx] = { ...s.clinics[idx], subscription_status: payload.clinic.subscription_status };
       })
       .addCase(updateClinicStatus.rejected, (s, { payload }) => {
         s.error = payload?.message || 'Failed to update clinic status';

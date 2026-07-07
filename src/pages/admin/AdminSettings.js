@@ -76,9 +76,7 @@ export default function AdminSettings() {
 
         const statusColor = subscriptionInfo.subscription_status === 'active'
           ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
-          : subscriptionInfo.subscription_status === 'trial'
-            ? 'bg-amber-50 text-amber-600 border border-amber-100'
-            : 'bg-rose-50 text-rose-600 border border-rose-100';
+          : 'bg-rose-50 text-rose-600 border border-rose-100';
 
         return (
           <div className="animate-in fade-in duration-300 space-y-6">

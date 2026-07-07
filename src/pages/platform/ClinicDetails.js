@@ -118,7 +118,7 @@ export default function ClinicDetails() {
   };
 
   const handleToggleStatus = async () => {
-    const newStatus = clinic.status === 'active' ? 'suspended' : 'active';
+    const newStatus = clinic.subscription_status === 'active' ? 'suspended' : 'active';
     try {
       await dispatch(updateClinicStatus({ id, status: newStatus })).unwrap();
       toast.success(newStatus === 'active'
@@ -168,13 +168,13 @@ export default function ClinicDetails() {
         <button
           onClick={handleToggleStatus}
           className={`font-bold px-5 py-2.5 rounded-xl text-sm transition flex items-center gap-2 shadow ${
-            clinic.status === 'active'
+            clinic.subscription_status === 'active'
               ? 'bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-100'
               : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-100'
           }`}
         >
-          {clinic.status === 'active' ? <ShieldAlert className="w-4 h-4" /> : <ShieldCheck className="w-4 h-4" />}
-          {clinic.status === 'active' ? (isRtl ? 'تعليق العيادة' : 'Suspend Clinic') : (isRtl ? 'إعادة التفعيل' : 'Reactivate Clinic')}
+          {clinic.subscription_status === 'active' ? <ShieldAlert className="w-4 h-4" /> : <ShieldCheck className="w-4 h-4" />}
+          {clinic.subscription_status === 'active' ? (isRtl ? 'تعليق العيادة' : 'Suspend Clinic') : (isRtl ? 'إعادة التفعيل' : 'Reactivate Clinic')}
         </button>
       </div>
 
@@ -202,7 +202,6 @@ export default function ClinicDetails() {
             <select value={subForm.status} onChange={(e) => setSubForm({ ...subForm, status: e.target.value })}
               className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500">
               <option value="active">Active</option>
-              <option value="trial">Trial</option>
               <option value="suspended">Suspended</option>
               <option value="cancelled">Cancelled</option>
             </select>

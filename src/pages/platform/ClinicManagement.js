@@ -141,8 +141,8 @@ export default function ClinicManagement() {
                     <td className="p-3 text-slate-600">{clinic.doctor_count}{clinic.max_doctors ? ` / ${clinic.max_doctors}` : ''}</td>
                     <td className="p-3 text-slate-600">{clinic.patient_count}</td>
                     <td className="p-3">
-                      <span className={`px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-widest ${statusColor(clinic.status)}`}>
-                        {clinic.status}
+                      <span className={`px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-widest ${statusColor(clinic.subscription_status)}`}>
+                        {clinic.subscription_status}
                       </span>
                     </td>
                   </tr>
