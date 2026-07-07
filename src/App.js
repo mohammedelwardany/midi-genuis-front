@@ -56,6 +56,7 @@ import ClinicManagement from './pages/platform/ClinicManagement';
 import ClinicDetails from './pages/platform/ClinicDetails';
 import PlatformAdmins from './pages/platform/PlatformAdmins';
 import AuditLog from './pages/platform/AuditLog';
+import SubscriptionPlans from './pages/platform/SubscriptionPlans';
 
 // Global Route
 import EmergencyContact from './pages/EmergencyContact';
@@ -101,6 +102,7 @@ function App() {
   const platformPortalTabs = [
     { name: isRtl ? 'لوحة التحكم' : 'Dashboard', href: '/platform/dashboard' },
     { name: isRtl ? 'العيادات' : 'Clinics', href: '/platform/clinics' },
+    { name: isRtl ? 'خطط الاشتراك' : 'Subscription Plans', href: '/platform/subscription-plans' },
     { name: isRtl ? 'مسؤولو المنصة' : 'Platform Admins', href: '/platform/admins' },
     { name: isRtl ? 'سجل التدقيق' : 'Audit Log', href: '/platform/audit-log' },
   ];
@@ -165,6 +167,7 @@ function App() {
           <Route path="/platform/dashboard" element={<PlatformDashboard />} />
           <Route path="/platform/clinics" element={<ClinicManagement />} />
           <Route path="/platform/clinics/:id" element={<ClinicDetails />} />
+          <Route path="/platform/subscription-plans" element={<SubscriptionPlans />} />
           <Route path="/platform/admins" element={<PlatformAdmins />} />
           <Route path="/platform/audit-log" element={<AuditLog />} />
         </Route>

@@ -104,6 +104,9 @@ export const ENDPOINTS = {
     platformAdmins: '/platform/platform-admins',
     platformAdminStatus: (id) => `/platform/platform-admins/${id}/status`,
     auditLogs: '/platform/audit-logs',
+    subscriptionPlans: '/platform/subscription-plans',
+    subscriptionPlanById: (id) => `/platform/subscription-plans/${id}`,
+    subscriptionPlanStatus: (id) => `/platform/subscription-plans/${id}/status`,
   },
 
   // ── Clinic (public, pre-auth) ──────────────────────

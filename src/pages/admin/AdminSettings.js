@@ -90,7 +90,7 @@ export default function AdminSettings() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl">
               <div className="p-4 border border-slate-200 rounded-xl bg-slate-50">
                 <div className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1">{t('adminSettings.plan', { defaultValue: 'Plan' })}</div>
-                <div className="font-extrabold text-slate-900 capitalize">{subscriptionInfo.plan_name}</div>
+                <div className="font-extrabold text-slate-900 capitalize">{subscriptionInfo.plan_catalog_name || subscriptionInfo.plan_name}</div>
               </div>
               <div className="p-4 border border-slate-200 rounded-xl bg-slate-50">
                 <div className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1">{t('adminSettings.status', { defaultValue: 'Status' })}</div>
@@ -107,6 +107,10 @@ export default function AdminSettings() {
                 </div>
               </div>
             </div>
+
+            {subscriptionInfo.plan_description && (
+              <p className="max-w-3xl text-sm font-medium text-slate-500 -mt-2">{subscriptionInfo.plan_description}</p>
+            )}
 
             <div className="max-w-3xl space-y-3 pt-2">
               {usageRows.map((row) => {

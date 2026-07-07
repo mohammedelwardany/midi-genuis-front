@@ -147,6 +147,50 @@ export const fetchAuditLogs = createAsyncThunk(
   }
 );
 
+export const fetchSubscriptionPlans = createAsyncThunk(
+  'platform/fetchSubscriptionPlans',
+  async (_, { rejectWithValue }) => {
+    try {
+      return await apiClient.get(ENDPOINTS.platform.subscriptionPlans);
+    } catch (err) {
+      return rejectWithValue({ message: err.message, status: err.status });
+    }
+  }
+);
+
+export const createSubscriptionPlan = createAsyncThunk(
+  'platform/createSubscriptionPlan',
+  async (planData, { rejectWithValue }) => {
+    try {
+      return await apiClient.post(ENDPOINTS.platform.subscriptionPlans, planData);
+    } catch (err) {
+      return rejectWithValue({ message: err.message, status: err.status });
+    }
+  }
+);
+
+export const updateSubscriptionPlan = createAsyncThunk(
+  'platform/updateSubscriptionPlan',
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      return await apiClient.put(ENDPOINTS.platform.subscriptionPlanById(id), data);
+    } catch (err) {
+      return rejectWithValue({ message: err.message, status: err.status });
+    }
+  }
+);
+
+export const updateSubscriptionPlanStatus = createAsyncThunk(
+  'platform/updateSubscriptionPlanStatus',
+  async ({ id, active }, { rejectWithValue }) => {
+    try {
+      return await apiClient.put(ENDPOINTS.platform.subscriptionPlanStatus(id), { active });
+    } catch (err) {
+      return rejectWithValue({ message: err.message, status: err.status });
+    }
+  }
+);
+
 // ─── Slice ────────────────────────────────────────────────────────────────────
 
 const platformSlice = createSlice({
@@ -157,6 +201,7 @@ const platformSlice = createSlice({
     selectedClinic: null,
     platformAdmins: [],
     auditLogs: [],
+    subscriptionPlans: [],
     loading: false,
     error: null,
   },
@@ -232,8 +277,11 @@ const platformSlice = createSlice({
         if (s.selectedClinic) {
           s.selectedClinic = {
             ...s.selectedClinic,
+            plan_id: payload.subscription.plan_id,
             plan_name: payload.subscription.plan_name,
             max_doctors: payload.subscription.max_doctors,
+            max_patients: payload.subscription.max_patients,
+            max_monthly_appointments: payload.subscription.max_monthly_appointments,
             subscription_status: payload.subscription.status,
             renews_at: payload.subscription.renews_at,
           };
@@ -299,6 +347,43 @@ const platformSlice = createSlice({
         s.loading = false;
         s.error = payload?.message || 'Failed to load audit logs';
       });
+
+    builder
+      .addCase(fetchSubscriptionPlans.pending, (s) => { s.loading = true; s.error = null; })
+      .addCase(fetchSubscriptionPlans.fulfilled, (s, { payload }) => {
+        s.loading = false;
+        s.subscriptionPlans = payload;
+      })
+      .addCase(fetchSubscriptionPlans.rejected, (s, { payload }) => {
+        s.loading = false;
+        s.error = payload?.message || 'Failed to load subscription plans';
+      });
+
+    builder
+      .addCase(createSubscriptionPlan.fulfilled, (s, { payload }) => {
+        s.subscriptionPlans.unshift(payload.plan);
+      })
+      .addCase(createSubscriptionPlan.rejected, (s, { payload }) => {
+        s.error = payload?.message || 'Failed to create subscription plan';
+      });
+
+    builder
+      .addCase(updateSubscriptionPlan.fulfilled, (s, { payload }) => {
+        const idx = s.subscriptionPlans.findIndex((p) => p.id === payload.plan.id);
+        if (idx !== -1) s.subscriptionPlans[idx] = payload.plan;
+      })
+      .addCase(updateSubscriptionPlan.rejected, (s, { payload }) => {
+        s.error = payload?.message || 'Failed to update subscription plan';
+      });
+
+    builder
+      .addCase(updateSubscriptionPlanStatus.fulfilled, (s, { payload }) => {
+        const idx = s.subscriptionPlans.findIndex((p) => p.id === payload.plan.id);
+        if (idx !== -1) s.subscriptionPlans[idx] = payload.plan;
+      })
+      .addCase(updateSubscriptionPlanStatus.rejected, (s, { payload }) => {
+        s.error = payload?.message || 'Failed to update subscription plan status';
+      });
   },
 });
 
@@ -310,6 +395,7 @@ export const selectClinics = (state) => state.platform.clinics;
 export const selectSelectedClinic = (state) => state.platform.selectedClinic;
 export const selectPlatformAdmins = (state) => state.platform.platformAdmins;
 export const selectAuditLogs = (state) => state.platform.auditLogs;
+export const selectSubscriptionPlans = (state) => state.platform.subscriptionPlans;
 export const selectPlatformLoading = (state) => state.platform.loading;
 export const selectPlatformError = (state) => state.platform.error;
 

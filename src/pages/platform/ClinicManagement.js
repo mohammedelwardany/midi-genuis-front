@@ -7,7 +7,9 @@ import toast from 'react-hot-toast';
 import {
   fetchAllClinics,
   createClinic,
+  fetchSubscriptionPlans,
   selectClinics,
+  selectSubscriptionPlans,
   selectPlatformLoading,
 } from '../../store/slices/platformSlice';
 
@@ -18,19 +20,25 @@ export default function ClinicManagement() {
   const isRtl = i18n.language.startsWith('ar');
 
   const clinics = useSelector(selectClinics);
+  const plans = useSelector(selectSubscriptionPlans);
   const loading = useSelector(selectPlatformLoading);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [form, setForm] = useState({
-    name: '', subdomain: '', plan_name: 'default', max_doctors: '',
+    name: '', subdomain: '', plan_id: '', plan_name: 'custom',
+    max_doctors: '', max_patients: '', max_monthly_appointments: '',
     admin_email: '', admin_password: '',
   });
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     dispatch(fetchAllClinics());
+    dispatch(fetchSubscriptionPlans());
   }, [dispatch]);
+
+  const activePlans = plans.filter((p) => p.active);
+  const isCustomPlan = !form.plan_id;
 
   const filteredClinics = clinics.filter((c) =>
     c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -43,17 +51,29 @@ export default function ClinicManagement() {
     return 'bg-slate-50 text-slate-600 border border-slate-100';
   };
 
+  const toInt = (v) => (v === '' ? null : parseInt(v, 10));
+
   const handleCreate = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     try {
       await dispatch(createClinic({
-        ...form,
-        max_doctors: form.max_doctors ? parseInt(form.max_doctors, 10) : null,
+        name: form.name,
+        subdomain: form.subdomain,
+        admin_email: form.admin_email,
+        admin_password: form.admin_password,
+        ...(form.plan_id
+          ? { plan_id: parseInt(form.plan_id, 10) }
+          : {
+              plan_name: form.plan_name,
+              max_doctors: toInt(form.max_doctors),
+              max_patients: toInt(form.max_patients),
+              max_monthly_appointments: toInt(form.max_monthly_appointments),
+            }),
       })).unwrap();
       toast.success(isRtl ? 'تم إنشاء العيادة بنجاح' : 'Clinic created successfully');
       setShowCreateModal(false);
-      setForm({ name: '', subdomain: '', plan_name: 'default', max_doctors: '', admin_email: '', admin_password: '' });
+      setForm({ name: '', subdomain: '', plan_id: '', plan_name: 'custom', max_doctors: '', max_patients: '', max_monthly_appointments: '', admin_email: '', admin_password: '' });
       dispatch(fetchAllClinics());
     } catch (err) {
       toast.error(err?.message || (isRtl ? 'فشل إنشاء العيادة' : 'Failed to create clinic'));
@@ -117,7 +137,7 @@ export default function ClinicManagement() {
                   >
                     <td className="p-3 font-extrabold text-slate-800">{clinic.name}</td>
                     <td className="p-3 text-slate-500 font-mono text-xs">{clinic.subdomain}</td>
-                    <td className="p-3 text-slate-600">{clinic.plan_name}</td>
+                    <td className="p-3 text-slate-600">{clinic.plan_catalog_name || clinic.plan_name}</td>
                     <td className="p-3 text-slate-600">{clinic.doctor_count}{clinic.max_doctors ? ` / ${clinic.max_doctors}` : ''}</td>
                     <td className="p-3 text-slate-600">{clinic.patient_count}</td>
                     <td className="p-3">
@@ -159,19 +179,38 @@ export default function ClinicManagement() {
                   placeholder="clinicname"
                   className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'خطة الاشتراك' : 'Plan Name'}</label>
-                  <input value={form.plan_name} onChange={(e) => setForm({ ...form, plan_name: e.target.value })}
-                    className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'الحد الأقصى للأطباء' : 'Max Doctors'}</label>
-                  <input type="number" min="0" value={form.max_doctors} onChange={(e) => setForm({ ...form, max_doctors: e.target.value })}
-                    placeholder={isRtl ? 'غير محدود' : 'Unlimited'}
-                    className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
-                </div>
+              <div>
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'خطة الاشتراك' : 'Subscription Plan'}</label>
+                <select value={form.plan_id} onChange={(e) => setForm({ ...form, plan_id: e.target.value })}
+                  className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500">
+                  <option value="">{isRtl ? 'مخصص (إدخال يدوي)' : 'Custom (manual limits)'}</option>
+                  {activePlans.map((p) => (
+                    <option key={p.id} value={p.id}>{p.name} — {p.duration_days}d</option>
+                  ))}
+                </select>
               </div>
+              {isCustomPlan && (
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'الحد الأقصى للأطباء' : 'Max Doctors'}</label>
+                    <input type="number" min="0" value={form.max_doctors} onChange={(e) => setForm({ ...form, max_doctors: e.target.value })}
+                      placeholder={isRtl ? 'غير محدود' : 'Unlimited'}
+                      className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'الحد الأقصى للمرضى' : 'Max Patients'}</label>
+                    <input type="number" min="0" value={form.max_patients} onChange={(e) => setForm({ ...form, max_patients: e.target.value })}
+                      placeholder={isRtl ? 'غير محدود' : 'Unlimited'}
+                      className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'المواعيد الشهرية' : 'Monthly Appts'}</label>
+                    <input type="number" min="0" value={form.max_monthly_appointments} onChange={(e) => setForm({ ...form, max_monthly_appointments: e.target.value })}
+                      placeholder={isRtl ? 'غير محدود' : 'Unlimited'}
+                      className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
+                  </div>
+                </div>
+              )}
               <div className="border-t border-slate-100 pt-4">
                 <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">{isRtl ? 'حساب المسؤول الأول' : "First Admin's Account"}</p>
                 <div className="space-y-4">

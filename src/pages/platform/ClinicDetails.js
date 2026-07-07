@@ -10,8 +10,10 @@ import {
   updateSubscription,
   updateClinicStatus,
   updateClinicBranding,
+  fetchSubscriptionPlans,
   clearSelectedClinic,
   selectSelectedClinic,
+  selectSubscriptionPlans,
   selectPlatformLoading,
 } from '../../store/slices/platformSlice';
 import { impersonateClinicAdmin } from '../../store/slices/authSlice';
@@ -24,9 +26,10 @@ export default function ClinicDetails() {
   const isRtl = i18n.language.startsWith('ar');
 
   const clinic = useSelector(selectSelectedClinic);
+  const plans = useSelector(selectSubscriptionPlans);
   const loading = useSelector(selectPlatformLoading);
 
-  const [subForm, setSubForm] = useState({ plan_name: '', max_doctors: '', max_patients: '', max_monthly_appointments: '', status: 'active' });
+  const [subForm, setSubForm] = useState({ plan_id: '', plan_name: '', max_doctors: '', max_patients: '', max_monthly_appointments: '', status: 'active' });
   const [adminForm, setAdminForm] = useState({ email: '', password: '' });
   const [brandForm, setBrandForm] = useState({ tagline: '', logoUrl: '', primaryColor: '', accentColor: '' });
   const [savingSub, setSavingSub] = useState(false);
@@ -36,12 +39,14 @@ export default function ClinicDetails() {
 
   useEffect(() => {
     dispatch(fetchClinicById(id));
+    dispatch(fetchSubscriptionPlans());
     return () => dispatch(clearSelectedClinic());
   }, [id, dispatch]);
 
   useEffect(() => {
     if (clinic) {
       setSubForm({
+        plan_id: clinic.plan_id ?? '',
         plan_name: clinic.plan_name || '',
         max_doctors: clinic.max_doctors ?? '',
         max_patients: clinic.max_patients ?? '',
@@ -58,6 +63,8 @@ export default function ClinicDetails() {
   }, [clinic]);
 
   const toInt = (v) => (v === '' ? null : parseInt(v, 10));
+  const activePlans = plans.filter((p) => p.active);
+  const isCustomPlan = !subForm.plan_id;
 
   const handleSaveSubscription = async (e) => {
     e.preventDefault();
@@ -65,13 +72,15 @@ export default function ClinicDetails() {
     try {
       await dispatch(updateSubscription({
         id,
-        data: {
-          plan_name: subForm.plan_name,
-          max_doctors: toInt(subForm.max_doctors),
-          max_patients: toInt(subForm.max_patients),
-          max_monthly_appointments: toInt(subForm.max_monthly_appointments),
-          status: subForm.status,
-        },
+        data: subForm.plan_id
+          ? { plan_id: parseInt(subForm.plan_id, 10), status: subForm.status }
+          : {
+              plan_name: subForm.plan_name,
+              max_doctors: toInt(subForm.max_doctors),
+              max_patients: toInt(subForm.max_patients),
+              max_monthly_appointments: toInt(subForm.max_monthly_appointments),
+              status: subForm.status,
+            },
       })).unwrap();
       toast.success(isRtl ? 'تم تحديث الاشتراك' : 'Subscription updated');
     } catch (err) {
@@ -171,11 +180,22 @@ export default function ClinicDetails() {
 
       <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
         <h3 className="text-lg font-extrabold text-slate-900 mb-4">{isRtl ? 'الاشتراك والحصص' : 'Subscription & Quotas'}</h3>
+        {clinic.plan_catalog_name && (
+          <p className="text-xs font-bold text-slate-400 mb-4 -mt-2">
+            {isRtl ? 'الخطة الحالية:' : 'Current catalog plan:'} <span className="text-primary-600">{clinic.plan_catalog_name}</span>
+            {clinic.plan_description ? ` — ${clinic.plan_description}` : ''}
+          </p>
+        )}
         <form onSubmit={handleSaveSubscription} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'الخطة' : 'Plan'}</label>
-            <input value={subForm.plan_name} onChange={(e) => setSubForm({ ...subForm, plan_name: e.target.value })}
-              className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
+          <div className="md:col-span-2">
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'خطة الاشتراك' : 'Subscription Plan'}</label>
+            <select value={subForm.plan_id} onChange={(e) => setSubForm({ ...subForm, plan_id: e.target.value })}
+              className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500">
+              <option value="">{isRtl ? 'مخصص (إدخال يدوي)' : 'Custom (manual limits)'}</option>
+              {activePlans.map((p) => (
+                <option key={p.id} value={p.id}>{p.name} — {p.duration_days}d</option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'حالة الاشتراك' : 'Subscription Status'}</label>
@@ -187,25 +207,33 @@ export default function ClinicDetails() {
               <option value="cancelled">Cancelled</option>
             </select>
           </div>
-          <div />
-          <div>
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'الحد الأقصى للأطباء' : 'Max Doctors'}</label>
-            <input type="number" min="0" value={subForm.max_doctors} onChange={(e) => setSubForm({ ...subForm, max_doctors: e.target.value })}
-              placeholder={isRtl ? 'غير محدود' : 'Unlimited'}
-              className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
-          </div>
-          <div>
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'الحد الأقصى للمرضى' : 'Max Patients'}</label>
-            <input type="number" min="0" value={subForm.max_patients} onChange={(e) => setSubForm({ ...subForm, max_patients: e.target.value })}
-              placeholder={isRtl ? 'غير محدود' : 'Unlimited'}
-              className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
-          </div>
-          <div>
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'المواعيد الشهرية' : 'Monthly Appointments'}</label>
-            <input type="number" min="0" value={subForm.max_monthly_appointments} onChange={(e) => setSubForm({ ...subForm, max_monthly_appointments: e.target.value })}
-              placeholder={isRtl ? 'غير محدود' : 'Unlimited'}
-              className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
-          </div>
+          {isCustomPlan && (
+            <>
+              <div>
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'اسم الخطة' : 'Plan Name'}</label>
+                <input value={subForm.plan_name} onChange={(e) => setSubForm({ ...subForm, plan_name: e.target.value })}
+                  className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'الحد الأقصى للأطباء' : 'Max Doctors'}</label>
+                <input type="number" min="0" value={subForm.max_doctors} onChange={(e) => setSubForm({ ...subForm, max_doctors: e.target.value })}
+                  placeholder={isRtl ? 'غير محدود' : 'Unlimited'}
+                  className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'الحد الأقصى للمرضى' : 'Max Patients'}</label>
+                <input type="number" min="0" value={subForm.max_patients} onChange={(e) => setSubForm({ ...subForm, max_patients: e.target.value })}
+                  placeholder={isRtl ? 'غير محدود' : 'Unlimited'}
+                  className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'المواعيد الشهرية' : 'Monthly Appointments'}</label>
+                <input type="number" min="0" value={subForm.max_monthly_appointments} onChange={(e) => setSubForm({ ...subForm, max_monthly_appointments: e.target.value })}
+                  placeholder={isRtl ? 'غير محدود' : 'Unlimited'}
+                  className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
+              </div>
+            </>
+          )}
           <div className="md:col-span-3">
             <button
               type="submit"
