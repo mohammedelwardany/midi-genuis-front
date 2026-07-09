@@ -5,9 +5,12 @@ import { ChevronRight, Printer, AlertTriangle, Calendar as CalendarIcon, Clock, 
 import { useTranslation } from 'react-i18next';
 import { fetchAppointmentById, selectSelectedAppt, selectAppointmentsLoading, selectAppointmentsError } from '../store/slices/appointmentSlice';
 import { fetchDoctorById, selectSelectedDoctor, clearSelectedDoctor } from '../store/slices/doctorSlice';
+import { fetchPaymentById, selectSelectedPayment, setSelectedPayment } from '../store/slices/paymentSlice';
+import { selectCurrentUser } from '../store/slices/authSlice';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { getAppointmentStatusColor } from '../utils/statusColors';
 import { formatDate, formatTime } from '../utils/dateFormatter';
+import { formatCurrency } from '../utils/currencyFormatter';
 
 export default function AppointmentDetails() {
   const { id } = useParams();
@@ -21,17 +24,23 @@ export default function AppointmentDetails() {
   const loading = useSelector(selectAppointmentsLoading);
   const error = useSelector(selectAppointmentsError);
   const doctor = useSelector(selectSelectedDoctor);
+  const rawPayment = useSelector(selectSelectedPayment);
+  const currentUser = useSelector(selectCurrentUser);
 
   const appointment = rawAppointment?.appointment ?? rawAppointment?.data ?? rawAppointment;
   const doctorData = doctor?.doctor ?? doctor?.data ?? doctor;
+  // Backend returns the literal string 'Payment not found' (not an object) when there's no match
+  const paymentData = rawPayment && typeof rawPayment === 'object' ? (rawPayment.data ?? rawPayment) : null;
 
   useEffect(() => {
     if (id) {
       dispatch(clearSelectedDoctor());
+      dispatch(setSelectedPayment(null));
       dispatch(fetchAppointmentById(id));
     }
     return () => {
       dispatch(clearSelectedDoctor());
+      dispatch(setSelectedPayment(null));
     };
   }, [id, dispatch]);
 
@@ -41,8 +50,24 @@ export default function AppointmentDetails() {
       if (docId) {
         dispatch(fetchDoctorById(docId));
       }
+      if (appointment.payment_id) {
+        dispatch(fetchPaymentById(appointment.payment_id));
+      }
     }
   }, [appointment, dispatch]);
+
+  const calculateAge = (dobString) => {
+    if (!dobString) return null;
+    const birthDate = new Date(dobString);
+    if (isNaN(birthDate.getTime())) return null;
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
 
   if (loading) {
     return (
@@ -92,8 +117,22 @@ export default function AppointmentDetails() {
     ? formatTime(scheduledDate, isRtl)
     : t('appointmentDetails.pendingTime', { defaultValue: 'Pending Time' });
 
+  const patientName = isRtl
+    ? (currentUser?.name_ar || currentUser?.name || 'مريض')
+    : (currentUser?.name_en || currentUser?.name || 'Patient');
+
+  const patientAge = calculateAge(currentUser?.date_of_birth);
+  const patientAgeString = patientAge !== null ? `${patientAge} ${isRtl ? 'سنة' : 'years'}` : '';
+  const patientGenderString = currentUser?.gender === 'Female'
+    ? t('userManagement.genderFemale', { defaultValue: 'Female' })
+    : t('userManagement.genderMale', { defaultValue: 'Male' });
+
+  const bookedOn = appointment.created_at
+    ? `${formatDate(appointment.created_at, isRtl, { month: 'short', day: 'numeric', year: 'numeric' })} ${t('appointmentDetails.at', { defaultValue: 'at' })} ${formatTime(appointment.created_at, isRtl)}`
+    : null;
+
   return (
-    <div className="animate-in fade-in duration-500 max-w-6xl mx-auto">
+    <div id="patient-appointment-details-container" className="animate-in fade-in duration-500 max-w-6xl mx-auto">
       {/* Header / Breadcrumbs */}
       <div className="flex justify-between items-end mb-8">
         <div>
@@ -235,23 +274,150 @@ export default function AppointmentDetails() {
              </div>
           </div>
 
-          {/* Location */}
-          <div className="bg-transparent">
-             <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 ps-1">{t('appointmentDetails.location', { defaultValue: 'Location' })}</h4>
-             <div className="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm">
-                <div className="h-32 bg-slate-800 relative w-full overflow-hidden flex items-center justify-center">
-                   <MapPin className="w-10 h-10 text-rose-500 absolute z-10 drop-shadow-lg" fill="currentColor" />
-                   <div className="absolute w-full h-full opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-repeat"></div>
-                </div>
-                <div className="p-5 bg-white">
-                   <div className="font-bold text-slate-900 mb-1 text-sm">{siteConfig?.clinic?.name || 'MediGenius Medical Plaza'}</div>
-                   <div className="text-xs text-slate-600 font-medium">{siteConfig?.clinic?.address || '450 Sutter St, Suite 1200, San Francisco, CA 94108'}</div>
-                </div>
-             </div>
-          </div>
 
         </div>
 
+      </div>
+
+      {/* Print-only appointment summary (A4) - hides the interactive dashboard chrome and renders a standalone business document */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        @media print {
+          @page { size: A4; margin: 0 !important; }
+          header, nav, aside, button, .print\\:hidden {
+            display: none !important;
+          }
+          body, html, #root, #root > div, div[class*="min-h-screen"], main, #patient-appointment-details-container {
+            background: white !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            display: block !important;
+            position: relative !important;
+            overflow: visible !important;
+            height: auto !important;
+            min-height: 0 !important;
+            max-width: none !important;
+          }
+          #patient-appointment-details-container > *:not(#patient-print-wrapper) {
+            display: none !important;
+          }
+          #patient-print-wrapper {
+            display: block !important;
+            width: 210mm !important;
+            background: white !important;
+            color: black !important;
+            box-sizing: border-box !important;
+            margin: 0 !important;
+            padding: 20mm 15mm !important;
+          }
+        }
+      ` }} />
+      <div id="patient-print-wrapper" className="hidden print:block text-slate-800 font-sans" dir={isRtl ? 'rtl' : 'ltr'}>
+        <div className="border-t-8 border-primary-600 pt-8">
+          {/* Letterhead */}
+          <div className="flex justify-between items-start mb-10">
+            <div className="text-start">
+              <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">{siteConfig.clinic.name}</h1>
+              <p className="text-xs text-slate-500 font-bold mt-1">{siteConfig.clinic.tagline}</p>
+              <p className="text-[11px] text-slate-400 mt-1 leading-normal">
+                {siteConfig.clinic.address}<br />
+                {t('appointmentDetails.phoneLabel', { defaultValue: 'Phone' })}: {siteConfig.clinic.phone}
+              </p>
+            </div>
+            <div className="text-end">
+              <h2 className="text-xl font-black text-primary-600 uppercase tracking-widest">{t('appointmentDetails.printTitle', { defaultValue: 'Appointment Summary' })}</h2>
+              <div className="text-xs text-slate-500 font-bold mt-2 space-y-1">
+                <div>{t('appointmentDetails.referenceNo', { defaultValue: 'Reference No' })}: <span className="font-extrabold text-slate-800 font-mono">#APT-{appointment.id}</span></div>
+                <div>{t('appointmentDetails.issueDate', { defaultValue: 'Issue Date' })}: <span className="font-extrabold text-slate-800">{formatDate(Date.now(), isRtl, { month: 'short', day: 'numeric', year: 'numeric' })}</span></div>
+                {bookedOn && (
+                  <div>{t('appointmentDetails.bookedOn', { defaultValue: 'Booked On' })}: <span className="font-extrabold text-slate-800">{bookedOn}</span></div>
+                )}
+                <div>{t('appointmentDetails.statusLabel', { defaultValue: 'Status' })}: <span className="font-extrabold text-slate-800 capitalize">{t(`appointmentDetails.status.${String(appointment.status || 'pending').toLowerCase()}`, { defaultValue: appointment.status || 'Pending' })}</span></div>
+              </div>
+            </div>
+          </div>
+
+          <hr className="border-slate-200 mb-8" />
+
+          {/* Patient / Provider grid */}
+          <div className="grid grid-cols-2 gap-8 mb-8">
+            <div className="text-start">
+              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t('appointmentDetails.patientLabel', { defaultValue: 'Patient' })}</h3>
+              <div className="text-sm font-extrabold text-slate-800">{patientName}</div>
+              <div className="text-xs text-slate-500 space-y-0.5 mt-1">
+                <div>{currentUser?.email || 'N/A'}</div>
+                <div>{currentUser?.phone || 'N/A'}</div>
+                {(patientAgeString || currentUser?.gender) && (
+                  <div>{patientGenderString}{patientAgeString && ` • ${patientAgeString}`}</div>
+                )}
+                {currentUser?.insurance_provider && (
+                  <div>{currentUser.insurance_provider} ({currentUser.policy_number})</div>
+                )}
+              </div>
+            </div>
+            <div className="text-start">
+              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t('appointmentDetails.yourCareProvider', { defaultValue: 'Your Care Provider' })}</h3>
+              <div className="text-sm font-extrabold text-slate-800">{doctorName}</div>
+              <div className="text-xs text-slate-500 space-y-0.5 mt-1">
+                <div>{specialization}</div>
+                <div>{doctorData?.clinic || appointment?.doctor?.clinic || t('appointmentDetails.mainMedicalCenter', { defaultValue: 'Main Medical Center' })}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Visit details table */}
+          <div className="border border-slate-200 rounded-xl overflow-hidden mb-8">
+            <table className="w-full text-start border-collapse text-xs">
+              <thead>
+                <tr className="bg-slate-50 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
+                  <th className="p-3 text-start">{t('appointmentDetails.dateTimeLabel', { defaultValue: 'Date & Time' })}</th>
+                  <th className="p-3 text-start">{t('appointmentDetails.durationLabel', { defaultValue: 'Duration' })}</th>
+                  <th className="p-3 text-start">{t('appointmentDetails.reasonForVisit', { defaultValue: 'Reason / Patient Notes' })}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200 font-medium text-slate-700">
+                <tr>
+                  <td className="p-3 align-top">
+                    <div className="font-extrabold">{formattedDate}</div>
+                    <div className="text-[10px] text-slate-400 mt-0.5">{formattedTime}</div>
+                  </td>
+                  <td className="p-3 align-top">
+                    {appointment.duration_minutes ? `${appointment.duration_minutes} ${t('appointmentDetails.minutes', { defaultValue: 'min' })}` : 'N/A'}
+                  </td>
+                  <td className="p-3 align-top">
+                    {appointment.notes || appointment.reason || t('appointmentDetails.noReason', { defaultValue: 'No additional reason or consultation notes provided.' })}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* Payment section - only rendered when a real payment record exists */}
+          {paymentData && (
+            <div className="border border-slate-200 rounded-xl overflow-hidden mb-8">
+              <table className="w-full text-start border-collapse text-xs">
+                <thead>
+                  <tr className="bg-slate-50 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
+                    <th className="p-3 text-start">{t('appointmentDetails.paymentMethodLabel', { defaultValue: 'Payment Method' })}</th>
+                    <th className="p-3 text-start">{t('appointmentDetails.paymentStatusLabel', { defaultValue: 'Payment Status' })}</th>
+                    <th className="p-3 text-end">{t('appointmentDetails.amountLabel', { defaultValue: 'Amount' })}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 font-medium text-slate-700">
+                  <tr>
+                    <td className="p-3 capitalize">{paymentData.payment_method || 'N/A'}</td>
+                    <td className="p-3 capitalize">{paymentData.status || 'N/A'}</td>
+                    <td className="p-3 text-end font-extrabold">{formatCurrency(paymentData.amount, isRtl)}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          <div className="text-center text-[10px] text-slate-400 font-bold uppercase tracking-widest pt-8 border-t border-slate-150">
+            {t('appointmentDetails.printFooter', { defaultValue: 'Thank you for choosing {{clinicName}}. Wish you a healthy recovery.', clinicName: siteConfig.clinic.name })}
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -12,7 +12,12 @@ import {
   selectPlatformLoading,
 } from '../../store/slices/platformSlice';
 
-const emptyForm = { name: '', description: '', max_doctors: '', max_patients: '', max_monthly_appointments: '', duration_days: '30' };
+const emptyForm = {
+  name: '', description: '',
+  max_doctors_per_specialization: '', max_patients: '', max_monthly_appointments: '',
+  max_admins: '', max_specializations: '', chatbot_enabled: false, stock_enabled: false,
+  duration_days: '30',
+};
 
 export default function SubscriptionPlans() {
   const { i18n } = useTranslation();
@@ -43,9 +48,13 @@ export default function SubscriptionPlans() {
     setForm({
       name: plan.name,
       description: plan.description || '',
-      max_doctors: plan.max_doctors ?? '',
+      max_doctors_per_specialization: plan.max_doctors_per_specialization ?? '',
       max_patients: plan.max_patients ?? '',
       max_monthly_appointments: plan.max_monthly_appointments ?? '',
+      max_admins: plan.max_admins ?? '',
+      max_specializations: plan.max_specializations ?? '',
+      chatbot_enabled: !!plan.chatbot_enabled,
+      stock_enabled: !!plan.stock_enabled,
       duration_days: plan.duration_days,
     });
     setShowModal(true);
@@ -59,9 +68,13 @@ export default function SubscriptionPlans() {
     const data = {
       name: form.name,
       description: form.description || null,
-      max_doctors: toInt(form.max_doctors),
+      max_doctors_per_specialization: toInt(form.max_doctors_per_specialization),
       max_patients: toInt(form.max_patients),
       max_monthly_appointments: toInt(form.max_monthly_appointments),
+      max_admins: toInt(form.max_admins),
+      max_specializations: toInt(form.max_specializations),
+      chatbot_enabled: !!form.chatbot_enabled,
+      stock_enabled: !!form.stock_enabled,
       duration_days: parseInt(form.duration_days, 10) || 30,
     };
     try {
@@ -96,6 +109,14 @@ export default function SubscriptionPlans() {
 
   const limitLabel = (v) => (v === null || v === undefined ? (isRtl ? 'غير محدود' : 'Unlimited') : v);
 
+  const featureBadge = (enabled) => (
+    <span className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-widest ${
+      enabled ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-slate-50 text-slate-400 border border-slate-100'
+    }`}>
+      {enabled ? (isRtl ? 'متضمن' : 'Included') : (isRtl ? 'غير متضمن' : 'Not included')}
+    </span>
+  );
+
   return (
     <div className="space-y-6 animate-in fade-in duration-500 max-w-5xl mx-auto pb-10">
       <div className="flex justify-between items-center bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
@@ -124,9 +145,13 @@ export default function SubscriptionPlans() {
               <thead>
                 <tr className="border-b border-slate-100 text-slate-400 text-xs font-bold uppercase tracking-wider">
                   <th className="p-3 text-start">{isRtl ? 'الاسم' : 'Name'}</th>
-                  <th className="p-3 text-start">{isRtl ? 'الأطباء' : 'Doctors'}</th>
+                  <th className="p-3 text-start">{isRtl ? 'المسؤولون' : 'Admins'}</th>
+                  <th className="p-3 text-start">{isRtl ? 'الأطباء / تخصص' : 'Doctors / Specialization'}</th>
                   <th className="p-3 text-start">{isRtl ? 'المرضى' : 'Patients'}</th>
                   <th className="p-3 text-start">{isRtl ? 'المواعيد الشهرية' : 'Monthly Appts'}</th>
+                  <th className="p-3 text-start">{isRtl ? 'التخصصات' : 'Specializations'}</th>
+                  <th className="p-3 text-start">{isRtl ? 'شات بوت' : 'ChatBot'}</th>
+                  <th className="p-3 text-start">{isRtl ? 'المخزون' : 'Stock'}</th>
                   <th className="p-3 text-start">{isRtl ? 'المدة (أيام)' : 'Duration (days)'}</th>
                   <th className="p-3 text-start">{isRtl ? 'الحالة' : 'Status'}</th>
                   <th className="p-3 text-start"></th>
@@ -139,9 +164,13 @@ export default function SubscriptionPlans() {
                       <button onClick={() => openEdit(plan)} className="font-extrabold text-slate-800 hover:text-primary-600 transition">{plan.name}</button>
                       {plan.description && <p className="text-xs text-slate-400 font-medium mt-0.5 max-w-xs truncate">{plan.description}</p>}
                     </td>
-                    <td className="p-3 text-slate-600">{limitLabel(plan.max_doctors)}</td>
+                    <td className="p-3 text-slate-600">{limitLabel(plan.max_admins)}</td>
+                    <td className="p-3 text-slate-600">{limitLabel(plan.max_doctors_per_specialization)}</td>
                     <td className="p-3 text-slate-600">{limitLabel(plan.max_patients)}</td>
                     <td className="p-3 text-slate-600">{limitLabel(plan.max_monthly_appointments)}</td>
+                    <td className="p-3 text-slate-600">{limitLabel(plan.max_specializations)}</td>
+                    <td className="p-3">{featureBadge(plan.chatbot_enabled)}</td>
+                    <td className="p-3">{featureBadge(plan.stock_enabled)}</td>
                     <td className="p-3 text-slate-600">{plan.duration_days}</td>
                     <td className="p-3">
                       <span className={`px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-widest ${
@@ -203,14 +232,28 @@ export default function SubscriptionPlans() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'الحد الأقصى للأطباء' : 'Max Doctors'}</label>
-                  <input type="number" min="0" value={form.max_doctors} onChange={(e) => setForm({ ...form, max_doctors: e.target.value })}
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'الحد الأقصى للمسؤولين' : 'Max Admins'}</label>
+                  <input type="number" min="0" value={form.max_admins} onChange={(e) => setForm({ ...form, max_admins: e.target.value })}
                     placeholder={isRtl ? 'غير محدود' : 'Unlimited'}
                     className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
                 </div>
                 <div>
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'الأطباء لكل تخصص' : 'Doctors per Specialization'}</label>
+                  <input type="number" min="0" value={form.max_doctors_per_specialization} onChange={(e) => setForm({ ...form, max_doctors_per_specialization: e.target.value })}
+                    placeholder={isRtl ? 'غير محدود' : 'Unlimited'}
+                    className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'الحد الأقصى للمرضى' : 'Max Patients'}</label>
                   <input type="number" min="0" value={form.max_patients} onChange={(e) => setForm({ ...form, max_patients: e.target.value })}
+                    placeholder={isRtl ? 'غير محدود' : 'Unlimited'}
+                    className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'الحد الأقصى للتخصصات' : 'Max Specializations'}</label>
+                  <input type="number" min="0" value={form.max_specializations} onChange={(e) => setForm({ ...form, max_specializations: e.target.value })}
                     placeholder={isRtl ? 'غير محدود' : 'Unlimited'}
                     className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
                 </div>
@@ -227,6 +270,18 @@ export default function SubscriptionPlans() {
                   <input required type="number" min="1" value={form.duration_days} onChange={(e) => setForm({ ...form, duration_days: e.target.value })}
                     className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
                 </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <label className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-sm cursor-pointer">
+                  <input type="checkbox" checked={form.chatbot_enabled} onChange={(e) => setForm({ ...form, chatbot_enabled: e.target.checked })}
+                    className="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500" />
+                  <span className="font-bold text-slate-600">{isRtl ? 'شات بوت' : 'ChatBot'}</span>
+                </label>
+                <label className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-sm cursor-pointer">
+                  <input type="checkbox" checked={form.stock_enabled} onChange={(e) => setForm({ ...form, stock_enabled: e.target.checked })}
+                    className="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500" />
+                  <span className="font-bold text-slate-600">{isRtl ? 'إدارة المخزون' : 'Stock Management'}</span>
+                </label>
               </div>
               <button
                 type="submit"

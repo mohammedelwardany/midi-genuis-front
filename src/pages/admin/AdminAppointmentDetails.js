@@ -349,20 +349,6 @@ export default function AdminAppointmentDetails() {
             </div>
           </div>
 
-          {/* Clinic Location */}
-          <div>
-            <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 ps-1">{isRtl ? 'الموقع والعنوان' : 'Facility Location'}</h4>
-            <div className="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm">
-              <div className="h-32 bg-slate-800 relative w-full overflow-hidden flex items-center justify-center">
-                <MapPin className="w-10 h-10 text-rose-500 absolute z-10 drop-shadow-lg" fill="currentColor" />
-                <div className="absolute w-full h-full opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-repeat"></div>
-              </div>
-              <div className="p-5 bg-white">
-                <div className="font-bold text-slate-900 mb-1 text-sm">{isRtl ? 'مجمع MediGenius الطبي' : 'MediGenius Medical Plaza'}</div>
-                <div className="text-xs text-slate-600 font-medium">450 Sutter St, Suite 1200, San Francisco, CA 94108</div>
-              </div>
-            </div>
-          </div>
 
         </div>
 

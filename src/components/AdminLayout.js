@@ -14,7 +14,7 @@ export default function AdminLayout({ title, tabs, mobileBrandLabel = 'Admin Por
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans flex flex-col relative overflow-x-hidden">
-      <TopNav title={title} tabs={tabs} showSearch={true} onMenuClick={toggleMobileMenu} />
+      <TopNav title={title} tabs={tabs} onMenuClick={toggleMobileMenu} />
 
       {/* Mobile Menu Backdrop */}
       {isMobileMenuOpen && (

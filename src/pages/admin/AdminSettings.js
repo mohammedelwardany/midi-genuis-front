@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, CreditCard, HeartPulse, Users, Calendar, Loader2 } from 'lucide-react';
+import { User, CreditCard, HeartPulse, Users, Calendar, Loader2, UserCog, Layers, Bot, Package } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
@@ -55,10 +55,16 @@ export default function AdminSettings() {
         const remaining = daysRemaining(subscriptionInfo.renews_at);
         const usageRows = [
           {
-            icon: HeartPulse,
-            label: t('adminSettings.doctorAccounts', { defaultValue: 'Doctor Accounts' }),
-            used: subscriptionInfo.doctor_count,
-            max: subscriptionInfo.max_doctors,
+            icon: UserCog,
+            label: t('adminSettings.adminAccounts', { defaultValue: 'Admin Accounts' }),
+            used: subscriptionInfo.admin_count,
+            max: subscriptionInfo.max_admins,
+          },
+          {
+            icon: Layers,
+            label: t('adminSettings.specializationsUsed', { defaultValue: 'Specializations Used' }),
+            used: subscriptionInfo.specialization_count,
+            max: subscriptionInfo.max_specializations,
           },
           {
             icon: Users,
@@ -110,6 +116,13 @@ export default function AdminSettings() {
               <p className="max-w-3xl text-sm font-medium text-slate-500 -mt-2">{subscriptionInfo.plan_description}</p>
             )}
 
+            <div className="max-w-3xl p-4 border border-slate-200 rounded-xl bg-slate-50 flex items-center gap-2 text-sm font-bold text-slate-700">
+              <HeartPulse className="w-4 h-4 text-indigo-500 shrink-0" />
+              {subscriptionInfo.max_doctors_per_specialization === null || subscriptionInfo.max_doctors_per_specialization === undefined
+                ? t('adminSettings.doctorsPerSpecializationUnlimited', { defaultValue: 'Unlimited doctors per specialization' })
+                : t('adminSettings.doctorsPerSpecialization', { defaultValue: 'Up to {{count}} doctors per specialization', count: subscriptionInfo.max_doctors_per_specialization })}
+            </div>
+
             <div className="max-w-3xl space-y-3 pt-2">
               {usageRows.map((row) => {
                 const unlimited = row.max === null || row.max === undefined;
@@ -137,6 +150,26 @@ export default function AdminSettings() {
                   </div>
                 );
               })}
+            </div>
+
+            <div className="max-w-3xl grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {[
+                { icon: Bot, label: t('adminSettings.chatbotFeature', { defaultValue: 'ChatBot' }), enabled: subscriptionInfo.chatbot_enabled },
+                { icon: Package, label: t('adminSettings.stockFeature', { defaultValue: 'Stock Management' }), enabled: subscriptionInfo.stock_enabled },
+              ].map((feature) => (
+                <div key={feature.label} className="p-4 border border-slate-200 rounded-xl flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm font-bold text-slate-800">
+                    <feature.icon className="w-4 h-4 text-indigo-500" /> {feature.label}
+                  </div>
+                  <span className={`px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-widest ${
+                    feature.enabled ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-slate-50 text-slate-500 border border-slate-100'
+                  }`}>
+                    {feature.enabled
+                      ? t('adminSettings.included', { defaultValue: 'Included' })
+                      : t('adminSettings.notIncluded', { defaultValue: 'Not included' })}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         );

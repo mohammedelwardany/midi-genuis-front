@@ -276,13 +276,16 @@
     "title": "My Bookings",
     "description": "Manage your clinical sessions, view history, and keep track of your healthcare journey.",
     "upcomingAppointments": "Upcoming Appointments",
-    "activeCount": "2 Active",
+    "activeCount": "{{count}} Active",
     "confirmed": "Confirmed",
     "dateTime": "Date & Time",
     "clinic": "Clinic",
-    "reschedule": "Reschedule",
     "cancel": "Cancel",
+    "cancelConfirm": "Are you sure you want to cancel this appointment?",
+    "cancelSuccess": "Appointment cancelled successfully",
+    "cancelError": "Failed to cancel appointment",
     "pending": "Pending",
+    "cancelled": "Cancelled",
     "completeForms": "Complete Forms",
     "visitHistory": "Visit History",
     "allSpecialties": "All Specialties",
@@ -290,14 +293,17 @@
       "practitioner": "Practitioner",
       "service": "Service",
       "date": "Date",
-      "status": "Status",
-      "records": "Records"
+      "status": "Status"
     },
     "completed": "Completed",
-    "report": "Report",
     "certificate": "Certificate",
     "results": "Results",
-    "viewAllHistory": "View All History"
+    "viewAllHistory": "View All History",
+    "mainCenter": "Main Center",
+    "noUpcoming": "No upcoming appointments scheduled.",
+    "bookNextVisit": "Book your next visit",
+    "synchronizingSchedule": "Synchronizing your schedule...",
+    "noHistoricalVisits": "No historical visits found."
   },
   "bookVisit": {
     "refineSearch": "Refine Search",
@@ -489,10 +495,12 @@
   },
   "visitHistory": {
     "title": "Visit History",
-    "description": "Review your historical appointments, clinical notes, and download comprehensive visit summaries for your records.",
-    "searchPlaceholder": "Search doctor or note...",
+    "description": "Review your past appointments, including cancelled and completed visits.",
+    "searchPlaceholder": "Search doctor or specialty...",
     "filterBy": "Filter By:",
-    "loadOlderVisits": "Load Older Visits"
+    "allYears": "All Years",
+    "noResults": "No visits match your filters.",
+    "noHistory": "You don't have any past visits yet."
   },
   "emergency": {
     "title": "Emergency Contact",

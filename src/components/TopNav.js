@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Bell, Settings, User, Search, LogOut, CheckCircle, AlertTriangle, FileText, Menu } from 'lucide-react';
+import { Bell, Settings, User, LogOut, CheckCircle, AlertTriangle, FileText, Menu } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { cn } from '../utils/cn';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { selectCurrentUser, logoutUser } from '../store/slices/authSlice';
 
-export default function TopNav({ title = "MediGenius Patient Portal", tabs = [], showSearch = false, onMenuClick }) {
+export default function TopNav({ title = "MediGenius Patient Portal", tabs = [], onMenuClick }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
@@ -91,28 +91,12 @@ export default function TopNav({ title = "MediGenius Patient Portal", tabs = [],
       </div>
 
       <div className="flex items-center space-x-5">
-        {showSearch && (
-          <div className="relative">
-            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input
-              type="text"
-              placeholder={t('topNav.search')}
-              className="ps-9 pe-4 py-1.5 rounded-full bg-slate-50 text-sm border-none focus:ring-1 focus:ring-primary-500 outline-none w-64 text-slate-600 transition-shadow"
-            />
-          </div>
-        )}
         <button
           onClick={toggleLanguage}
           className="text-xs font-bold text-primary-600 bg-primary-50 hover:bg-primary-100 px-3 py-1.5 rounded-lg border border-primary-200 transition-colors mx-2"
         >
           {i18n.language.startsWith('en') ? 'العربية' : 'English'}
         </button>
-
-        {/* {!showSearch && (
-          <button onClick={() => navigate('/emergency')} className="text-sm font-medium text-red-500 hover:text-red-600 me-2 whitespace-nowrap">
-            {t('topNav.emergencyContact')}
-          </button>
-        )} */}
 
         {/* Notifications Dropdown */}
         <div className="relative" ref={notifRef}>
@@ -162,12 +146,6 @@ export default function TopNav({ title = "MediGenius Patient Portal", tabs = [],
             </div>
           )}
         </div>
-
-        {showSearch && (
-          <button className="text-slate-400 hover:text-slate-600 p-1">
-            <Settings className="w-5 h-5" />
-          </button>
-        )}
 
         {/* Profile Dropdown */}
         <div className="relative" ref={profileRef}>

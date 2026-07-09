@@ -3,14 +3,14 @@
     "name": "MediGenius",
     "tagline": "Advanced Clinical Intelligence",
     "logoUrl": "/logo.png",
-    "address": "450 Sutter St, Suite 1200, San Francisco, CA 94108",
-    "phone": "1-800-MED-URGE",
-    "email": "support@medigenius.org",
-    "website": "https://medigenius.org"
+    "address": "Cairo - Egypt",
+    "phone": "",
+    "email": "",
+    "website": ""
   },
   "legal": {
     "companyName": "MediGenius Intelligence Systems",
-    "copyrightYear": 2024,
+    "copyrightYear": 2026,
     "rightsReserved": "All rights reserved.",
     "privacyPolicyUrl": "/privacy",
     "termsOfServiceUrl": "/terms"
@@ -55,7 +55,7 @@
     }
   },
   "payment": {
-    "instapay": "medigenius@instapay",
-    "wallet": "01012345678"
+    "instapay": "",
+    "wallet": ""
   }
 }

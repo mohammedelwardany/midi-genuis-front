@@ -84,7 +84,6 @@ export default function Login() {
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('auth.passwordLabel')}</label>
-              <button type="button" className="text-[11px] font-bold text-primary-600 hover:text-primary-800 transition-colors uppercase">{t('auth.forgotPassword')}</button>
             </div>
             <div className="relative">
               <Lock className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />

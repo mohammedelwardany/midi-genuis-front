@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Shield, CreditCard, Bell, Camera, Lock, CheckCircle2, AlertTriangle, Key, Loader2 } from 'lucide-react';
+import { User, Shield, CreditCard, Bell, Camera, Lock, CheckCircle2, AlertTriangle, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
@@ -111,45 +111,6 @@ export default function ProfileSettings() {
                      </div>
                   </div>
 
-                  <div className="pt-6 border-t border-slate-100">
-                     <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2"><Key className="w-5 h-5 text-primary-600" /> Two-Factor Authentication (2FA)</h3>
-                     <div className="flex items-start justify-between bg-primary-50/50 border border-primary-100 p-6 rounded-2xl gap-4">
-                        <div>
-                           <div className="font-bold text-slate-900 text-[15px] mb-1">Authenticator App</div>
-                           <p className="text-[13px] font-medium text-slate-600 leading-relaxed">Secure your account with an Authenticator like Google Authenticator or Authy. This offers the highest level of security.</p>
-                        </div>
-                        <button className="shrink-0 bg-primary-600 hover:bg-primary-700 text-white font-bold px-4 py-2 rounded-xl text-[13px] shadow-sm transition-colors">Enable 2FA</button>
-                     </div>
-                  </div>
-
-                  <div className="pt-6 border-t border-slate-100 pb-2">
-                     <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">Recent Login Activity</h3>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Last 30 Days</span>
-                     </div>
-                     <div className="space-y-3">
-                        <div className="flex justify-between items-center bg-slate-50 rounded-xl p-4 border border-slate-100">
-                           <div>
-                              <div className="font-bold text-slate-800 text-sm mb-0.5">Mac OS X • Chrome</div>
-                              <div className="text-[11px] font-medium text-slate-500 text-xs">New York, USA (IP: 192.168.1.1)</div>
-                           </div>
-                           <div className="text-end">
-                              <div className="text-[11px] font-bold text-emerald-600 flex items-center gap-1 justify-end"><CheckCircle2 className="w-3.5 h-3.5" /> Active Match</div>
-                              <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mt-1">Current Session</div>
-                           </div>
-                        </div>
-                        <div className="flex justify-between items-center bg-slate-50 rounded-xl p-4 border border-slate-100">
-                           <div>
-                              <div className="font-bold text-slate-800 text-sm mb-0.5">iOS 16 • Safari</div>
-                              <div className="text-[11px] font-medium text-slate-500 text-xs">New York, USA (IP: 192.168.1.5)</div>
-                           </div>
-                           <div className="text-end">
-                              <div className="text-[11px] font-bold text-slate-500">Yesterday at 4:32 PM</div>
-                           </div>
-                        </div>
-                     </div>
-                  </div>
-
                   <div className="pt-6 mt-6 border-t border-slate-100 flex justify-between items-center">
                      <button
                         onClick={handleDeleteAccount}
@@ -236,69 +197,7 @@ export default function ProfileSettings() {
                   </div>
                </div>
             );
-         case 'notifications':
-            return (
-               <div className="animate-in fade-in duration-300 space-y-8">
-                  <div>
-                     <h3 className="text-xl font-extrabold text-slate-900 mb-1">Notification Preferences</h3>
-                     <p className="text-sm font-medium text-slate-500 mb-6">Choose how and when we communicate with you regarding your medical care.</p>
-
-                     <div className="space-y-4">
-
-                        <div className="flex items-center justify-between p-5 bg-slate-50 border border-slate-100 rounded-2xl">
-                           <div>
-                              <div className="font-bold text-slate-800 text-[15px] mb-1">Appointment Reminders</div>
-                              <div className="text-[13px] font-medium text-slate-500">Receive SMS texts and emails 24 hours before your scheduled visit.</div>
-                           </div>
-                           <label className="relative inline-flex items-center cursor-pointer">
-                              <input type="checkbox" className="sr-only peer" defaultChecked />
-                              <div className="w-11 h-6 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-                           </label>
-                        </div>
-
-                        <div className="flex items-center justify-between p-5 bg-slate-50 border border-slate-100 rounded-2xl">
-                           <div>
-                              <div className="font-bold text-slate-800 text-[15px] mb-1">Secure Messages</div>
-                              <div className="text-[13px] font-medium text-slate-500">Get an email alert when your clinical team replies to you.</div>
-                           </div>
-                           <label className="relative inline-flex items-center cursor-pointer">
-                              <input type="checkbox" className="sr-only peer" defaultChecked />
-                              <div className="w-11 h-6 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-                           </label>
-                        </div>
-
-                        <div className="flex items-center justify-between p-5 bg-slate-50 border border-slate-100 rounded-2xl">
-                           <div>
-                              <div className="font-bold text-slate-800 text-[15px] mb-1">New Test Results</div>
-                              <div className="text-[13px] font-medium text-slate-500">Instant SMS alert when your laboratory or radiology results are published.</div>
-                           </div>
-                           <label className="relative inline-flex items-center cursor-pointer">
-                              <input type="checkbox" className="sr-only peer" />
-                              <div className="w-11 h-6 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-                           </label>
-                        </div>
-
-                        <div className="flex items-center justify-between p-5 bg-slate-50 border border-slate-100 rounded-2xl">
-                           <div>
-                              <div className="font-bold text-slate-800 text-[15px] mb-1">Billing & Statements</div>
-                              <div className="text-[13px] font-medium text-slate-500">Monthly invoice summaries and payment receipt confirmations.</div>
-                           </div>
-                           <label className="relative inline-flex items-center cursor-pointer">
-                              <input type="checkbox" className="sr-only peer" defaultChecked />
-                              <div className="w-11 h-6 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-                           </label>
-                        </div>
-
-                     </div>
-                  </div>
-
-                  <div className="pt-6 mt-6 border-t border-slate-100 flex justify-end gap-3">
-                     <span className="text-emerald-600 font-bold text-sm bg-emerald-50 px-4 py-2.5 rounded-xl border border-emerald-100 flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4" /> Preferences Auto-Saved
-                     </span>
-                  </div>
-               </div>
-            );
+        
          case 'personal':
          default:
             return (
@@ -454,14 +353,7 @@ export default function ProfileSettings() {
                   )}>
                   <CreditCard className="w-4 h-4" /> {t('profileSettings.insuranceDetails', { defaultValue: 'Insurance Details' })}
                </button>
-               <button
-                  onClick={() => setActiveTab('notifications')}
-                  className={cn(
-                     "w-full text-start font-bold px-6 py-3.5 rounded-e-xl transition-colors flex items-center gap-3 text-sm border-s-2",
-                     activeTab === 'notifications' ? "bg-slate-100/80 text-primary-700 border-primary-600" : "text-slate-500 hover:bg-slate-50 hover:text-slate-800 border-transparent"
-                  )}>
-                  <Bell className="w-4 h-4" /> {t('profileSettings.notifications', { defaultValue: 'Notifications' })}
-               </button>
+
             </div>
 
             {/* Content Area */}

@@ -29,7 +29,12 @@ export default function ClinicDetails() {
   const plans = useSelector(selectSubscriptionPlans);
   const loading = useSelector(selectPlatformLoading);
 
-  const [subForm, setSubForm] = useState({ plan_id: '', plan_name: '', max_doctors: '', max_patients: '', max_monthly_appointments: '', status: 'active' });
+  const [subForm, setSubForm] = useState({
+    plan_id: '', plan_name: '',
+    max_doctors_per_specialization: '', max_patients: '', max_monthly_appointments: '',
+    max_admins: '', max_specializations: '', chatbot_enabled: false, stock_enabled: false,
+    status: 'active',
+  });
   const [adminForm, setAdminForm] = useState({ email: '', password: '' });
   const [brandForm, setBrandForm] = useState({ tagline: '', logoUrl: '', primaryColor: '', accentColor: '' });
   const [savingSub, setSavingSub] = useState(false);
@@ -48,9 +53,13 @@ export default function ClinicDetails() {
       setSubForm({
         plan_id: clinic.plan_id ?? '',
         plan_name: clinic.plan_name || '',
-        max_doctors: clinic.max_doctors ?? '',
+        max_doctors_per_specialization: clinic.max_doctors_per_specialization ?? '',
         max_patients: clinic.max_patients ?? '',
         max_monthly_appointments: clinic.max_monthly_appointments ?? '',
+        max_admins: clinic.max_admins ?? '',
+        max_specializations: clinic.max_specializations ?? '',
+        chatbot_enabled: !!clinic.chatbot_enabled,
+        stock_enabled: !!clinic.stock_enabled,
         status: clinic.subscription_status || 'active',
       });
       setBrandForm({
@@ -76,9 +85,13 @@ export default function ClinicDetails() {
           ? { plan_id: parseInt(subForm.plan_id, 10), status: subForm.status }
           : {
               plan_name: subForm.plan_name,
-              max_doctors: toInt(subForm.max_doctors),
+              max_doctors_per_specialization: toInt(subForm.max_doctors_per_specialization),
               max_patients: toInt(subForm.max_patients),
               max_monthly_appointments: toInt(subForm.max_monthly_appointments),
+              max_admins: toInt(subForm.max_admins),
+              max_specializations: toInt(subForm.max_specializations),
+              chatbot_enabled: !!subForm.chatbot_enabled,
+              stock_enabled: !!subForm.stock_enabled,
               status: subForm.status,
             },
       })).unwrap();
@@ -214,8 +227,8 @@ export default function ClinicDetails() {
                   className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
               </div>
               <div>
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'الحد الأقصى للأطباء' : 'Max Doctors'}</label>
-                <input type="number" min="0" value={subForm.max_doctors} onChange={(e) => setSubForm({ ...subForm, max_doctors: e.target.value })}
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'الأطباء لكل تخصص' : 'Doctors per Specialization'}</label>
+                <input type="number" min="0" value={subForm.max_doctors_per_specialization} onChange={(e) => setSubForm({ ...subForm, max_doctors_per_specialization: e.target.value })}
                   placeholder={isRtl ? 'غير محدود' : 'Unlimited'}
                   className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
               </div>
@@ -230,6 +243,30 @@ export default function ClinicDetails() {
                 <input type="number" min="0" value={subForm.max_monthly_appointments} onChange={(e) => setSubForm({ ...subForm, max_monthly_appointments: e.target.value })}
                   placeholder={isRtl ? 'غير محدود' : 'Unlimited'}
                   className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'الحد الأقصى للمسؤولين' : 'Max Admins'}</label>
+                <input type="number" min="0" value={subForm.max_admins} onChange={(e) => setSubForm({ ...subForm, max_admins: e.target.value })}
+                  placeholder={isRtl ? 'غير محدود' : 'Unlimited'}
+                  className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'الحد الأقصى للتخصصات' : 'Max Specializations'}</label>
+                <input type="number" min="0" value={subForm.max_specializations} onChange={(e) => setSubForm({ ...subForm, max_specializations: e.target.value })}
+                  placeholder={isRtl ? 'غير محدود' : 'Unlimited'}
+                  className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
+              </div>
+              <div className="flex items-end gap-4">
+                <label className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-sm cursor-pointer w-full">
+                  <input type="checkbox" checked={subForm.chatbot_enabled} onChange={(e) => setSubForm({ ...subForm, chatbot_enabled: e.target.checked })}
+                    className="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500" />
+                  <span className="font-bold text-slate-600">{isRtl ? 'شات بوت' : 'ChatBot'}</span>
+                </label>
+                <label className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-sm cursor-pointer w-full">
+                  <input type="checkbox" checked={subForm.stock_enabled} onChange={(e) => setSubForm({ ...subForm, stock_enabled: e.target.checked })}
+                    className="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500" />
+                  <span className="font-bold text-slate-600">{isRtl ? 'إدارة المخزون' : 'Stock Management'}</span>
+                </label>
               </div>
             </>
           )}

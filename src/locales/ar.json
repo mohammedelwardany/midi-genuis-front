@@ -276,13 +276,16 @@
     "title": "حجوزاتي",
     "description": "أدر جلساتك الطبية واطلع على السجل وتابع رحلتك الصحية.",
     "upcomingAppointments": "المواعيد القادمة",
-    "activeCount": "2 نشط",
+    "activeCount": "{{count}} نشط",
     "confirmed": "مؤكد",
     "dateTime": "التاريخ والوقت",
     "clinic": "العيادة",
-    "reschedule": "إعادة الجدولة",
     "cancel": "إلغاء",
+    "cancelConfirm": "هل أنت متأكد أنك تريد إلغاء هذا الموعد؟",
+    "cancelSuccess": "تم إلغاء الموعد بنجاح",
+    "cancelError": "فشل إلغاء الموعد",
     "pending": "قيد الانتظار",
+    "cancelled": "ملغى",
     "completeForms": "إكمال النماذج",
     "visitHistory": "سجل الزيارات",
     "allSpecialties": "كل التخصصات",
@@ -290,14 +293,17 @@
       "practitioner": "الممارس",
       "service": "الخدمة",
       "date": "التاريخ",
-      "status": "الحالة",
-      "records": "السجلات"
+      "status": "الحالة"
     },
     "completed": "مكتمل",
-    "report": "تقرير",
     "certificate": "شهادة",
     "results": "نتائج",
-    "viewAllHistory": "عرض كل السجل"
+    "viewAllHistory": "عرض كل السجل",
+    "mainCenter": "المركز الرئيسي",
+    "noUpcoming": "لا توجد مواعيد قادمة مجدولة.",
+    "bookNextVisit": "احجز زيارتك القادمة",
+    "synchronizingSchedule": "جارٍ مزامنة جدولك...",
+    "noHistoricalVisits": "لم يتم العثور على زيارات سابقة."
   },
   "bookVisit": {
     "refineSearch": "تحسين البحث",
@@ -496,10 +502,12 @@
   },
   "visitHistory": {
     "title": "سجل الزيارات",
-    "description": "أدر جلساتك الطبية واطلع على السجل وتابع رحلتك الصحية.",
-    "searchPlaceholder": "ابحث عن طبيب أو ملاحظة...",
+    "description": "استعرض مواعيدك السابقة، بما في ذلك الزيارات الملغاة والمكتملة.",
+    "searchPlaceholder": "ابحث عن طبيب أو تخصص...",
     "filterBy": "تصفية حسب:",
-    "loadOlderVisits": "تحميل زيارات أقدم"
+    "allYears": "كل السنوات",
+    "noResults": "لا توجد زيارات تطابق عوامل التصفية.",
+    "noHistory": "ليس لديك أي زيارات سابقة بعد."
   },
   "emergency": {
     "title": "اتصال الطوارئ",

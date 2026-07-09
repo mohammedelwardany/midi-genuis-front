@@ -232,7 +232,7 @@ const appointmentSlice = createSlice({
       });
 
     builder.addCase(cancelAppointment.fulfilled, (s, { payload: id }) => {
-      const appt = s.list.find((a) => a.id === id);
+      const appt = s.list.find((a) => (a.id ?? a.appointment_id) === id);
       if (appt) appt.status = 'cancelled';
     });
   },

@@ -25,7 +25,6 @@ export default function SidebarLayout() {
       <TopNav
         title={t('app.patientPortalTitle', { defaultValue: 'MediGenius Patient Portal' })}
         tabs={[{name: t('nav.bookVisit'), href: '/patient/book/doctors'}]}
-        showSearch={false}
         onMenuClick={toggleMobileMenu}
       />
       <div className="flex flex-1 relative">
