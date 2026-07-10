@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { UserPlus, User, Search, Filter, MoreVertical, Mail, AlertCircle, CheckCircle2, Trash2, Edit, Loader2, Calendar, Plus, Shield } from 'lucide-react';
+import { UserPlus, User, Search, Filter, MoreVertical, Mail, AlertCircle, CheckCircle2, Trash2, Edit, Loader2, Calendar, Plus, Shield, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { cn } from '../../utils/cn';
@@ -360,7 +360,7 @@ export default function UserManagement() {
                   {t('userManagement.registerModalTitle', { type: activeTab === 'doctors' ? t('userManagement.doctorSingular') : t('userManagement.patientSingular') })}
                 </h3>
                 <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-slate-600">
-                  <AlertCircle className="w-6 h-6 rotate-45" />
+                  <X className="w-6 h-6" />
                 </button>
               </div>
 

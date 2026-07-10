@@ -406,7 +406,7 @@ export default function DoctorSchedule() {
       </div>
 
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
           <div className="bg-white rounded-[32px] w-full max-w-md p-8 shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-300">
             <div className="flex items-center gap-4 mb-6">
               <div className="w-12 h-12 rounded-[18px] bg-primary-50 text-primary-600 flex items-center justify-center">

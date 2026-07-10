@@ -376,6 +376,7 @@
     "contactDetails": "بيانات التواصل",
     "firstName": "الاسم الأول",
     "lastName": "اسم العائلة",
+    "gender": "الجنس",
     "phoneNumber": "رقم الهاتف",
     "visitInformation": "معلومات الزيارة",
     "reasonForVisit": "سبب الزيارة",

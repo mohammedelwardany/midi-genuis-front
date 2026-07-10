@@ -368,6 +368,7 @@
     "contactDetails": "Contact Details",
     "firstName": "First Name",
     "lastName": "Last Name",
+    "gender": "Gender",
     "phoneNumber": "Phone Number",
     "visitInformation": "Visit Information",
     "reasonForVisit": "Reason for Visit",
