@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import { selectCurrentUser, logoutUser } from '../store/slices/authSlice';
 import { updateMe, deleteMe } from '../store/slices/patientSlice';
 import { cn } from '../utils/cn';
+import { getAvatarSrc } from '../utils/avatar';
 
 export default function ProfileSettings() {
    const dispatch = useDispatch();
@@ -19,11 +20,6 @@ export default function ProfileSettings() {
    const formatDateForInput = (dateString) => {
       if (!dateString) return '';
       return dateString.split('T')[0];
-   };
-
-   const getProfileName = () => {
-      if (i18n.language.startsWith('ar')) return currentUser?.name_ar || currentUser?.name || 'User';
-      return currentUser?.name_en || currentUser?.name || 'User';
    };
 
          const [hasInsurance, setHasInsurance] = useState(false);
@@ -204,7 +200,7 @@ export default function ProfileSettings() {
                <div className="animate-in fade-in duration-300 text-start">
                   <div className="flex items-center gap-6 pb-8 border-b border-slate-100 mb-8">
                      <div className="relative group shrink-0">
-                        <img src={`https://ui-avatars.com/api/?name=${getProfileName()}&size=150&background=c7d2fe&color=3730a3`} className="w-24 h-24 rounded-full border-4 border-slate-50 shadow-sm object-cover" alt="Profile" />
+                        <img src={getAvatarSrc(currentUser?.avatar, formData.gender)} className="w-24 h-24 rounded-full border-4 border-slate-50 shadow-sm object-cover" alt="Profile" />
                         <button className="absolute bottom-0 end-0 bg-primary-600 text-white p-2 rounded-full border-2 border-white hover:bg-primary-700 transition-colors shadow-sm">
                            <Camera className="w-4 h-4" />
                         </button>

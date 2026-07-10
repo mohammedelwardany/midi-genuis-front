@@ -44,7 +44,7 @@ export default function PatientDirectory() {
                   <tr className="hover:bg-slate-50/50 transition-colors">
                      <td className="px-8 py-5">
                         <div className="flex items-center gap-4">
-                           <img src="https://ui-avatars.com/api/?name=Eleanor+Rigby&background=f1f5f9" className="w-12 h-12 rounded-full border border-slate-200" alt="avatar" />
+                           <img src="/avatars/female.svg" className="w-12 h-12 rounded-full border border-slate-200" alt="avatar" />
                            <div>
                               <div className="font-extrabold text-[15px] text-slate-900 tracking-tight">Eleanor Rigby</div>
                               <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">ID: #MG-88219</div>
@@ -74,7 +74,7 @@ export default function PatientDirectory() {
                   <tr className="hover:bg-slate-50/50 transition-colors">
                      <td className="px-8 py-5">
                         <div className="flex items-center gap-4">
-                           <img src="https://ui-avatars.com/api/?name=Arthur+Dent&background=f1f5f9" className="w-12 h-12 rounded-full border border-slate-200" alt="avatar" />
+                           <img src="/avatars/male.svg" className="w-12 h-12 rounded-full border border-slate-200" alt="avatar" />
                            <div>
                               <div className="font-extrabold text-[15px] text-slate-900 tracking-tight">Arthur Dent</div>
                               <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">ID: #MG-44012</div>
@@ -103,7 +103,7 @@ export default function PatientDirectory() {
                   <tr className="hover:bg-slate-50/50 transition-colors">
                      <td className="px-8 py-5">
                         <div className="flex items-center gap-4">
-                           <img src="https://ui-avatars.com/api/?name=Jasmine+Miller&background=f1f5f9" className="w-12 h-12 rounded-full border border-slate-200" alt="avatar" />
+                           <img src="/avatars/female.svg" className="w-12 h-12 rounded-full border border-slate-200" alt="avatar" />
                            <div>
                               <div className="font-extrabold text-[15px] text-slate-900 tracking-tight">Jasmine Miller</div>
                               <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">ID: #MG-92110</div>
@@ -130,7 +130,7 @@ export default function PatientDirectory() {
                   <tr className="hover:bg-slate-50/50 transition-colors border-b border-transparent">
                      <td className="px-8 py-5">
                         <div className="flex items-center gap-4">
-                           <img src="https://ui-avatars.com/api/?name=Marcus+Aurelius&background=f1f5f9" className="w-12 h-12 rounded-full border border-slate-200" alt="avatar" />
+                           <img src="/avatars/male.svg" className="w-12 h-12 rounded-full border border-slate-200" alt="avatar" />
                            <div>
                               <div className="font-extrabold text-[15px] text-slate-900 tracking-tight">Marcus Aurelius</div>
                               <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">ID: #MG-11022</div>

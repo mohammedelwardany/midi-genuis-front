@@ -389,7 +389,20 @@ export default function UserManagement() {
 
                 {activeTab === 'doctors' ? (
                   <>
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('patientInfo.gender')}</label>
+                        <select value={formData.gender} onChange={(e) => setFormData({ ...formData, gender: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold">
+                          <option value="Male">{t('userManagement.genderMale')}</option>
+                          <option value="Female">{t('userManagement.genderFemale')}</option>
+                        </select>
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('userManagement.thAppointmentDuration', { defaultValue: 'Duration (mins)' })}</label>
+                        <input type="number" value={formData.appointment_duration} onChange={(e) => setFormData({ ...formData, appointment_duration: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold" placeholder="30" required />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1.5">
                         <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('userManagement.thSpecialization')}</label>
                         <select
@@ -420,10 +433,6 @@ export default function UserManagement() {
                       <div className="space-y-1.5">
                         <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('userManagement.thExperience')}</label>
                         <input type="number" value={formData.experience_years} onChange={(e) => setFormData({ ...formData, experience_years: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold" placeholder={t('userManagement.experiencePlaceholder')} required />
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest">{t('userManagement.thAppointmentDuration', { defaultValue: 'Duration (mins)' })}</label>
-                        <input type="number" value={formData.appointment_duration} onChange={(e) => setFormData({ ...formData, appointment_duration: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold" placeholder="30" required />
                       </div>
                     </div>
                     <div className="space-y-1.5">

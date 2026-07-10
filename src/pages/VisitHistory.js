@@ -112,7 +112,7 @@ export default function VisitHistory() {
             className="bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm font-bold text-slate-700 appearance-none focus:outline-none focus:ring-2 focus:ring-primary-500 cursor-pointer pe-10"
           >
             <option value="all">{t('bookings.allSpecialties', { defaultValue: 'All Specialties' })}</option>
-            {specialties.map((s) => <option key={s} value={s}>{s}</option>)}
+            {specialties.map((s) => <option key={s} value={s}>{t('specializations.' + s, { defaultValue: s })}</option>)}
           </select>
           <ChevronDown className="w-4 h-4 text-slate-400 absolute end-3 top-1/2 -translate-y-1/2 pointer-events-none" />
         </div>

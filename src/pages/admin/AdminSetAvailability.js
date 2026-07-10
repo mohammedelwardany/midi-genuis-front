@@ -141,7 +141,7 @@ export default function AdminSetAvailability() {
                  {doctorName || t('doctorSchedule.loading')}
                </h2>
                <p className="text-sm font-medium text-slate-500 mt-1">
-                 {selectedDoctor?.specialization || t('doctorSchedule.medicalSpecialist')}
+                 {selectedDoctor?.specialization ? t('specializations.' + selectedDoctor.specialization, { defaultValue: selectedDoctor.specialization }) : t('doctorSchedule.medicalSpecialist')}
                </p>
             </div>
           </div>

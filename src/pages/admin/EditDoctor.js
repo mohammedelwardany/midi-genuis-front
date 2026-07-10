@@ -31,7 +31,8 @@ export default function EditDoctor() {
     experience_years: '',
     appointment_duration: '',
     bio: '',
-    email: ''
+    email: '',
+    gender: 'Male'
   });
 
   const [customSpecialization, setCustomSpecialization] = useState('');
@@ -61,7 +62,8 @@ export default function EditDoctor() {
         experience_years: doctor.experience_years || '',
         appointment_duration: doctor.appointment_duration || '',
         bio: doctor.bio || '',
-        email: doctor.email || ''
+        email: doctor.email || '',
+        gender: doctor.gender || 'Male'
       });
       if (!isKnown && doctor.specialization) {
         setCustomSpecialization(doctor.specialization);
@@ -82,7 +84,8 @@ export default function EditDoctor() {
         specialization: finalSpecialization,
         bio: formData.bio,
         experience_years: formData.experience_years.toString(),
-        appointment_duration: formData.appointment_duration.toString()
+        appointment_duration: formData.appointment_duration.toString(),
+        gender: formData.gender
       }
     })).then((res) => {
       if (!res.error) {
@@ -188,6 +191,20 @@ export default function EditDoctor() {
                   />
                 </div>
               )}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest flex items-center gap-2">
+                <User className="w-3.5 h-3.5" /> {t('patientInfo.gender')}
+              </label>
+              <select
+                value={formData.gender}
+                onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-semibold appearance-none cursor-pointer"
+              >
+                <option value="Male">{t('userManagement.genderMale')}</option>
+                <option value="Female">{t('userManagement.genderFemale')}</option>
+              </select>
             </div>
 
             <div className="space-y-2">

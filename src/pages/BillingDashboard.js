@@ -130,13 +130,7 @@ export default function BillingDashboard() {
           </div>
         </div>
 
-        {/* Support Card */}
-        <div className="bg-gradient-to-br from-primary-600 to-indigo-700 text-white rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow flex flex-col justify-between">
-          <span className="text-xs font-bold text-white/80 uppercase tracking-wider block mb-3">{t('billing.support', { defaultValue: 'Billing Support' })}</span>
-          <p className="text-xs text-white/90 leading-relaxed font-medium">
-            {t('billing.supportDescription', { defaultValue: 'Need details about outstanding clinic charges or manual wire details? Get in touch with our desk.' })}
-          </p>
-        </div>
+
       </div>
 
       {/* Main Content Split */}
@@ -235,20 +229,7 @@ export default function BillingDashboard() {
               </div>
            </div>
 
-           {/* Support Policy Block */}
-           <div className="bg-primary-50/50 rounded-2xl p-6 border border-primary-100 relative overflow-hidden">
-              <div className="flex gap-3 relative z-10">
-                 <div className="text-primary-600 shrink-0">
-                    <Info className="w-5 h-5" />
-                 </div>
-                 <div>
-                    <h4 className="font-bold text-slate-800 text-sm mb-1">{t('billing.supportTitle', { defaultValue: 'Need Invoice Copies?' })}</h4>
-                    <p className="text-sm text-slate-600 leading-relaxed font-medium">
-                       {t('billing.invoiceCopiesDesc', { defaultValue: 'Official stamped corporate statements or insurance reports are readily downloadable. Contact the reception desk at (555) 012-3456.' })}
-                    </p>
-                  </div>
-              </div>
-           </div>
+
         </div>
       </div>
 

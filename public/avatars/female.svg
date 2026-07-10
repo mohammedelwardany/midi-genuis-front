@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150">
+  <defs>
+    <clipPath id="circleClipF">
+      <circle cx="75" cy="75" r="75"/>
+    </clipPath>
+  </defs>
+  <circle cx="75" cy="75" r="75" fill="#e0e7ff"/>
+  <g clip-path="url(#circleClipF)">
+    <!-- Shoulders / body -->
+    <rect x="15" y="112" width="120" height="60" rx="30" fill="#4338ca"/>
+    <!-- Long hair (wide, frames the face and extends toward the shoulders) -->
+    <ellipse cx="75" cy="68" rx="40" ry="48" fill="#312e81"/>
+    <!-- Head -->
+    <circle cx="75" cy="60" r="27" fill="#a5b4fc"/>
+  </g>
+</svg>

@@ -13,6 +13,7 @@ import {
   selectMyReports,
   selectPatientsLoading
 } from '../../store/slices/patientSlice';
+import { getAvatarSrc } from '../../utils/avatar';
 
 export default function PatientProfile() {
   const { id } = useParams();
@@ -103,7 +104,7 @@ export default function PatientProfile() {
             
             <div className="flex flex-col md:flex-row gap-8 items-start md:items-center relative z-10">
                <img 
-                 src={`https://ui-avatars.com/api/?name=${encodeURIComponent(patientName)}&size=180&background=0550c7&color=ffffff`} 
+                 src={getAvatarSrc(patient.avatar, patient.gender)}
                  alt="Avatar" 
                  className="w-32 h-32 rounded-3xl object-cover shadow-sm border-4 border-slate-50 shrink-0" 
                />

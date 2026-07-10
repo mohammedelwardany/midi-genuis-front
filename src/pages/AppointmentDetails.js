@@ -11,6 +11,7 @@ import { useSiteConfig } from '../context/SiteConfigContext';
 import { getAppointmentStatusColor } from '../utils/statusColors';
 import { formatDate, formatTime } from '../utils/dateFormatter';
 import { formatCurrency } from '../utils/currencyFormatter';
+import { getAvatarSrc } from '../utils/avatar';
 
 export default function AppointmentDetails() {
   const { id } = useParams();
@@ -107,6 +108,8 @@ export default function AppointmentDetails() {
   const specializationFallback = doctorData?.specialization || appointment?.doctor?.specialization || appointment?.doctor_specialization;
   const specKey = String(specializationFallback || '').toLowerCase().replace(' ', '_');
   const specialization = rawSpecialization || t('specializations.' + specKey, { defaultValue: specializationFallback || (isRtl ? 'طبيب استشاري' : 'Clinical Specialist') });
+
+  const doctorGender = doctorData?.gender || appointment?.doctor?.gender || appointment?.doctor_gender;
 
   const scheduledDate = appointment.scheduledAt || appointment.scheduled_at || appointment.date;
   const formattedDate = scheduledDate
@@ -215,7 +218,7 @@ export default function AppointmentDetails() {
             
             <div className="flex items-center gap-4 mb-6">
               <img 
-                src={doctorData?.avatar || appointment?.doctor?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(doctorName)}&background=eff6ff&color=1d4ed8&size=100`} 
+                src={getAvatarSrc(doctorData?.avatar || appointment?.doctor?.avatar, doctorGender)}
                 alt={doctorName} 
                 className="w-14 h-14 rounded-full border border-slate-100 object-cover" 
               />

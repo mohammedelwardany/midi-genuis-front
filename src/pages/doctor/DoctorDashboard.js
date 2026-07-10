@@ -109,7 +109,7 @@ export default function DoctorDashboard() {
                   {t('doctorDashboard.title')}, {i18n.language.startsWith('ar') ? (currentUser?.name_ar || currentUser?.name) : (currentUser?.name_en || currentUser?.name || 'Doctor')}!
                </h2>
                <p className="text-[15px] font-medium text-slate-500">
-                  {currentUser?.specialization || t('doctorDashboard.desc')}
+                  {currentUser?.specialization ? t('specializations.' + currentUser.specialization, { defaultValue: currentUser.specialization }) : t('doctorDashboard.desc')}
                </p>
             </div>
          </div>

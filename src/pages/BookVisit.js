@@ -11,6 +11,7 @@ import {
    selectDoctorsLoading
 } from '../store/slices/doctorSlice';
 import { updateBookingDraft, clearBookingDraft } from '../store/slices/appointmentSlice';
+import { getAvatarSrc } from '../utils/avatar';
 
 export default function BookVisit() {
    const navigate = useNavigate();
@@ -127,7 +128,7 @@ export default function BookVisit() {
                            : 'bg-white border-slate-200 text-slate-700 hover:border-primary-300 hover:bg-primary-50'
                      }`}
                   >
-                     {spec === 'All' ? t('common.all', { defaultValue: 'All' }) : spec}
+                     {spec === 'All' ? t('common.all', { defaultValue: 'All' }) : t('specializations.' + spec, { defaultValue: spec })}
                   </button>
                ))}
             </div>
@@ -172,7 +173,7 @@ export default function BookVisit() {
                         {/* Photo */}
                         <div className="shrink-0 flex sm:block items-center gap-4">
                            <img
-                              src={`https://ui-avatars.com/api/?name=${name || 'Doctor'}&size=150&background=c7d2fe&color=3730a3`}
+                              src={getAvatarSrc(doctor.avatar, doctor.gender)}
                               alt={name}
                               className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover bg-slate-100 border-2 border-slate-100"
                            />
@@ -200,7 +201,7 @@ export default function BookVisit() {
                            </div>
 
                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-2">
-                              <span className="text-sm md:text-base font-bold text-primary-700">{doctor.specialization}</span>
+                              <span className="text-sm md:text-base font-bold text-primary-700">{t('specializations.' + doctor.specialization, { defaultValue: doctor.specialization })}</span>
                               {isTopRated && (
                                  <span className="sm:hidden inline-flex items-center gap-1 bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full text-xs font-bold">
                                     <Award className="w-3 h-3" /> {t('bookVisit.topRated', { defaultValue: 'Top Rated' })}

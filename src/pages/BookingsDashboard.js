@@ -8,6 +8,7 @@ import { fetchAppointments, cancelAppointment, selectAppointments, selectAppoint
 import { cn } from '../utils/cn';
 import { formatDate, formatTime } from '../utils/dateFormatter';
 import { getAppointmentStatusColor } from '../utils/statusColors';
+import { getAvatarSrc } from '../utils/avatar';
 import {
   getApptScheduledDate,
   isUpcomingAppointment,
@@ -105,7 +106,7 @@ export default function BookingsDashboard() {
 
                 <div className="flex justify-between items-start mb-6">
                   <div className="flex gap-4">
-                    <img src={`https://ui-avatars.com/api/?name=${getApptDoctorName(appt, isRtl)}&background=dbeafe&color=1d4ed8&size=100`} alt="Dr" className="w-14 h-14 rounded-full border-2 border-slate-50 shadow-sm" />
+                    <img src={getAvatarSrc(null, appt.doctor_gender)} alt="Dr" className="w-14 h-14 rounded-full border-2 border-slate-50 shadow-sm" />
                     <div>
                       <div className="font-bold text-lg text-slate-800 tracking-tight">{getApptDoctorName(appt, isRtl)}</div>
                       <div className="text-sm font-medium text-slate-500">{getApptSpecialization(appt, isRtl, t)}</div>
@@ -178,7 +179,7 @@ export default function BookingsDashboard() {
                   >
                     <td className="p-4 ps-6 text-start">
                       <div className="flex items-center gap-3">
-                        <img src={`https://ui-avatars.com/api/?name=${getApptDoctorName(appt, isRtl)}&size=80&background=f1f5f9`} className="w-8 h-8 rounded-full border border-slate-200" alt="avatar" />
+                        <img src={getAvatarSrc(null, appt.doctor_gender)} className="w-8 h-8 rounded-full border border-slate-200" alt="avatar" />
                         <span className="font-bold text-slate-800">{getApptDoctorName(appt, isRtl)}</span>
                       </div>
                     </td>

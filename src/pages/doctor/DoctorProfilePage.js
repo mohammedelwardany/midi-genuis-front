@@ -14,13 +14,14 @@ import {
 import { fetchDoctorById, selectSelectedDoctor, selectDoctorsLoading } from '../../store/slices/doctorSlice';
 import { selectCurrentUser, selectUserRole } from '../../store/slices/authSlice';
 import { useTranslation } from 'react-i18next';
+import { getAvatarSrc } from '../../utils/avatar';
 
 export default function DoctorProfilePage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
-  const { i18n } = useTranslation();
+
+  const { t, i18n } = useTranslation();
   const currentUser = useSelector(selectCurrentUser);
   const userRole = useSelector(selectUserRole);
   const doctor = useSelector(selectSelectedDoctor);
@@ -71,9 +72,9 @@ export default function DoctorProfilePage() {
         
         <div className="flex flex-col md:flex-row gap-10 items-start relative z-10">
           <div className="relative shrink-0">
-            <img 
-              src={`https://ui-avatars.com/api/?name=${i18n.language.startsWith('ar') ? (doctor.name_ar || doctor.name_en) : doctor.name_en}&size=200&background=0550c7&color=ffffff`} 
-              alt={doctor.name_en} 
+            <img
+              src={getAvatarSrc(doctor.avatar, doctor.gender)}
+              alt={doctor.name_en}
               className="w-44 h-44 rounded-[40px] object-cover shadow-xl border-4 border-white" 
             />
             <div className="absolute -bottom-3 -right-3 bg-emerald-500 text-white p-2.5 rounded-2xl shadow-lg border-4 border-white">
@@ -88,7 +89,7 @@ export default function DoctorProfilePage() {
                   {i18n.language.startsWith('ar') ? (doctor.name_ar || doctor.name_en) : doctor.name_en}
                 </h1>
                 <div className="flex items-center gap-3">
-                  <span className="bg-primary-100 text-primary-700 px-3 py-1 rounded-lg text-[11px] font-extrabold uppercase tracking-widest">{doctor.specialization}</span>
+                  <span className="bg-primary-100 text-primary-700 px-3 py-1 rounded-lg text-[11px] font-extrabold uppercase tracking-widest">{t('specializations.' + doctor.specialization, { defaultValue: doctor.specialization })}</span>
                   <span className="text-slate-400 text-sm font-bold flex items-center gap-1.5">
                     <History className="w-4 h-4" /> {doctor.experience_years} Years Experience
                   </span>

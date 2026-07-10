@@ -9,6 +9,7 @@ import { uploadReport } from '../store/slices/patientSlice';
 import { initiatePayment, uploadReceipt } from '../store/slices/paymentSlice';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { selectCurrentUser } from '../store/slices/authSlice';
+import { getAvatarSrc } from '../utils/avatar';
 import toast from 'react-hot-toast';
 
 export default function FinalizePayment() {
@@ -236,10 +237,10 @@ export default function FinalizePayment() {
             <h3 className="text-lg font-bold text-slate-900 mb-6">{t('finalizePayment.bookingSummary', { defaultValue: 'Booking Summary' })}</h3>
 
             <div className="flex items-center gap-4 border-b border-slate-100 pb-6 mb-6">
-              <img src={`https://ui-avatars.com/api/?name=${(i18n.language.startsWith('ar') ? selectedDoctor?.name_ar : selectedDoctor?.name_en) || 'Doc'}&background=f1f5f9`} className="w-12 h-12 rounded-lg object-cover" alt="Dr" />
+              <img src={getAvatarSrc(selectedDoctor?.avatar, selectedDoctor?.gender)} className="w-12 h-12 rounded-lg object-cover" alt="Dr" />
               <div>
-                <h4 onClick={() => console.log(draft)} className="font-bold text-slate-900 text-sm">{(i18n.language.startsWith('ar') ? selectedDoctor?.name_ar : selectedDoctor?.name_en) || 'Medical Specialist'}</h4>
-                <p className="text-xs font-medium text-slate-500 mt-0.5">{selectedDoctor?.specialization || t('finalizePayment.specialistConsultation', { defaultValue: 'Consultation' })}</p>
+                <h4 className="font-bold text-slate-900 text-sm">{(i18n.language.startsWith('ar') ? selectedDoctor?.name_ar : selectedDoctor?.name_en) || 'Medical Specialist'}</h4>
+                <p className="text-xs font-medium text-slate-500 mt-0.5">{selectedDoctor?.specialization ? t('specializations.' + selectedDoctor.specialization, { defaultValue: selectedDoctor.specialization }) : t('finalizePayment.specialistConsultation', { defaultValue: 'Consultation' })}</p>
                 <p className="text-[10px] font-bold text-primary-600 mt-1 uppercase tracking-widest">
                   {selectedDate && new Date(selectedDate).toLocaleDateString(i18n.language.startsWith('ar') ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric' })} • {selectedSlot?.start_time}
                 </p>

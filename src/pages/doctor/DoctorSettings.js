@@ -4,6 +4,7 @@ import { User, Shield, Stethoscope, Camera, Key, CheckCircle2, Lock, Loader2 } f
 import { useTranslation } from 'react-i18next';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import { fetchDoctorById, updateDoctor, selectSelectedDoctor, selectDoctorsLoading } from '../../store/slices/doctorSlice';
+import { getAvatarSrc } from '../../utils/avatar';
 
 export default function DoctorSettings() {
   const dispatch = useDispatch();
@@ -188,7 +189,7 @@ export default function DoctorSettings() {
           <div className="animate-in fade-in duration-300 text-start">
             <div className="flex items-center gap-6 pb-8 border-b border-slate-100 mb-8">
                <div className="relative group shrink-0">
-                  <img src={`https://ui-avatars.com/api/?name=${i18n.language.startsWith('ar') ? (formData.name_ar || formData.name_en) : (formData.name_en || 'Doctor')}&size=150&background=dbeafe&color=1d4ed8`} className="w-24 h-24 rounded-full border-4 border-slate-50 shadow-sm object-cover" alt="Profile" />
+                  <img src={getAvatarSrc(doctor?.avatar, doctor?.gender)} className="w-24 h-24 rounded-full border-4 border-slate-50 shadow-sm object-cover" alt="Profile" />
                   <button className="absolute bottom-0 end-0 bg-[#0550c7] text-white p-2 rounded-full border-2 border-white hover:bg-blue-800 transition-colors shadow-sm">
                      <Camera className="w-4 h-4" />
                   </button>
