@@ -73,6 +73,16 @@ export default function PatientInfo() {
     }
   };
 
+  if (!draft.doctorId || !draft.selectedSlot) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full py-20 text-center">
+        <Info className="w-12 h-12 text-slate-300 mb-4" />
+        <h3 className="text-xl font-bold text-slate-800">{t('pickSchedule.noBookingData', { defaultValue: 'No Booking Data Found' })}</h3>
+        <button onClick={() => navigate('/patient/book/doctors')} className="mt-4 text-primary-600 font-bold hover:underline">{t('pickSchedule.backToDoctors', { defaultValue: 'Go back to doctors list' })}</button>
+      </div>
+    );
+  }
+
   return (
     <div className="animate-in fade-in duration-500 max-w-4xl mx-auto pb-24">
       <div className="mb-10">
@@ -212,7 +222,7 @@ export default function PatientInfo() {
 
         {/* Action Bar Local */}
         <div className="flex justify-between items-center pt-6 border-t border-slate-100">
-           <button onClick={() => navigate('/patient/book/schedule')} className="font-bold text-slate-700 flex items-center hover:text-slate-900 transition-colors py-2 text-sm">
+           <button onClick={() => navigate(draft.doctorId ? `/patient/book/schedule/${draft.doctorId}` : '/patient/book/doctors')} className="font-bold text-slate-700 flex items-center hover:text-slate-900 transition-colors py-2 text-sm">
               <ArrowLeft className="w-4 h-4 me-2 rtl:rotate-180" /> {t('patientInfo.backToSchedule', { defaultValue: 'Back to Schedule' })}
            </button>
            <button 

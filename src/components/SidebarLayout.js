@@ -1,21 +1,59 @@
 import React, { useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
 import TopNav from './TopNav';
 import { Calendar, UserCircle, CreditCard, CheckCircle, BriefcaseMedical, X } from 'lucide-react';
 import { cn } from '../utils/cn';
+import { selectBookingDraft } from '../store/slices/appointmentSlice';
 
 export default function SidebarLayout() {
   const { t, i18n } = useTranslation();
   const location = useLocation();
   const isRtl = i18n.language.startsWith('ar');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const draft = useSelector(selectBookingDraft);
+
+  // A schedule slot can only be picked once a doctor is chosen, and the
+  // later steps all depend on that slot being picked - gate them so the
+  // sidebar can never link to a route that isn't valid yet (routes like
+  // /patient/book/schedule/:id and /patient/book/:appointmentId/confirm
+  // require params the sidebar has no way to fill in on its own).
+  const hasDoctor = !!draft.doctorId;
+  const hasSchedule = hasDoctor && !!draft.selectedSlot;
 
   const steps = [
-    { name: t('booking.steps.pickSchedule', { defaultValue: 'Pick Schedule' }), icon: Calendar, path: '/patient/book/schedule' },
-    { name: t('booking.steps.patientInfo', { defaultValue: 'Patient Info' }), icon: UserCircle, path: '/patient/book/patient' },
-    { name: t('booking.steps.payment', { defaultValue: 'Payment' }), icon: CreditCard, path: '/patient/book/payment' },
-    { name: t('booking.steps.confirm', { defaultValue: 'Confirm' }), icon: CheckCircle, path: '/patient/book/confirm' }
+    {
+      id: 'schedule',
+      name: t('booking.steps.pickSchedule', { defaultValue: 'Pick Schedule' }),
+      icon: Calendar,
+      path: hasDoctor ? `/patient/book/schedule/${draft.doctorId}` : '/patient/book/doctors',
+    },
+    {
+      id: 'patient',
+      name: t('booking.steps.patientInfo', { defaultValue: 'Patient Info' }),
+      icon: UserCircle,
+      path: '/patient/book/patient',
+      disabled: !hasSchedule,
+    },
+    {
+      id: 'payment',
+      name: t('booking.steps.payment', { defaultValue: 'Payment' }),
+      icon: CreditCard,
+      path: '/patient/book/payment',
+      disabled: !hasSchedule,
+    },
+    {
+      // No confirmation exists to link to until a booking is actually
+      // completed (the URL needs a real :appointmentId) - this step is
+      // reached via the app's own post-payment redirect, never via the
+      // sidebar itself.
+      id: 'confirm',
+      name: t('booking.steps.confirm', { defaultValue: 'Confirm' }),
+      icon: CheckCircle,
+      path: '#',
+      disabled: true,
+    },
   ];
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -60,20 +98,26 @@ export default function SidebarLayout() {
             <ul className="space-y-1">
               {steps.map((step) => {
                 const Icon = step.icon;
+                // The confirm step's real path always carries a dynamic
+                // :appointmentId the sidebar doesn't have, so it can't be
+                // matched via NavLink's own `to` comparison - detect it by
+                // URL shape instead, independent of whether it's clickable.
+                const isCurrentActive = step.id === 'confirm'
+                  ? /^\/patient\/book\/[^/]+\/confirm$/.test(location.pathname)
+                  : location.pathname === step.path;
                 return (
-                  <li key={step.name}>
+                  <li key={step.id}>
                     <NavLink
                       to={step.disabled ? '#' : step.path}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className={({ isActive }) => {
-                        const isCurrentActive = isActive || (step.path === '/patient/book/confirm' && /^\/patient\/book\/[^/]+\/confirm$/.test(location.pathname));
-                        return cn(
-                          "flex items-center gap-3 px-6 py-3 font-medium transition-colors",
-                           isCurrentActive && !step.disabled
-                             ? "bg-slate-50 text-primary-600 border-s-2 border-primary-600"
-                             : "text-slate-600 hover:bg-slate-50"
-                        );
-                      }}
+                      className={() => cn(
+                        "flex items-center gap-3 px-6 py-3 font-medium transition-colors",
+                        isCurrentActive
+                          ? "bg-slate-50 text-primary-600 border-s-2 border-primary-600"
+                          : step.disabled
+                            ? "text-slate-300 cursor-not-allowed"
+                            : "text-slate-600 hover:bg-slate-50"
+                      )}
                       style={step.disabled ? { pointerEvents: 'none' } : {}}
                     >
                       <Icon className="w-4 h-4" />
