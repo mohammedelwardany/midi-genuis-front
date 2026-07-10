@@ -138,9 +138,6 @@ export default function PickSchedule() {
             {t('pickSchedule.descriptionPrefix', { defaultValue: 'Select an available date and time slot for' })} <span className="text-slate-700 font-bold">{i18n.language.startsWith('ar') ? (selectedDoctor?.name_ar || selectedDoctor?.name) : (selectedDoctor?.name_en || selectedDoctor?.name || 'Specialist')}</span>.
           </p>
         </div>
-        <div className="bg-primary-50 text-primary-600 px-4 py-2 rounded-full text-[10px] font-extrabold uppercase tracking-widest flex items-center gap-2 border border-primary-100/50">
-          <span className="w-2 h-2 rounded-full bg-primary-500 animate-pulse"></span> {t('pickSchedule.availableNow', { defaultValue: 'Fetching Real-time' })}
-        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 flex-1 pb-24">

@@ -319,7 +319,9 @@
     "telehealthAvailable": "Telehealth Available",
     "telehealthDescription": "Consult with top specialists from the comfort of your home.",
     "learnMore": "Learn More",
-    "availableSpecialists": "Available Specialists",
+    "availableSpecialists": "Find a Doctor",
+    "pageSubtitle": "Search or pick a specialty, then tap \"Book Now\" to schedule your visit.",
+    "searchPlaceholder": "Search doctors by name...",
     "filters": "Filters",
     "featuredSpecialists": "Featured Specialists",
     "topRated": "Top Rated",
@@ -336,7 +338,6 @@
     "title": "Pick Schedule",
     "descriptionPrefix": "Select an available date and time slot for",
     "timezone": "Current timezone: GMT -5 (EST).",
-    "availableNow": "Available Now",
     "selectedDate": "Selected Date",
     "availableBlocks": "3 available blocks found",
     "morningSlots": "Morning Slots",
@@ -714,7 +715,8 @@
     "save": "Save",
     "cancel": "Cancel",
     "search": "Search",
-    "seeAll": "See All"
+    "seeAll": "See All",
+    "clear": "Clear"
   },
   "patientAdminProfile": {
     "title": "Patient Profile",

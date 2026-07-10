@@ -319,7 +319,9 @@
     "telehealthAvailable": "الاستشارة عن بُعد متاحة",
     "telehealthDescription": "استشر أفضل الأخصائيين من منزلك.",
     "learnMore": "اعرف المزيد",
-    "availableSpecialists": "الأخصائيون المتاحون",
+    "availableSpecialists": "ابحث عن طبيب",
+    "pageSubtitle": "ابحث أو اختر تخصصاً، ثم اضغط \"احجز الآن\" لتحديد موعد زيارتك.",
+    "searchPlaceholder": "ابحث عن طبيب بالاسم...",
     "sortBy": "الترتيب حسب:",
     "highestRated": "الأعلى تقييماً",
     "nearestDate": "أقرب موعد",
@@ -337,13 +339,13 @@
     "save": "حفظ",
     "cancel": "إلغاء",
     "search": "بحث",
-    "seeAll": "عرض الكل"
+    "seeAll": "عرض الكل",
+    "clear": "مسح"
   },
   "pickSchedule": {
     "title": "اختيار الموعد",
     "descriptionPrefix": "اختر تاريخاً ووقتاً متاحين لـ",
     "timezone": "المنطقة الزمنية الحالية: GMT -5 (EST).",
-    "availableNow": "متاح الآن",
     "selectedDate": "التاريخ المختار",
     "availableBlocks": "تم العثور على 3 فترات متاحة",
     "morningSlots": "فترات الصباح",
