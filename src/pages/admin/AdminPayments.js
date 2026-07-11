@@ -9,6 +9,7 @@ import { BASE_URL } from '../../api/endpoints';
 import toast from 'react-hot-toast';
 import { getPaymentStatusColor } from '../../utils/statusColors';
 import { formatDate } from '../../utils/dateFormatter';
+import ModalPortal from '../../components/ModalPortal';
 
 const ensureArray = (val) => {
   if (Array.isArray(val)) return val;
@@ -446,7 +447,7 @@ export default function AdminPayments() {
 
       {/* Review & Verification Modal */}
       {showReviewModal && selectedPayment && (
-        <>
+        <ModalPortal>
           {/* Backdrop */}
           <div
             className="fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-[150] transition-opacity animate-in fade-in"
@@ -622,7 +623,7 @@ export default function AdminPayments() {
 
             </div>
           </div>
-        </>
+        </ModalPortal>
       )}
 
     </div>

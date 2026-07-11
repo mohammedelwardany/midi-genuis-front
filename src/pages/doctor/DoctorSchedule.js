@@ -11,6 +11,7 @@ import {
   selectDoctorsLoading 
 } from '../../store/slices/doctorSlice';
 import { selectCurrentUser } from '../../store/slices/authSlice';
+import ModalPortal from '../../components/ModalPortal';
 
 export default function DoctorSchedule() {
   const navigate = useNavigate();
@@ -406,6 +407,7 @@ export default function DoctorSchedule() {
       </div>
 
       {showAddModal && (
+        <ModalPortal>
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
           <div className="bg-white rounded-[32px] w-full max-w-md p-8 shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-300">
             <div className="flex items-center gap-4 mb-6">
@@ -476,6 +478,7 @@ export default function DoctorSchedule() {
             </form>
           </div>
         </div>
+        </ModalPortal>
       )}
     </div>
   )

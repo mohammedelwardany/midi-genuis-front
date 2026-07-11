@@ -12,6 +12,7 @@ import {
   selectDoctorsLoading,
   selectSelectedDoctor
 } from '../../store/slices/doctorSlice';
+import ModalPortal from '../../components/ModalPortal';
 
 export default function AdminSetAvailability() {
   const { id: doctorId } = useParams();
@@ -255,6 +256,7 @@ export default function AdminSetAvailability() {
       </div>
 
       {showAddModal && (
+        <ModalPortal>
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
           <div className="bg-white rounded-[32px] w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95 duration-300">
             <h3 className="text-xl font-extrabold text-slate-900 mb-6">{t('doctorSchedule.addAvailability')}</h3>
@@ -282,6 +284,7 @@ export default function AdminSetAvailability() {
             </form>
           </div>
         </div>
+        </ModalPortal>
       )}
     </div>
   );

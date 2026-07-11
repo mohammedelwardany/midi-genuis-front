@@ -17,6 +17,7 @@ import {
   selectPatientsLoading
 } from '../../store/slices/patientSlice';
 import { ENDPOINTS } from '../../api/endpoints';
+import ModalPortal from '../../components/ModalPortal';
 
 export default function PatientAdminProfile() {
   const { id } = useParams();
@@ -265,6 +266,7 @@ export default function PatientAdminProfile() {
         </div>
       </div>      {/* Edit Profile Modal */}
       {showEditModal && (
+        <ModalPortal>
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowEditModal(false)}></div>
           <div className="relative bg-white rounded-[32px] shadow-2xl p-8 w-full max-w-lg animate-in zoom-in-95 duration-200">
@@ -386,6 +388,7 @@ export default function PatientAdminProfile() {
             </form>
           </div>
         </div>
+        </ModalPortal>
       )}
     </div>
   );

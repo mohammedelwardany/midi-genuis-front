@@ -6,6 +6,7 @@ import { fetchMyPayments, fetchPaymentById, selectAllPayments, selectPaymentsLoa
 import { BASE_URL } from '../api/endpoints';
 import { getPaymentStatusColor } from '../utils/statusColors';
 import { formatDate } from '../utils/dateFormatter';
+import ModalPortal from '../components/ModalPortal';
 
 export default function BillingDashboard() {
   const { t, i18n } = useTranslation();
@@ -235,7 +236,7 @@ export default function BillingDashboard() {
 
       {/* Premium Side Drawer for Payment Details */}
       {showDrawer && (
-        <>
+        <ModalPortal>
           {/* Backdrop */}
           <div 
             className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[100] transition-opacity duration-300"
@@ -399,7 +400,7 @@ export default function BillingDashboard() {
               </button>
             </div>
           </div>
-        </>
+        </ModalPortal>
       )}
     </div>
   )

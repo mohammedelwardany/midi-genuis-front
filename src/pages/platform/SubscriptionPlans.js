@@ -11,6 +11,7 @@ import {
   selectSubscriptionPlans,
   selectPlatformLoading,
 } from '../../store/slices/platformSlice';
+import ModalPortal from '../../components/ModalPortal';
 
 const emptyForm = {
   name: '', description: '',
@@ -209,6 +210,7 @@ export default function SubscriptionPlans() {
       </div>
 
       {showModal && (
+        <ModalPortal>
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4" onClick={() => setShowModal(false)}>
           <div className="bg-white rounded-3xl p-8 max-w-lg w-full shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-6">
@@ -294,6 +296,7 @@ export default function SubscriptionPlans() {
             </form>
           </div>
         </div>
+        </ModalPortal>
       )}
     </div>
   );

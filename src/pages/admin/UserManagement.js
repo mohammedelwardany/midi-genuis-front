@@ -5,6 +5,7 @@ import { UserPlus, User, Search, Filter, MoreVertical, Mail, AlertCircle, CheckC
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { cn } from '../../utils/cn';
+import ModalPortal from '../../components/ModalPortal';
 import {
   fetchDoctors,
   addDoctor,
@@ -352,6 +353,7 @@ export default function UserManagement() {
       {/* Add User Modal */}
       {
         showAddModal && (
+          <ModalPortal>
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowAddModal(false)}></div>
             <div className="relative bg-white rounded-3xl shadow-2xl p-8 w-full max-w-2xl animate-in zoom-in-95 duration-200 overflow-y-auto max-h-[90vh]">
@@ -503,6 +505,7 @@ export default function UserManagement() {
               </form>
             </div>
           </div>
+          </ModalPortal>
         )
       }
     </div >
