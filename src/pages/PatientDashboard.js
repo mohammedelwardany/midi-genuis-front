@@ -2,11 +2,20 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { Activity, PlusCircle, FileText, Download, Calendar, Loader2 } from 'lucide-react';
-import { fetchNextAppointment, selectNextAppointment } from '../store/slices/appointmentSlice';
+import { Activity, PlusCircle, FileText, Download, Calendar, Loader2, ChevronRight, Clock3 } from 'lucide-react';
+import { fetchNextAppointment, selectNextAppointment, fetchAppointments, selectAppointments } from '../store/slices/appointmentSlice';
 import { selectCurrentUser } from '../store/slices/authSlice';
 import { fetchMyReports, selectMyReports, selectPatientsLoading } from '../store/slices/patientSlice';
 import { BASE_URL } from '../api/endpoints';
+import { cn } from '../utils/cn';
+import { getAppointmentStatusColor } from '../utils/statusColors';
+import { formatDate, formatTime } from '../utils/dateFormatter';
+import {
+   getApptScheduledDate,
+   getDisplayStatus,
+   getApptDoctorName,
+   getApptSpecialization,
+} from '../utils/appointmentDisplay';
 
 export default function PatientDashboard() {
    const navigate = useNavigate();
@@ -15,15 +24,34 @@ export default function PatientDashboard() {
 
    const user = useSelector(selectCurrentUser);
    const nextAppt = useSelector(selectNextAppointment);
+   const appointments = useSelector(selectAppointments) || [];
    const reports = useSelector(selectMyReports) || [];
    const reportsLoading = useSelector(selectPatientsLoading);
 
    useEffect(() => {
       dispatch(fetchNextAppointment());
+      dispatch(fetchAppointments());
       dispatch(fetchMyReports());
    }, [dispatch]);
 
    const isRtl = i18n.language.startsWith('ar');
+
+   // "Next Appointments" widget: everything still in play (pending/confirmed/
+   // cancelled) rather than just the single soonest one the hero card shows -
+   // lets a patient see a rejected/cancelled booking at a glance, not just
+   // whatever's next on the calendar. Excludes 'completed' (a derived status
+   // for past confirmed visits - that's what Visit History is for).
+   const nextAppointments = [...appointments]
+      .filter((a) => ['pending', 'confirmed', 'cancelled'].includes(getDisplayStatus(a)))
+      .sort((a, b) => {
+         const dateA = getApptScheduledDate(a);
+         const dateB = getApptScheduledDate(b);
+         if (!dateA && !dateB) return 0;
+         if (!dateA) return 1;
+         if (!dateB) return -1;
+         return new Date(dateA) - new Date(dateB);
+      })
+      .slice(0, 5);
 
    const getFullUrl = (path) => {
       if (!path) return '#';
@@ -113,6 +141,59 @@ export default function PatientDashboard() {
                   >
                      {nextAppt ? t('patientDashboard.viewDetails') : t('patientDashboard.bookAppt')}
                   </button>
+               </div>
+            </div>
+
+            {/* Next Appointments (pending / confirmed / cancelled) */}
+            <div className="bg-white rounded-[24px] p-6 md:p-8 shadow-sm border border-slate-100 overflow-hidden">
+               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 gap-4">
+                  <div>
+                     <h3 className="text-lg font-bold text-slate-900 mb-1">{t('patientDashboard.nextApptsTitle', { defaultValue: 'Next Appointments' })}</h3>
+                     <p className="text-[13px] font-medium text-slate-500">{t('patientDashboard.nextApptsDesc', { defaultValue: 'Everything awaiting review, confirmed, or cancelled.' })}</p>
+                  </div>
+                  <button onClick={() => navigate('/patient/bookings')} className="text-[13px] font-bold text-primary-600 hover:text-primary-700 transition-colors">{t('patientDashboard.viewAllRecords')}</button>
+               </div>
+
+               <div className="divide-y divide-slate-50">
+                  {nextAppointments.length > 0 ? nextAppointments.map((appt) => {
+                     const displayStatus = getDisplayStatus(appt);
+                     const scheduledDate = getApptScheduledDate(appt);
+                     return (
+                        <div
+                           key={appt.id || appt.appointment_id}
+                           onClick={() => navigate(`/patient/appointments/${appt.id || appt.appointment_id}`)}
+                           className="flex items-center justify-between gap-4 py-4 first:pt-0 last:pb-0 cursor-pointer hover:bg-slate-50/60 -mx-2 px-2 rounded-xl transition-colors"
+                        >
+                           <div className="flex items-center gap-4 min-w-0">
+                              <div className="bg-primary-50 text-primary-600 rounded-full p-2.5 shrink-0">
+                                 <Clock3 className="w-4 h-4" />
+                              </div>
+                              <div className="min-w-0">
+                                 <div className="font-bold text-slate-800 text-sm truncate">{getApptDoctorName(appt, isRtl)}</div>
+                                 <div className="text-xs font-medium text-slate-500 truncate">{getApptSpecialization(appt, isRtl, t)}</div>
+                              </div>
+                           </div>
+                           <div className="flex items-center gap-3 shrink-0">
+                              <div className="text-end hidden sm:block">
+                                 <div className="text-xs font-bold text-slate-700">
+                                    {scheduledDate ? formatDate(scheduledDate, isRtl, { month: 'short', day: 'numeric' }) : t('appointmentDetails.pendingDate', { defaultValue: 'Pending Date' })}
+                                 </div>
+                                 <div className="text-[11px] text-slate-400 font-medium">
+                                    {scheduledDate ? formatTime(scheduledDate, isRtl) : ''}
+                                 </div>
+                              </div>
+                              <span className={cn("px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest", getAppointmentStatusColor(displayStatus))}>
+                                 {t(`bookings.${displayStatus}`, { defaultValue: displayStatus })}
+                              </span>
+                              <ChevronRight className="w-4 h-4 text-slate-300 rtl:rotate-180 hidden md:block" />
+                           </div>
+                        </div>
+                     );
+                  }) : (
+                     <div className="py-10 text-center text-slate-400 font-bold italic">
+                        {t('patientDashboard.noNextAppts', { defaultValue: 'No pending, confirmed, or cancelled appointments right now.' })}
+                     </div>
+                  )}
                </div>
             </div>
 

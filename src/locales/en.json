@@ -187,7 +187,10 @@
     "medications": "Medications",
     "noUpcoming": "You have no upcoming appointments. Stay on top of your health by booking a checkup.",
     "noRecords": "No medical records available at this time.",
-    "loadingRecords": "Loading clinical records..."
+    "loadingRecords": "Loading clinical records...",
+    "nextApptsTitle": "Next Appointments",
+    "nextApptsDesc": "Everything awaiting review, confirmed, or cancelled.",
+    "noNextAppts": "No pending, confirmed, or cancelled appointments right now."
   },
   "billing": {
     "title": "Billing & Payments",
@@ -422,7 +425,8 @@
     "guidance1": "Please arrive 15 minutes early",
     "guidance2": "Bring all current medications or a digital list for the doctor to review.",
     "scheduleAnother": "Schedule Another Appointment",
-    "returnToDashboard": "Return to Dashboard"
+    "returnToDashboard": "Return to Dashboard",
+    "printTitle": "Booking Receipt"
   },
   "appointmentDetails": {
     "appointments": "Appointments",
@@ -465,7 +469,8 @@
       "consultationFinished": "Clinical consultation finished"
     },
     "pendingDate": "Pending Date",
-    "pendingTime": "Pending Time"
+    "pendingTime": "Pending Time",
+    "adminNoteTitle": "Note from Clinic Administration"
   },
   "messages": {
     "title": "Secure Messaging",

@@ -187,7 +187,10 @@
     "medications": "الأدوية",
     "noUpcoming": "ليس لديك مواعيد قادمة متوقعة حالياً. حافظ على صحتك من خلال حجز موعد للفحص.",
     "noRecords": "لا توجد سجلات طبية متاحة في الوقت الحالي.",
-    "loadingRecords": "جاري تحميل السجلات ال..."
+    "loadingRecords": "جاري تحميل السجلات ال...",
+    "nextApptsTitle": "المواعيد القادمة",
+    "nextApptsDesc": "كل ما هو قيد المراجعة أو مؤكد أو ملغى.",
+    "noNextAppts": "لا توجد مواعيد معلقة أو مؤكدة أو ملغاة حالياً."
   },
   "billing": {
     "title": "الفواتير والمدفوعات",
@@ -430,7 +433,8 @@
     "guidance1": "يرجى الحضور قبل الموعد بـ 15 دقيقة",
     "guidance2": "يرجى إحضار جميع الأدوية الحالية أو قائمة رقمية ليقوم الطبيب بمراجعتها.",
     "scheduleAnother": "جدولة موعد آخر",
-    "returnToDashboard": "العودة للوحة التحكم"
+    "returnToDashboard": "العودة للوحة التحكم",
+    "printTitle": "إيصال الحجز"
   },
   "appointmentDetails": {
     "appointments": "المواعيد",
@@ -473,7 +477,8 @@
       "consultationFinished": "انتهت الاستشارة الطبية"
     },
     "pendingDate": "تاريخ معلق",
-    "pendingTime": "وقت معلق"
+    "pendingTime": "وقت معلق",
+    "adminNoteTitle": "ملاحظة من إدارة العيادة"
   },
   "messages": {
     "title": "المراسلة الآمنة",

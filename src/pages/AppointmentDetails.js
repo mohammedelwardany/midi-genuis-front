@@ -187,6 +187,19 @@ export default function AppointmentDetails() {
                  {appointment.notes || appointment.reason || t('appointmentDetails.noReason', { defaultValue: 'No additional reason or consultation notes provided.' })}
                </p>
             </div>
+
+            {/* Admin review note - most relevant when the clinic rejected the payment / cancelled the appointment, but shown whenever the admin left one */}
+            {paymentData?.notes && (
+              <div className={`mt-8 pt-8 border-t ${String(appointment.status).toLowerCase() === 'cancelled' ? 'border-rose-100' : 'border-slate-100'}`}>
+                <h3 className={`text-lg font-bold mb-3 flex items-center gap-2 ${String(appointment.status).toLowerCase() === 'cancelled' ? 'text-rose-600' : 'text-slate-900'}`}>
+                  <AlertTriangle className={`w-5 h-5 ${String(appointment.status).toLowerCase() === 'cancelled' ? 'text-rose-500' : 'text-orange-500'}`} />
+                  {t('appointmentDetails.adminNoteTitle', { defaultValue: 'Note from Clinic Administration' })}
+                </h3>
+                <p className={`leading-relaxed font-medium p-5 rounded-2xl border ${String(appointment.status).toLowerCase() === 'cancelled' ? 'text-rose-700 bg-rose-50 border-rose-100' : 'text-slate-600 bg-slate-50 border-slate-100'}`}>
+                  {paymentData.notes}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Pre-Visit Instructions */}
@@ -412,6 +425,13 @@ export default function AppointmentDetails() {
                     <td className="p-3 capitalize">{paymentData.status || 'N/A'}</td>
                     <td className="p-3 text-end font-extrabold">{formatCurrency(paymentData.amount, isRtl)}</td>
                   </tr>
+                  {paymentData.notes && (
+                    <tr>
+                      <td className="p-3" colSpan={3}>
+                        <span className="font-bold text-slate-500">{t('appointmentDetails.adminNoteTitle', { defaultValue: 'Note from Clinic Administration' })}:</span> {paymentData.notes}
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

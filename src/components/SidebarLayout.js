@@ -62,7 +62,10 @@ export default function SidebarLayout() {
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans relative overflow-x-hidden">
       <TopNav
         title={t('app.patientPortalTitle', { defaultValue: 'MediGenius Patient Portal' })}
-        tabs={[{name: t('nav.bookVisit'), href: '/patient/book/doctors'}]}
+        tabs={[
+          { name: t('nav.dashboard'), href: '/patient/dashboard' },
+          { name: t('nav.bookVisit'), href: '/patient/book/doctors' },
+        ]}
         onMenuClick={toggleMobileMenu}
       />
       <div className="flex flex-1 relative">
