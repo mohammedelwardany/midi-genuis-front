@@ -208,7 +208,7 @@ const patientSlice = createSlice({
 
     builder
       .addCase(updatePatient.fulfilled, (s, { payload }) => {
-        const updated = payload.data ?? payload;
+        const updated = payload.updatedPatient ?? payload;
         const uid = updated.user_id || updated.id;
         const idx = s.list.findIndex(p => (p.user_id || p.id) === uid);
         if (idx !== -1) s.list[idx] = updated;

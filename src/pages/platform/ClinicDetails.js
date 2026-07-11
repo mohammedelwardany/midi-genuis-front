@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Loader2, UserPlus, ShieldCheck, ShieldAlert, Save, LogIn, Palette } from 'lucide-react';
+import { ArrowLeft, Loader2, UserPlus, ShieldCheck, ShieldAlert, Save, LogIn, Palette, Trash2, KeyRound, Copy, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
 import {
   fetchClinicById,
   addClinicAdmin,
+  deleteClinicAdmin,
+  resetAdminPassword,
   updateSubscription,
   updateClinicStatus,
   updateClinicBranding,
@@ -17,6 +19,7 @@ import {
   selectPlatformLoading,
 } from '../../store/slices/platformSlice';
 import { impersonateClinicAdmin } from '../../store/slices/authSlice';
+import ModalPortal from '../../components/ModalPortal';
 
 export default function ClinicDetails() {
   const { id } = useParams();
@@ -41,6 +44,10 @@ export default function ClinicDetails() {
   const [addingAdmin, setAddingAdmin] = useState(false);
   const [savingBrand, setSavingBrand] = useState(false);
   const [impersonatingId, setImpersonatingId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
+  const [resettingId, setResettingId] = useState(null);
+  const [resetResult, setResetResult] = useState(null); // { email, tempPassword }
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     dispatch(fetchClinicById(id));
@@ -153,6 +160,46 @@ export default function ClinicDetails() {
     } finally {
       setImpersonatingId(null);
     }
+  };
+
+  const handleDeleteAdmin = async (admin) => {
+    if (!window.confirm(isRtl
+      ? `هل تريد حذف حساب المسؤول ${admin.email}؟ لا يمكن التراجع عن هذا الإجراء.`
+      : `Delete admin account ${admin.email}? This cannot be undone.`)) {
+      return;
+    }
+    setDeletingId(admin.id);
+    try {
+      await dispatch(deleteClinicAdmin(admin.id)).unwrap();
+      toast.success(isRtl ? 'تم حذف المسؤول' : 'Admin deleted');
+    } catch (err) {
+      toast.error(err?.message || (isRtl ? 'فشل حذف المسؤول' : 'Failed to delete admin'));
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const handleResetPassword = async (admin) => {
+    if (!window.confirm(isRtl
+      ? `إعادة تعيين كلمة مرور ${admin.email}؟ سيُطلب منه تعيين كلمة مرور جديدة عند تسجيل الدخول التالي.`
+      : `Reset the password for ${admin.email}? They'll be required to set a new one on their next login.`)) {
+      return;
+    }
+    setResettingId(admin.id);
+    try {
+      const result = await dispatch(resetAdminPassword(admin.id)).unwrap();
+      setResetResult({ email: result.email, tempPassword: result.tempPassword });
+      setCopied(false);
+    } catch (err) {
+      toast.error(err?.message || (isRtl ? 'فشلت إعادة تعيين كلمة المرور' : 'Failed to reset password'));
+    } finally {
+      setResettingId(null);
+    }
+  };
+
+  const handleCopyTempPassword = () => {
+    navigator.clipboard.writeText(resetResult.tempPassword);
+    setCopied(true);
   };
 
   if (loading && !clinic) {
@@ -342,15 +389,33 @@ export default function ClinicDetails() {
                 <span className="font-bold text-slate-800 text-sm block">{admin.email}</span>
                 <span className="text-xs text-slate-400">{new Date(admin.created_at).toLocaleDateString(isRtl ? 'ar-EG' : 'en-US')}</span>
               </div>
-              <button
-                onClick={() => handleImpersonate(admin.id)}
-                disabled={impersonatingId === admin.id}
-                className="bg-indigo-50 hover:bg-indigo-100 disabled:opacity-60 text-indigo-600 border border-indigo-100 font-bold px-3 py-1.5 rounded-lg text-xs transition flex items-center gap-1.5"
-                title={isRtl ? 'تسجيل الدخول كهذا المسؤول' : 'Log in as this admin'}
-              >
-                {impersonatingId === admin.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <LogIn className="w-3.5 h-3.5" />}
-                {isRtl ? 'تسجيل الدخول كـ' : 'Log in as'}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleImpersonate(admin.id)}
+                  disabled={impersonatingId === admin.id}
+                  className="bg-indigo-50 hover:bg-indigo-100 disabled:opacity-60 text-indigo-600 border border-indigo-100 font-bold px-3 py-1.5 rounded-lg text-xs transition flex items-center gap-1.5"
+                  title={isRtl ? 'تسجيل الدخول كهذا المسؤول' : 'Log in as this admin'}
+                >
+                  {impersonatingId === admin.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <LogIn className="w-3.5 h-3.5" />}
+                  {isRtl ? 'تسجيل الدخول كـ' : 'Log in as'}
+                </button>
+                <button
+                  onClick={() => handleResetPassword(admin)}
+                  disabled={resettingId === admin.id}
+                  className="bg-amber-50 hover:bg-amber-100 disabled:opacity-60 text-amber-600 border border-amber-100 font-bold p-1.5 rounded-lg text-xs transition"
+                  title={isRtl ? 'إعادة تعيين كلمة المرور' : 'Reset password'}
+                >
+                  {resettingId === admin.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <KeyRound className="w-3.5 h-3.5" />}
+                </button>
+                <button
+                  onClick={() => handleDeleteAdmin(admin)}
+                  disabled={deletingId === admin.id}
+                  className="bg-rose-50 hover:bg-rose-100 disabled:opacity-60 text-rose-600 border border-rose-100 font-bold p-1.5 rounded-lg text-xs transition"
+                  title={isRtl ? 'حذف هذا المسؤول' : 'Delete this admin'}
+                >
+                  {deletingId === admin.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -371,6 +436,40 @@ export default function ClinicDetails() {
           </button>
         </form>
       </div>
+
+      {resetResult && (
+        <ModalPortal>
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4" onClick={() => setResetResult(null)}>
+            <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl" onClick={(e) => e.stopPropagation()}>
+              <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mb-4">
+                <KeyRound className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-extrabold text-slate-900 mb-2">{isRtl ? 'تم إعادة تعيين كلمة المرور' : 'Password Reset'}</h3>
+              <p className="text-sm font-medium text-slate-500 mb-5">
+                {isRtl
+                  ? `شارك كلمة المرور المؤقتة هذه مع ${resetResult.email} خارج التطبيق. لن تظهر مرة أخرى.`
+                  : `Share this temporary password with ${resetResult.email} outside the app. It won't be shown again.`}
+              </p>
+              <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl p-4 mb-6">
+                <code className="flex-1 font-mono text-sm font-bold text-slate-900 break-all">{resetResult.tempPassword}</code>
+                <button
+                  onClick={handleCopyTempPassword}
+                  className="shrink-0 p-2 rounded-lg text-slate-500 hover:bg-slate-200 transition-colors"
+                  title={isRtl ? 'نسخ' : 'Copy'}
+                >
+                  {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                </button>
+              </div>
+              <button
+                onClick={() => setResetResult(null)}
+                className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl text-sm transition"
+              >
+                {isRtl ? 'تم' : 'Done'}
+              </button>
+            </div>
+          </div>
+        </ModalPortal>
+      )}
     </div>
   );
 }

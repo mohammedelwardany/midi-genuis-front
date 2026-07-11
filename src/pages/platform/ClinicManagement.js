@@ -53,6 +53,17 @@ export default function ClinicManagement() {
     return 'bg-slate-50 text-slate-600 border border-slate-100';
   };
 
+  // "used / allowed" - null max reads as unlimited (no ceiling to divide by)
+  const quotaFraction = (used, max) => (max === null || max === undefined ? `${used}` : `${used} / ${max}`);
+
+  // Doctors are capped per-specialization, not as a single clinic-wide
+  // number - the effective ceiling is that per-specialization cap times how
+  // many specializations the clinic is allowed to offer at all.
+  const effectiveMaxDoctors = (clinic) =>
+    clinic.max_doctors_per_specialization != null && clinic.max_specializations != null
+      ? clinic.max_doctors_per_specialization * clinic.max_specializations
+      : null;
+
   const toInt = (v) => (v === '' ? null : parseInt(v, 10));
 
   const handleCreate = async (e) => {
@@ -149,8 +160,10 @@ export default function ClinicManagement() {
                     <td className="p-3 font-extrabold text-slate-800">{clinic.name}</td>
                     <td className="p-3 text-slate-500 font-mono text-xs">{clinic.subdomain}</td>
                     <td className="p-3 text-slate-600">{clinic.plan_catalog_name || clinic.plan_name}</td>
-                    <td className="p-3 text-slate-600">{clinic.doctor_count}</td>
-                    <td className="p-3 text-slate-600">{clinic.patient_count}</td>
+                    <td className="p-3 text-slate-600 font-mono text-xs" title={isRtl ? 'مبني على الحد لكل تخصص × عدد التخصصات المسموح بها' : 'Derived from the per-specialization cap × allowed specializations'}>
+                      {quotaFraction(clinic.doctor_count, effectiveMaxDoctors(clinic))}
+                    </td>
+                    <td className="p-3 text-slate-600 font-mono text-xs">{quotaFraction(clinic.patient_count, clinic.max_patients)}</td>
                     <td className="p-3">
                       <span className={`px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-widest ${statusColor(clinic.subscription_status)}`}>
                         {clinic.subscription_status}

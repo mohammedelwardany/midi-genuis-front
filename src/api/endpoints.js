@@ -12,6 +12,7 @@ export const ENDPOINTS = {
     logout: '/auth/logout',
     refresh: '/auth/refresh',
     register: '/patients/register',
+    completePasswordReset: '/auth/complete-password-reset',
   },
 
   // ── Patients ──────────────────────────────────────
@@ -97,6 +98,8 @@ export const ENDPOINTS = {
     clinics: '/platform/clinics',
     clinicById: (id) => `/platform/clinics/${id}`,
     addClinicAdmin: (id) => `/platform/clinics/${id}/admins`,
+    deleteClinicAdmin: (id) => `/platform/admins/${id}`,
+    resetAdminPassword: (id) => `/platform/admins/${id}/reset-password`,
     updateSubscription: (id) => `/platform/clinics/${id}/subscription`,
     updateClinicStatus: (id) => `/platform/clinics/${id}/status`,
     updateClinicBranding: (id) => `/platform/clinics/${id}/branding`,

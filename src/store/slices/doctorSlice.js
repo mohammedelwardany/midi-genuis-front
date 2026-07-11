@@ -176,7 +176,7 @@ const doctorSlice = createSlice({
       .addCase(addDoctor.pending, (s) => { s.loading = true; })
       .addCase(addDoctor.fulfilled, (s, { payload }) => {
         s.loading = false;
-        const newDoctor = payload.data ?? payload;
+        const newDoctor = payload.doctor ?? payload;
         s.list.push(newDoctor);
       })
       .addCase(addDoctor.rejected, (s, { payload }) => {
@@ -189,7 +189,7 @@ const doctorSlice = createSlice({
       .addCase(updateDoctor.pending, (s) => { s.loading = true; })
       .addCase(updateDoctor.fulfilled, (s, { payload }) => {
         s.loading = false;
-        const updatedDoctor = payload.data ?? payload;
+        const updatedDoctor = payload.doctor ?? payload;
         const index = s.list.findIndex(d => d.id === updatedDoctor.id);
         if (index !== -1) s.list[index] = updatedDoctor;
         if (s.selected?.id === updatedDoctor.id) s.selected = updatedDoctor;

@@ -147,7 +147,7 @@ export default function SubscriptionPlans() {
                 <tr className="border-b border-slate-100 text-slate-400 text-xs font-bold uppercase tracking-wider">
                   <th className="p-3 text-start">{isRtl ? 'الاسم' : 'Name'}</th>
                   <th className="p-3 text-start">{isRtl ? 'المسؤولون' : 'Admins'}</th>
-                  <th className="p-3 text-start">{isRtl ? 'الأطباء / تخصص' : 'Doctors / Specialization'}</th>
+                  <th className="p-3 text-start">{isRtl ? 'الأطباء لكل تخصص' : 'Doctors Per Specialization'}</th>
                   <th className="p-3 text-start">{isRtl ? 'المرضى' : 'Patients'}</th>
                   <th className="p-3 text-start">{isRtl ? 'المواعيد الشهرية' : 'Monthly Appts'}</th>
                   <th className="p-3 text-start">{isRtl ? 'التخصصات' : 'Specializations'}</th>

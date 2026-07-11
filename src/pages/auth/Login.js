@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { Lock, Mail, ArrowRight } from 'lucide-react';
 import { useSiteConfig } from '../../context/SiteConfigContext';
-import { loginUser, selectAuthLoading, selectAuthError, selectIsLoggedIn, selectUserRole } from '../../store/slices/authSlice';
+import { loginUser, selectAuthLoading, selectAuthError, selectIsLoggedIn, selectUserRole, selectCurrentUser } from '../../store/slices/authSlice';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -19,15 +19,18 @@ export default function Login() {
   const apiError = useSelector(selectAuthError);
   const isLoggedIn = useSelector(selectIsLoggedIn);
   const userRole = useSelector(selectUserRole);
+  const currentUser = useSelector(selectCurrentUser);
 
   useEffect(() => {
     if (isLoggedIn && userRole) {
-      if (userRole === 'platform_admin') navigate('/platform/dashboard');
+      if (currentUser?.must_reset_password) {
+        navigate('/reset-required');
+      } else if (userRole === 'platform_admin') navigate('/platform/dashboard');
       else if (userRole === 'admin') navigate('/admin/dashboard');
       else if (userRole === 'doctor') navigate('/doctor/dashboard');
       else navigate('/patient/dashboard');
     }
-  }, [isLoggedIn, userRole, navigate]);
+  }, [isLoggedIn, userRole, currentUser, navigate]);
 
   const handleLogin = (e) => {
     e.preventDefault();

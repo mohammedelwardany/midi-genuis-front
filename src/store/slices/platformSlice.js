@@ -70,6 +70,29 @@ export const addClinicAdmin = createAsyncThunk(
   }
 );
 
+export const deleteClinicAdmin = createAsyncThunk(
+  'platform/deleteClinicAdmin',
+  async (adminId, { rejectWithValue }) => {
+    try {
+      await apiClient.del(ENDPOINTS.platform.deleteClinicAdmin(adminId));
+      return { adminId };
+    } catch (err) {
+      return rejectWithValue({ message: err.message, status: err.status });
+    }
+  }
+);
+
+export const resetAdminPassword = createAsyncThunk(
+  'platform/resetAdminPassword',
+  async (adminId, { rejectWithValue }) => {
+    try {
+      return await apiClient.put(ENDPOINTS.platform.resetAdminPassword(adminId));
+    } catch (err) {
+      return rejectWithValue({ message: err.message, status: err.status });
+    }
+  }
+);
+
 export const updateSubscription = createAsyncThunk(
   'platform/updateSubscription',
   async ({ id, data }, { rejectWithValue }) => {
@@ -149,9 +172,10 @@ export const changeOwnPassword = createAsyncThunk(
 
 export const fetchAuditLogs = createAsyncThunk(
   'platform/fetchAuditLogs',
-  async (clinicId, { rejectWithValue }) => {
+  async ({ clinicId, page = 1, pageSize = 20 } = {}, { rejectWithValue }) => {
     try {
-      return await apiClient.get(ENDPOINTS.platform.auditLogs, clinicId ? { params: { clinic_id: clinicId } } : {});
+      const params = { page, page_size: pageSize, ...(clinicId ? { clinic_id: clinicId } : {}) };
+      return await apiClient.get(ENDPOINTS.platform.auditLogs, { params });
     } catch (err) {
       return rejectWithValue({ message: err.message, status: err.status });
     }
@@ -212,6 +236,10 @@ const platformSlice = createSlice({
     selectedClinic: null,
     platformAdmins: [],
     auditLogs: [],
+    auditLogsTotal: 0,
+    auditLogsPage: 1,
+    auditLogsPageSize: 20,
+    auditLogsTotalPages: 1,
     subscriptionPlans: [],
     loading: false,
     error: null,
@@ -284,6 +312,16 @@ const platformSlice = createSlice({
       });
 
     builder
+      .addCase(deleteClinicAdmin.fulfilled, (s, { payload }) => {
+        if (s.selectedClinic) {
+          s.selectedClinic.admins = (s.selectedClinic.admins || []).filter((a) => a.id !== payload.adminId);
+        }
+      })
+      .addCase(deleteClinicAdmin.rejected, (s, { payload }) => {
+        s.error = payload?.message || 'Failed to delete clinic admin';
+      });
+
+    builder
       .addCase(updateSubscription.fulfilled, (s, { payload }) => {
         if (s.selectedClinic) {
           s.selectedClinic = {
@@ -352,7 +390,11 @@ const platformSlice = createSlice({
       .addCase(fetchAuditLogs.pending, (s) => { s.loading = true; s.error = null; })
       .addCase(fetchAuditLogs.fulfilled, (s, { payload }) => {
         s.loading = false;
-        s.auditLogs = payload;
+        s.auditLogs = payload.logs;
+        s.auditLogsTotal = payload.total;
+        s.auditLogsPage = payload.page;
+        s.auditLogsPageSize = payload.pageSize;
+        s.auditLogsTotalPages = payload.totalPages;
       })
       .addCase(fetchAuditLogs.rejected, (s, { payload }) => {
         s.loading = false;
@@ -406,6 +448,10 @@ export const selectClinics = (state) => state.platform.clinics;
 export const selectSelectedClinic = (state) => state.platform.selectedClinic;
 export const selectPlatformAdmins = (state) => state.platform.platformAdmins;
 export const selectAuditLogs = (state) => state.platform.auditLogs;
+export const selectAuditLogsTotal = (state) => state.platform.auditLogsTotal;
+export const selectAuditLogsPage = (state) => state.platform.auditLogsPage;
+export const selectAuditLogsPageSize = (state) => state.platform.auditLogsPageSize;
+export const selectAuditLogsTotalPages = (state) => state.platform.auditLogsTotalPages;
 export const selectSubscriptionPlans = (state) => state.platform.subscriptionPlans;
 export const selectPlatformLoading = (state) => state.platform.loading;
 export const selectPlatformError = (state) => state.platform.error;

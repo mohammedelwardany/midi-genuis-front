@@ -11,6 +11,7 @@ import AdminLayout from './components/AdminLayout';
 
 // Auth Pages
 import Login from './pages/auth/Login';
+import ResetRequired from './pages/auth/ResetRequired';
 import Register from './pages/auth/Register';
 
 // Patient Pages
@@ -116,6 +117,7 @@ function App() {
         {/* Core Auth & Entry */}
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/reset-required" element={<ResetRequired />} />
         <Route path="/register" element={<Register />} />
 
         {/* Patient Portal Main Layout */}

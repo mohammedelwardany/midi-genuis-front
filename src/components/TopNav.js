@@ -22,6 +22,16 @@ export default function TopNav({ title = "MediGenius Patient Portal", tabs = [],
     i18n.changeLanguage(newLang);
   };
 
+  // TopNav is mounted by every authenticated layout, so this is the one
+  // place a forced password reset can be enforced regardless of which page
+  // the user navigates to directly (Login.js only catches it right after
+  // signing in).
+  useEffect(() => {
+    if (user?.must_reset_password && location.pathname !== '/reset-required') {
+      navigate('/reset-required');
+    }
+  }, [user, location.pathname, navigate]);
+
   const getSettingsPath = () => {
     if (location.pathname.startsWith('/doctor')) return '/doctor/settings';
     if (location.pathname.startsWith('/platform')) return '/platform/settings';

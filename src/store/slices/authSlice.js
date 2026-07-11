@@ -88,6 +88,20 @@ export const returnFromImpersonation = createAsyncThunk(
   }
 );
 
+// Self-service completion of a platform-admin-forced password reset. The
+// user is already authenticated (they logged in with the temp password) -
+// this just replaces it and clears the must_reset_password flag.
+export const completePasswordReset = createAsyncThunk(
+  'auth/completePasswordReset',
+  async (newPassword, { rejectWithValue }) => {
+    try {
+      return await apiClient.put(ENDPOINTS.auth.completePasswordReset, { new_password: newPassword });
+    } catch (err) {
+      return rejectWithValue({ message: err.message, status: err.status });
+    }
+  }
+);
+
 // ─── Slice ────────────────────────────────────────────────────────────────────
 
 const storedUser = localStorage.getItem('user_data');
@@ -149,6 +163,15 @@ const authSlice = createSlice({
         s.loading = false;
         s.error = payload?.message || 'Registration failed';
       });
+
+    // Forced password reset completed - clear the flag locally so the app
+    // stops redirecting to the reset-required screen.
+    builder.addCase(completePasswordReset.fulfilled, (s) => {
+      if (s.user) {
+        s.user = { ...s.user, must_reset_password: false };
+        localStorage.setItem('user_data', JSON.stringify(s.user));
+      }
+    });
 
     // Update Profile (Sync with Patient Update)
     builder.addCase(updateMe.fulfilled, (s, { payload }) => {
