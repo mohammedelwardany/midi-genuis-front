@@ -18,21 +18,10 @@
     "emergencyContact": "اتصال الطوارئ",
     "notifications": "الإشعارات",
     "markAllRead": "تحديد الكل كمقروء",
-    "viewAll": "عرض جميع الأنشطة",
+    "noNotifications": "لا توجد إشعارات جديدة",
     "myProfile": "ملفي الشخصي",
     "accountSettings": "إعدادات الحساب",
-    "logOut": "تسجيل الخروج",
-    "notificationsList": {
-      "appointmentConfirmedTitle": "تم تأكيد الموعد",
-      "appointmentConfirmedBody": "تم تأكيد موعدك مع الدكتور تشين غداً الساعة 10:00 صباحاً.",
-      "tenMinutesAgo": "منذ 10 دقائق",
-      "newLabResultsTitle": "نتائج مختبر جديدة",
-      "newLabResultsBody": "نتائج تحليل الأيض الشامل الأخيرة أصبحت متاحة.",
-      "twoHoursAgo": "منذ ساعتين",
-      "actionRequiredTitle": "إجراء مطلوب",
-      "actionRequiredBody": "يرجى إكمال نماذج ما قبل الزيارة.",
-      "yesterday": "أمس"
-    }
+    "logOut": "تسجيل الخروج"
   },
   "app": {
     "patientPortalTitle": "بوابة المرضى {{appName}}",

@@ -6,6 +6,7 @@ import adminReducer       from './slices/adminSlice';
 import appointmentReducer from './slices/appointmentSlice';
 import paymentReducer     from './slices/paymentSlice';
 import platformReducer    from './slices/platformSlice';
+import notificationReducer from './slices/notificationSlice';
 
 const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ const store = configureStore({
     appointments: appointmentReducer,
     payments:     paymentReducer,
     platform:     platformReducer,
+    notifications: notificationReducer,
   },
   devTools: process.env.NODE_ENV !== 'production',
 });

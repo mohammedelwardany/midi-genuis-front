@@ -117,4 +117,12 @@ export const ENDPOINTS = {
   clinic: {
     branding: '/clinics/branding',
   },
+
+  // ── Notifications ───────────────────────────────────
+  notifications: {
+    list: '/notifications',
+    unreadCount: '/notifications/unread-count',
+    markRead: (id) => `/notifications/${id}/read`,
+    markAllRead: '/notifications/read-all',
+  },
 };
