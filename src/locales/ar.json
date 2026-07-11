@@ -339,7 +339,7 @@
     "descriptionPrefix": "اختر تاريخاً ووقتاً متاحين لـ",
     "timezone": "المنطقة الزمنية الحالية: GMT -5 (EST).",
     "selectedDate": "التاريخ المختار",
-    "availableBlocks": "تم العثور على 3 فترات متاحة",
+    "availableBlocks": "تم العثور على {{count}} موعد متاح",
     "morningSlots": "فترات الصباح",
     "afternoonSlots": "فترات الظهيرة",
     "eveningSlots": "فترات المساء",
@@ -600,7 +600,21 @@
     "notesPlaceholder": "اذكر أي متطلبات محددة للمرضى، مثل 'يتطلب صياماً قبل الموعد' أو 'إحضار قائمة الأدوية الحالية'...",
     "plannedDates": "تواريخ الجدول المخططة",
     "operationalNotes": "ملاحظات تشغيلية",
-    "discardChanges": "تجاهل التغييرات"
+    "discardChanges": "تجاهل التغييرات",
+    "timePeriods": "الفترات الزمنية",
+    "totalBlocks": "إجمالي الفترات",
+    "dailyPattern": "النمط اليومي",
+    "period": {
+      "morning": "صباحاً",
+      "afternoon": "بعد الظهر",
+      "evening": "مساءً"
+    },
+    "errorNoDays": "يرجى تحديد يوم نشاط واحد على الأقل",
+    "errorNoPeriods": "يرجى تحديد فترة زمنية واحدة على الأقل (صباحاً/بعد الظهر/مساءً)",
+    "errorNoBlocks": "لم يتم إنشاء أي فترات توفر للأيام المحددة",
+    "errorSaving": "فشل حفظ التوفر",
+    "generatingBlocks": "جارٍ إنشاء {{count}} فترة توفر للشهر القادم...",
+    "blocksConfigured": "تم ضبط {{count}} فترة توفر للشهر بنجاح"
   },
   "doctorSettings": {
     "title": "إعدادات ملف الطبيب",

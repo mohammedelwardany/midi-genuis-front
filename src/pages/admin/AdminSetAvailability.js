@@ -4,15 +4,16 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { Settings, Plus, LayoutGrid, List as ListIcon, Clock, MapPin, Calendar, Loader2, ArrowLeft, ArrowRight, UserCircle, Briefcase } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { 
-  fetchUpcomingAvailability, 
-  addAvailability, 
+import {
+  fetchUpcomingAvailability,
+  addAvailability,
   fetchDoctorById,
-  selectDoctorSchedule, 
+  selectDoctorSchedule,
   selectDoctorsLoading,
   selectSelectedDoctor
 } from '../../store/slices/doctorSlice';
 import ModalPortal from '../../components/ModalPortal';
+import { PERIODS, defaultPeriodTimes } from '../../utils/availabilityPeriods';
 
 export default function AdminSetAvailability() {
   const { id: doctorId } = useParams();
@@ -29,11 +30,19 @@ export default function AdminSetAvailability() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
-  const [newSlot, setNewSlot] = useState({
-    available_date: new Date().toISOString().split('T')[0],
-    start_time: '08:00',
-    end_time: '11:00'
-  });
+  const [newSlotDate, setNewSlotDate] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedPeriods, setSelectedPeriods] = useState(['morning']);
+  const [periodTimes, setPeriodTimes] = useState(defaultPeriodTimes());
+
+  const togglePeriod = (periodId) => {
+    setSelectedPeriods(prev =>
+      prev.includes(periodId) ? prev.filter(p => p !== periodId) : [...prev, periodId]
+    );
+  };
+
+  const setPeriodTime = (periodId, field, value) => {
+    setPeriodTimes(prev => ({ ...prev, [periodId]: { ...prev[periodId], [field]: value } }));
+  };
 
   const getTimeInMinutes = (timeStr) => {
     const [h, m] = timeStr.split(':').map(Number);
@@ -101,13 +110,17 @@ export default function AdminSetAvailability() {
 
   const handleAddSlot = async (e) => {
     if (e) e.preventDefault();
+    if (selectedPeriods.length === 0) {
+      toast.error(t('doctorConfigureAvailability.errorNoPeriods', { defaultValue: 'Please select at least one time period (morning/afternoon/evening)' }));
+      return;
+    }
     try {
-      await dispatch(addAvailability({
+      await Promise.all(selectedPeriods.map(periodId => dispatch(addAvailability({
         doctor_user_id: parseInt(doctorId, 10),
-        available_date: newSlot.available_date,
-        start_time: newSlot.start_time,
-        end_time: newSlot.end_time
-      })).unwrap();
+        available_date: newSlotDate,
+        start_time: periodTimes[periodId].start,
+        end_time: periodTimes[periodId].end
+      })).unwrap()));
 
       toast.success(t('doctorSchedule.slotAdded', { defaultValue: 'Availability block added successfully' }));
       setShowAddModal(false);
@@ -258,23 +271,57 @@ export default function AdminSetAvailability() {
       {showAddModal && (
         <ModalPortal>
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white rounded-[32px] w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95 duration-300">
+          <div className="bg-white rounded-[32px] w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-extrabold text-slate-900 mb-6">{t('doctorSchedule.addAvailability')}</h3>
             <form onSubmit={handleAddSlot} className="space-y-6">
               <div>
                 <label className="block text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-2">{t('doctorSchedule.availableDate')}</label>
-                <input type="date" required value={newSlot.available_date} onChange={(e) => setNewSlot({...newSlot, available_date: e.target.value})} className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 font-semibold focus:ring-2 focus:ring-primary-500" />
+                <input type="date" required value={newSlotDate} onChange={(e) => setNewSlotDate(e.target.value)} className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 font-semibold focus:ring-2 focus:ring-primary-500" />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-2">{t('doctorSchedule.startTime')}</label>
-                  <input type="time" required value={newSlot.start_time} onChange={(e) => setNewSlot({...newSlot, start_time: e.target.value})} className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 font-semibold focus:ring-2 focus:ring-primary-500" />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-2">{t('doctorSchedule.endTime')}</label>
-                  <input type="time" required value={newSlot.end_time} onChange={(e) => setNewSlot({...newSlot, end_time: e.target.value})} className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 font-semibold focus:ring-2 focus:ring-primary-500" />
+
+              <div>
+                <label className="block text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-3">{t('doctorConfigureAvailability.timePeriods', { defaultValue: 'Time Periods' })}</label>
+                <div className="space-y-3">
+                  {PERIODS.map(period => {
+                    const isActive = selectedPeriods.includes(period.id);
+                    const Icon = period.icon;
+                    return (
+                      <div key={period.id} className={`rounded-2xl border-2 transition-all overflow-hidden ${isActive ? 'border-primary-200 bg-primary-50/30' : 'border-slate-100 bg-slate-50/50'}`}>
+                        <button
+                          type="button"
+                          onClick={() => togglePeriod(period.id)}
+                          className="w-full flex items-center justify-between px-4 py-3"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isActive ? 'bg-primary-600 text-white' : 'bg-white text-slate-400 border border-slate-100'}`}>
+                              <Icon className="w-4 h-4" />
+                            </div>
+                            <span className={`font-bold text-sm ${isActive ? 'text-primary-700' : 'text-slate-500'}`}>
+                              {t(`doctorConfigureAvailability.period.${period.id}`, { defaultValue: period.id.charAt(0).toUpperCase() + period.id.slice(1) })}
+                            </span>
+                          </div>
+                          <div className={`w-10 h-6 rounded-full p-0.5 transition-colors ${isActive ? 'bg-primary-600' : 'bg-slate-200'}`}>
+                            <div className={`w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${isActive ? 'translate-x-4 rtl:-translate-x-4' : 'translate-x-0'}`} />
+                          </div>
+                        </button>
+                        {isActive && (
+                          <div className="grid grid-cols-2 gap-3 px-4 pb-4">
+                            <div>
+                              <label className="block text-[9px] font-extrabold text-slate-400 uppercase tracking-widest mb-1.5">{t('doctorSchedule.startTime')}</label>
+                              <input type="time" required value={periodTimes[period.id].start} onChange={(e) => setPeriodTime(period.id, 'start', e.target.value)} className="w-full bg-white border-2 border-slate-100 focus:border-primary-500 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-800 outline-none" />
+                            </div>
+                            <div>
+                              <label className="block text-[9px] font-extrabold text-slate-400 uppercase tracking-widest mb-1.5">{t('doctorSchedule.endTime')}</label>
+                              <input type="time" required value={periodTimes[period.id].end} onChange={(e) => setPeriodTime(period.id, 'end', e.target.value)} className="w-full bg-white border-2 border-slate-100 focus:border-primary-500 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-800 outline-none" />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
+
               <div className="flex gap-3 pt-2">
                 <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 px-6 py-3.5 bg-slate-100 text-slate-600 font-extrabold text-sm rounded-xl hover:bg-slate-200">{t('common.cancel')}</button>
                 <button type="submit" disabled={loading} className="flex-1 px-6 py-3.5 bg-primary-600 text-white font-extrabold text-sm rounded-xl hover:bg-primary-700 flex items-center justify-center gap-2">

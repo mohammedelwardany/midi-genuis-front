@@ -36,21 +36,19 @@ export default function PatientDashboard() {
 
    const isRtl = i18n.language.startsWith('ar');
 
-   // "Next Appointments" widget: everything still in play (pending/confirmed/
-   // cancelled) rather than just the single soonest one the hero card shows -
-   // lets a patient see a rejected/cancelled booking at a glance, not just
-   // whatever's next on the calendar. Excludes 'completed' (a derived status
-   // for past confirmed visits - that's what Visit History is for).
+   // "Next Appointments" widget: every appointment scheduled in the future,
+   // regardless of status - a pending or even cancelled appointment that's
+   // still ahead on the calendar is just as relevant to see here as a
+   // confirmed one. Past-dated appointments (of any status) belong in Visit
+   // History, not here, so they're excluded even if their status is
+   // technically 'pending' or 'cancelled'.
+   const now = new Date();
    const nextAppointments = [...appointments]
-      .filter((a) => ['pending', 'confirmed', 'cancelled'].includes(getDisplayStatus(a)))
-      .sort((a, b) => {
-         const dateA = getApptScheduledDate(a);
-         const dateB = getApptScheduledDate(b);
-         if (!dateA && !dateB) return 0;
-         if (!dateA) return 1;
-         if (!dateB) return -1;
-         return new Date(dateA) - new Date(dateB);
+      .filter((a) => {
+         const scheduledDate = getApptScheduledDate(a);
+         return scheduledDate && new Date(scheduledDate) >= now;
       })
+      .sort((a, b) => new Date(getApptScheduledDate(a)) - new Date(getApptScheduledDate(b)))
       .slice(0, 5);
 
    const getFullUrl = (path) => {

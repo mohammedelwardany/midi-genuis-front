@@ -18,6 +18,7 @@ import {
 } from '../../store/slices/patientSlice';
 import { createAppointment } from '../../store/slices/appointmentSlice';
 import { initiatePayment, uploadReceipt, reviewPayment } from '../../store/slices/paymentSlice';
+import { generateSlotsForDate, getDatesWithOpenSlots, isSameSlot } from '../../utils/availabilitySlots';
 
 export default function AdminBookVisit() {
    const { id: patientId } = useParams();
@@ -164,8 +165,12 @@ export default function AdminBookVisit() {
       return name?.toLowerCase().includes(searchQuery.toLowerCase());
    });
 
-   const availableDates = [...new Set(availability.map(slot => new Date(slot.available_date).toISOString().split('T')[0]))];
-   const slotsForSelectedDate = availability.filter(slot => new Date(slot.available_date).toISOString().split('T')[0] === selectedDate);
+   // Each doctor_availability row is a whole window (e.g. 08:00-18:00), not a
+   // single bookable slot - split every window into real appointment_duration
+   // sized slots, matching the same logic PickSchedule.js uses for patients.
+   const appointmentDuration = selectedDoctor?.appointment_duration || 15;
+   const availableDates = getDatesWithOpenSlots(availability, appointmentDuration);
+   const slotsForSelectedDate = generateSlotsForDate(availability, selectedDate, appointmentDuration);
 
    const patientName = i18n.language.startsWith('ar') ? (selectedPatient?.name_ar || selectedPatient?.name) : (selectedPatient?.name_en || selectedPatient?.name);
 
@@ -287,15 +292,25 @@ export default function AdminBookVisit() {
                      <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm h-[300px] overflow-y-auto custom-scrollbar">
                         <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-4">{t('adminBookVisit.availableSlotsFor', { date: selectedDate })}</label>
                         <div className="grid grid-cols-2 gap-3">
-                           {slotsForSelectedDate.length > 0 ? slotsForSelectedDate.map(slot => (
-                              <button
-                                 key={slot.id}
-                                 onClick={() => setSelectedSlot(slot)}
-                                 className={`p-4 rounded-xl text-center border-2 transition-all ${selectedSlot === slot ? 'border-primary-600 bg-primary-50 text-primary-700 font-bold' : 'border-slate-50 bg-slate-50 text-slate-600 hover:border-slate-200'}`}
-                              >
-                                 {slot.start_time.substring(0, 5)} - {slot.end_time.substring(0, 5)}
-                              </button>
-                           )) : (
+                           {slotsForSelectedDate.length > 0 ? slotsForSelectedDate.map(slot => {
+                              const isSelected = isSameSlot(selectedSlot, slot);
+                              return (
+                                 <button
+                                    key={`${slot.id}-${slot.start_time}`}
+                                    onClick={() => !slot.taken && setSelectedSlot(slot)}
+                                    disabled={slot.taken}
+                                    className={`p-4 rounded-xl text-center border-2 transition-all ${
+                                       slot.taken
+                                          ? 'border-slate-50 bg-slate-50 text-slate-300 cursor-not-allowed line-through'
+                                          : isSelected
+                                             ? 'border-primary-600 bg-primary-50 text-primary-700 font-bold'
+                                             : 'border-slate-50 bg-slate-50 text-slate-600 hover:border-slate-200'
+                                    }`}
+                                 >
+                                    {slot.start_time} - {slot.end_time}
+                                 </button>
+                              );
+                           }) : (
                               <div className="col-span-full py-10 text-center text-slate-400 font-medium">{t('adminBookVisit.noSlotsFound')}</div>
                            )}
                         </div>

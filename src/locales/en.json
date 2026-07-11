@@ -331,7 +331,7 @@
     "descriptionPrefix": "Select an available date and time slot for",
     "timezone": "Current timezone: GMT -5 (EST).",
     "selectedDate": "Selected Date",
-    "availableBlocks": "3 available blocks found",
+    "availableBlocks": "{{count}} open slots found",
     "morningSlots": "Morning Slots",
     "afternoonSlots": "Afternoon Slots",
     "eveningSlots": "Evening Slots",
@@ -592,7 +592,21 @@
     "notesPlaceholder": "Mention any specific requirements for patients, such as 'Pre-appointment fasting required' or 'Bring current medication list'...",
     "plannedDates": "Planned Schedule Dates",
     "operationalNotes": "Operational Notes",
-    "discardChanges": "Discard Changes"
+    "discardChanges": "Discard Changes",
+    "timePeriods": "Time Periods",
+    "totalBlocks": "Total Blocks",
+    "dailyPattern": "Daily Pattern",
+    "period": {
+      "morning": "Morning",
+      "afternoon": "Afternoon",
+      "evening": "Evening"
+    },
+    "errorNoDays": "Please select at least one active day",
+    "errorNoPeriods": "Please select at least one time period (morning/afternoon/evening)",
+    "errorNoBlocks": "No availability blocks generated for the selected days",
+    "errorSaving": "Failed to save availability",
+    "generatingBlocks": "Generating {{count}} availability blocks for the next month...",
+    "blocksConfigured": "Successfully configured {{count}} availability blocks for the month"
   },
   "doctorSettings": {
     "title": "Clinical Profile Settings",

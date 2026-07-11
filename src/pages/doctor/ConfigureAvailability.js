@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { Clock, MapPin, FileText, ArrowLeft, Check, Calendar, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { addAvailability, selectDoctorsLoading } from '../../store/slices/doctorSlice';
+import { PERIODS, defaultPeriodTimes } from '../../utils/availabilityPeriods';
 
 export default function ConfigureAvailability() {
    const navigate = useNavigate();
@@ -17,23 +18,28 @@ export default function ConfigureAvailability() {
    const [isSaving, setIsSaving] = useState(false);
 
    const toggleExcludeDate = (dateStr) => {
-      setExcludedDates(prev => 
+      setExcludedDates(prev =>
          prev.includes(dateStr) ? prev.filter(d => d !== dateStr) : [...prev, dateStr]
       );
    };
 
-   const [formData, setFormData] = useState({
-      start_time: '08:00',
-      end_time: '11:00'
-   });
+   const [selectedPeriods, setSelectedPeriods] = useState(['morning', 'afternoon']);
+   const [periodTimes, setPeriodTimes] = useState(defaultPeriodTimes());
 
-   const [previewSlots, setPreviewSlots] = useState([]);
+   const togglePeriod = (periodId) => {
+      setSelectedPeriods(prev =>
+         prev.includes(periodId) ? prev.filter(p => p !== periodId) : [...prev, periodId]
+      );
+   };
 
-   useEffect(() => {
-      if (formData.start_time && formData.end_time) {
-         setPreviewSlots([{ start: formData.start_time, end: formData.end_time }]);
-      }
-   }, [formData.start_time, formData.end_time]);
+   const setPeriodTime = (periodId, field, value) => {
+      setPeriodTimes(prev => ({ ...prev, [periodId]: { ...prev[periodId], [field]: value } }));
+   };
+
+   const previewSlots = useMemo(
+      () => selectedPeriods.map(id => ({ id, start: periodTimes[id].start, end: periodTimes[id].end })),
+      [selectedPeriods, periodTimes]
+   );
 
    const toggleDay = (day) => {
       setActiveDays(prev =>
@@ -41,7 +47,7 @@ export default function ConfigureAvailability() {
       );
    };
 
-   const calculateTotalSlots = () => {
+   const countIncludedDays = () => {
       let total = 0;
       const startDate = new Date();
       const dayMapping = { 1: 'mon', 2: 'tue', 3: 'wed', 4: 'thu', 5: 'fri', 6: 'sat', 0: 'sun' };
@@ -57,9 +63,16 @@ export default function ConfigureAvailability() {
       return total;
    };
 
+   // Total availability blocks that will be created = included days × selected periods
+   const calculateTotalSlots = () => countIncludedDays() * selectedPeriods.length;
+
    const handleSave = async () => {
       if (activeDays.length === 0) {
-         toast.error('Please select at least one active day');
+         toast.error(t('doctorConfigureAvailability.errorNoDays', { defaultValue: 'Please select at least one active day' }));
+         return;
+      }
+      if (selectedPeriods.length === 0) {
+         toast.error(t('doctorConfigureAvailability.errorNoPeriods', { defaultValue: 'Please select at least one time period (morning/afternoon/evening)' }));
          return;
       }
 
@@ -79,32 +92,34 @@ export default function ConfigureAvailability() {
 
             const dayName = dayMapping[currentDate.getDay()];
             const dateStr = currentDate.toISOString().split('T')[0];
-            
+
             if (activeDays.includes(dayName) && !excludedDates.includes(dateStr)) {
-               allSlotsToCreate.push({
-                  available_date: dateStr,
-                  start_time: formData.start_time,
-                  end_time: formData.end_time
+               selectedPeriods.forEach(periodId => {
+                  allSlotsToCreate.push({
+                     available_date: dateStr,
+                     start_time: periodTimes[periodId].start,
+                     end_time: periodTimes[periodId].end
+                  });
                });
             }
          }
 
          if (allSlotsToCreate.length === 0) {
-            toast.error('No availability blocks generated for the selected days');
+            toast.error(t('doctorConfigureAvailability.errorNoBlocks', { defaultValue: 'No availability blocks generated for the selected days' }));
             setIsSaving(false);
             return;
          }
 
-         toast.loading(`Generating ${allSlotsToCreate.length} availability blocks for the next month...`, { id: 'bulk-add' });
+         toast.loading(t('doctorConfigureAvailability.generatingBlocks', { count: allSlotsToCreate.length, defaultValue: `Generating ${allSlotsToCreate.length} availability blocks for the next month...` }), { id: 'bulk-add' });
 
-         await Promise.all(allSlotsToCreate.map(slotData => 
+         await Promise.all(allSlotsToCreate.map(slotData =>
             dispatch(addAvailability(slotData)).unwrap()
          ));
 
-         toast.success(`Successfully configured ${allSlotsToCreate.length} availability blocks for the month`, { id: 'bulk-add' });
+         toast.success(t('doctorConfigureAvailability.blocksConfigured', { count: allSlotsToCreate.length, defaultValue: `Successfully configured ${allSlotsToCreate.length} availability blocks for the month` }), { id: 'bulk-add' });
          navigate('/doctor/schedule');
       } catch (err) {
-         toast.error(err?.message || 'Failed to save availability', { id: 'bulk-add' });
+         toast.error(err?.message || t('doctorConfigureAvailability.errorSaving', { defaultValue: 'Failed to save availability' }), { id: 'bulk-add' });
       } finally {
          setIsSaving(false);
       }
@@ -156,33 +171,59 @@ export default function ConfigureAvailability() {
                         </div>
                      </div>
 
-                     {/* Times Selection */}
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div>
-                           <label className="block text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-3">{t('doctorConfigureAvailability.startTime', { defaultValue: 'Start Time' })}</label>
-                           <div className="relative">
-                              <input
-                                 type="time"
-                                 value={formData.start_time}
-                                 onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
-                                 className="w-full bg-slate-50/50 border-2 border-transparent focus:border-primary-500 focus:bg-white rounded-2xl px-6 py-4 text-[15px] font-bold text-slate-800 transition-all outline-none"
-                              />
-                           </div>
-                        </div>
-                        <div>
-                           <label className="block text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-3">{t('doctorConfigureAvailability.endTime', { defaultValue: 'End Time' })}</label>
-                           <div className="relative">
-                              <input
-                                 type="time"
-                                 value={formData.end_time}
-                                 onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
-                                 className="w-full bg-slate-50/50 border-2 border-transparent focus:border-primary-500 focus:bg-white rounded-2xl px-6 py-4 text-[15px] font-bold text-slate-800 transition-all outline-none"
-                              />
-                           </div>
+                     {/* Time Periods Selection - AM/PM/Evening, each independently toggleable and editable */}
+                     <div>
+                        <label className="block text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-4">{t('doctorConfigureAvailability.timePeriods', { defaultValue: 'Time Periods' })}</label>
+                        <div className="space-y-3">
+                           {PERIODS.map(period => {
+                              const isActive = selectedPeriods.includes(period.id);
+                              const Icon = period.icon;
+                              return (
+                                 <div key={period.id} className={`rounded-2xl border-2 transition-all overflow-hidden ${isActive ? 'border-primary-200 bg-primary-50/30' : 'border-slate-100 bg-slate-50/50'}`}>
+                                    <button
+                                       type="button"
+                                       onClick={() => togglePeriod(period.id)}
+                                       className="w-full flex items-center justify-between px-5 py-4"
+                                    >
+                                       <div className="flex items-center gap-3">
+                                          <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${isActive ? 'bg-primary-600 text-white' : 'bg-white text-slate-400 border border-slate-100'}`}>
+                                             <Icon className="w-4 h-4" />
+                                          </div>
+                                          <span className={`font-bold text-sm ${isActive ? 'text-primary-700' : 'text-slate-500'}`}>
+                                             {t(`doctorConfigureAvailability.period.${period.id}`, { defaultValue: period.id.charAt(0).toUpperCase() + period.id.slice(1) })}
+                                          </span>
+                                       </div>
+                                       <div className={`w-11 h-6 rounded-full p-0.5 transition-colors ${isActive ? 'bg-primary-600' : 'bg-slate-200'}`}>
+                                          <div className={`w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${isActive ? 'translate-x-5 rtl:-translate-x-5' : 'translate-x-0'}`} />
+                                       </div>
+                                    </button>
+                                    {isActive && (
+                                       <div className="grid grid-cols-2 gap-4 px-5 pb-5">
+                                          <div>
+                                             <label className="block text-[9px] font-extrabold text-slate-400 uppercase tracking-widest mb-2">{t('doctorConfigureAvailability.startTime', { defaultValue: 'Start Time' })}</label>
+                                             <input
+                                                type="time"
+                                                value={periodTimes[period.id].start}
+                                                onChange={(e) => setPeriodTime(period.id, 'start', e.target.value)}
+                                                className="w-full bg-white border-2 border-slate-100 focus:border-primary-500 rounded-xl px-4 py-3 text-sm font-bold text-slate-800 transition-all outline-none"
+                                             />
+                                          </div>
+                                          <div>
+                                             <label className="block text-[9px] font-extrabold text-slate-400 uppercase tracking-widest mb-2">{t('doctorConfigureAvailability.endTime', { defaultValue: 'End Time' })}</label>
+                                             <input
+                                                type="time"
+                                                value={periodTimes[period.id].end}
+                                                onChange={(e) => setPeriodTime(period.id, 'end', e.target.value)}
+                                                className="w-full bg-white border-2 border-slate-100 focus:border-primary-500 rounded-xl px-4 py-3 text-sm font-bold text-slate-800 transition-all outline-none"
+                                             />
+                                          </div>
+                                       </div>
+                                    )}
+                                 </div>
+                              );
+                           })}
                         </div>
                      </div>
-
-                     {/* Duration Selection */}
                   </div>
                </div>
 
@@ -194,7 +235,7 @@ export default function ConfigureAvailability() {
                         <div className="text-[11px] font-bold text-primary-100 uppercase tracking-widest mb-4">{t('doctorConfigureAvailability.availabilityPreview')}</div>
                         <div className="flex items-end gap-2 mb-6">
                            <span className="text-5xl font-black">{calculateTotalSlots()}</span>
-                           <span className="text-xs font-bold text-primary-100 mb-2 uppercase tracking-wide">Total Slots</span>
+                           <span className="text-xs font-bold text-primary-100 mb-2 uppercase tracking-wide">{t('doctorConfigureAvailability.totalBlocks', { defaultValue: 'Total Blocks' })}</span>
                         </div>
                         <button
                            onClick={handleSave}
@@ -209,7 +250,7 @@ export default function ConfigureAvailability() {
 
                   {/* Individual Day Pattern Preview */}
                   <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6">
-                     <div className="text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-4">Daily Pattern</div>
+                     <div className="text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-4">{t('doctorConfigureAvailability.dailyPattern', { defaultValue: 'Daily Pattern' })}</div>
                      <div className="space-y-2 max-h-[220px] overflow-y-auto pr-2 custom-scrollbar">
                         {previewSlots.map((slot, i) => (
                            <div key={i} className="bg-white border border-slate-200/60 p-3 rounded-xl flex justify-between items-center">

@@ -6,6 +6,7 @@ import { ChevronRight, ChevronLeft, Sun, Moon, Info, ArrowLeft, Loader2 } from '
 import { fetchDoctorAvailability, selectDoctorAvailability, selectPatientsLoading } from '../store/slices/patientSlice';
 import { fetchDoctorById, selectSelectedDoctor } from '../store/slices/doctorSlice';
 import { updateBookingDraft, selectBookingDraft } from '../store/slices/appointmentSlice';
+import { generateSlotsForDate, getDatesWithOpenSlots, isSameSlot } from '../utils/availabilitySlots';
 
 export default function PickSchedule() {
   const navigate = useNavigate();
@@ -75,23 +76,13 @@ export default function PickSchedule() {
     }
   }, [dispatch, selectedDoctor]);
 
-  // Group slots by date - Normalize to YYYY-MM-DD to avoid mismatch with time components
-  const availableDates = [...new Set(availability.map(slot => {
-    try {
-      return new Date(slot.available_date).toISOString().split('T')[0];
-    } catch (e) {
-      return slot.available_date; // Fallback
-    }
-  }))];
-
-  const slotsForSelectedDate = availability.filter(slot => {
-    try {
-      const normalizedSlotDate = new Date(slot.available_date).toISOString().split('T')[0];
-      return normalizedSlotDate === selectedDate;
-    } catch (e) {
-      return slot.available_date === selectedDate;
-    }
-  });
+  // Each doctor_availability row is a whole window (e.g. 08:00-18:00), not a
+  // single bookable slot - split every window into real appointment_duration
+  // sized slots, and only offer dates that still have an open (non-taken) one.
+  const appointmentDuration = selectedDoctor?.appointment_duration || 15;
+  const availableDates = getDatesWithOpenSlots(availability, appointmentDuration);
+  const slotsForSelectedDate = generateSlotsForDate(availability, selectedDate, appointmentDuration);
+  const openSlotsCount = slotsForSelectedDate.filter(s => !s.taken).length;
 
   const morningSlots = slotsForSelectedDate.filter(s => parseInt(s.start_time.split(':')[0]) < 12);
   const afternoonSlots = slotsForSelectedDate.filter(s => {
@@ -99,6 +90,29 @@ export default function PickSchedule() {
     return hour >= 12 && hour < 17;
   });
   const eveningSlots = slotsForSelectedDate.filter(s => parseInt(s.start_time.split(':')[0]) >= 17);
+
+  const renderSlotButton = (slot) => {
+    const isSelected = isSameSlot(selectedSlot, slot);
+    return (
+      <button
+        key={`${slot.id}-${slot.start_time}`}
+        onClick={() => !slot.taken && setSelectedSlot(slot)}
+        disabled={slot.taken}
+        className={`p-4 rounded-xl text-start border-2 transition-all ${
+          slot.taken
+            ? 'border-slate-100 bg-slate-50 cursor-not-allowed opacity-60'
+            : isSelected
+              ? 'border-primary-600 bg-primary-600 shadow-md'
+              : 'border-slate-100 hover:border-primary-500 bg-white'
+        }`}
+      >
+        <div className={`font-bold text-sm mb-1 ${slot.taken ? 'text-slate-400 line-through' : isSelected ? 'text-white' : 'text-slate-800'}`}>{slot.start_time} - {slot.end_time}</div>
+        <div className={`text-[10px] font-bold uppercase tracking-widest ${slot.taken ? 'text-slate-400' : isSelected ? 'text-primary-100' : 'text-primary-600'}`}>
+          {slot.taken ? t('pickSchedule.booked', { defaultValue: 'Booked' }) : t('pickSchedule.available', { defaultValue: 'Available' })}
+        </div>
+      </button>
+    );
+  };
 
   const handleContinue = () => {
     if (!selectedSlot) return;
@@ -234,7 +248,7 @@ export default function PickSchedule() {
               {selectedDate ? new Date(selectedDate).toLocaleDateString(i18n.language.startsWith('ar') ? 'ar-EG' : 'en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' }) : t('pickSchedule.pickDate', { defaultValue: 'Pick a date' })}
             </div>
             <div className="inline-flex items-center gap-2 bg-white/20 text-white px-3 py-1.5 rounded-lg text-[11px] font-semibold backdrop-blur-sm border border-white/10">
-              <Info className="w-3.5 h-3.5" /> {t('pickSchedule.availableBlocks', { count: slotsForSelectedDate.length, defaultValue: `${slotsForSelectedDate.length} available blocks found` })}
+              <Info className="w-3.5 h-3.5" /> {t('pickSchedule.availableBlocks', { count: openSlotsCount, defaultValue: `${openSlotsCount} open slots found` })}
             </div>
           </div>
 
@@ -266,16 +280,7 @@ export default function PickSchedule() {
                   <div>
                     <h4 className="flex items-center gap-2 text-sm font-bold text-slate-800 mb-4"><Sun className="w-4 h-4 text-orange-500" /> {t('pickSchedule.morning', { defaultValue: 'Morning' })}</h4>
                     <div className="grid grid-cols-2 gap-3">
-                      {morningSlots.map(slot => (
-                        <button
-                          key={slot.id || slot.start_time}
-                          onClick={() => setSelectedSlot(slot)}
-                          className={`p-4 rounded-xl text-start border-2 transition-all ${selectedSlot === slot ? 'border-primary-600 bg-primary-600 shadow-md' : 'border-slate-100 hover:border-primary-500 bg-white'}`}
-                        >
-                          <div className={`font-bold text-sm mb-1 ${selectedSlot === slot ? 'text-white' : 'text-slate-800'}`}>{slot.start_time} - {slot.end_time}</div>
-                          <div className={`text-[10px] font-bold uppercase tracking-widest ${selectedSlot === slot ? 'text-primary-100' : 'text-primary-600'}`}>{t('pickSchedule.available', { defaultValue: 'Available' })}</div>
-                        </button>
-                      ))}
+                      {morningSlots.map(renderSlotButton)}
                     </div>
                   </div>
                 )}
@@ -284,16 +289,7 @@ export default function PickSchedule() {
                   <div>
                     <h4 className="flex items-center gap-2 text-sm font-bold text-slate-800 mb-4 text-slate-500"><Sun className="w-4 h-4 text-primary-500" /> {t('pickSchedule.afternoon', { defaultValue: 'Afternoon' })}</h4>
                     <div className="grid grid-cols-2 gap-3">
-                      {afternoonSlots.map(slot => (
-                        <button
-                          key={slot.id || slot.start_time}
-                          onClick={() => setSelectedSlot(slot)}
-                          className={`p-4 rounded-xl text-start border-2 transition-all ${selectedSlot === slot ? 'border-primary-600 bg-primary-600 shadow-md' : 'border-slate-100 hover:border-primary-500 bg-white'}`}
-                        >
-                          <div className={`font-bold text-sm mb-1 ${selectedSlot === slot ? 'text-white' : 'text-slate-800'}`}>{slot.start_time} - {slot.end_time}</div>
-                          <div className={`text-[10px] font-bold uppercase tracking-widest ${selectedSlot === slot ? 'text-primary-100' : 'text-primary-600'}`}>{t('pickSchedule.available', { defaultValue: 'Available' })}</div>
-                        </button>
-                      ))}
+                      {afternoonSlots.map(renderSlotButton)}
                     </div>
                   </div>
                 )}
@@ -302,16 +298,7 @@ export default function PickSchedule() {
                   <div>
                     <h4 className="flex items-center gap-2 text-sm font-bold text-slate-800 mb-4 text-slate-500"><Moon className="w-4 h-4 text-slate-400" /> {t('pickSchedule.evening', { defaultValue: 'Evening' })}</h4>
                     <div className="grid grid-cols-2 gap-3">
-                      {eveningSlots.map(slot => (
-                        <button
-                          key={slot.id || slot.start_time}
-                          onClick={() => setSelectedSlot(slot)}
-                          className={`p-4 rounded-xl text-start border-2 transition-all ${selectedSlot === slot ? 'border-primary-600 bg-primary-600 shadow-md' : 'border-slate-100 hover:border-primary-500 bg-white'}`}
-                        >
-                          <div className={`font-bold text-sm mb-1 ${selectedSlot === slot ? 'text-white' : 'text-slate-800'}`}>{slot.start_time} - {slot.end_time}</div>
-                          <div className={`text-[10px] font-bold uppercase tracking-widest ${selectedSlot === slot ? 'text-primary-100' : 'text-primary-600'}`}>{t('pickSchedule.available', { defaultValue: 'Available' })}</div>
-                        </button>
-                      ))}
+                      {eveningSlots.map(renderSlotButton)}
                     </div>
                   </div>
                 )}
