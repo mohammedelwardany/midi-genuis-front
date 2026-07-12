@@ -18,12 +18,14 @@ import {
 } from '../../store/slices/patientSlice';
 import { ENDPOINTS } from '../../api/endpoints';
 import ModalPortal from '../../components/ModalPortal';
+import { useConfirm } from '../../context/ConfirmDialogContext';
 
 export default function PatientAdminProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { t } = useTranslation();
+  const confirm = useConfirm();
 
   const patient = useSelector(selectSelectedPatient);
   const reports = useSelector(selectMyReports);
@@ -63,7 +65,7 @@ export default function PatientAdminProfile() {
   }, [patient]);
 
   const handleDeleteReport = async (reportId) => {
-    if (window.confirm('Are you sure you want to delete this report?')) {
+    if (await confirm({ message: t('patientAdminProfile.deleteReportConfirm', { defaultValue: 'Are you sure you want to delete this report?' }), danger: true })) {
       try {
         await dispatch(deletePatientReport({ patientId: id, reportId })).unwrap();
         toast.success('Report deleted');

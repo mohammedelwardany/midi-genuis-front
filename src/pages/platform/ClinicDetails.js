@@ -23,6 +23,7 @@ import { impersonateClinicAdmin } from '../../store/slices/authSlice';
 import ModalPortal from '../../components/ModalPortal';
 import { BASE_URL } from '../../api/endpoints';
 import { generatePrimaryShades } from '../../utils/colorPalette';
+import { useConfirm } from '../../context/ConfirmDialogContext';
 
 export default function ClinicDetails() {
   const { id } = useParams();
@@ -30,6 +31,7 @@ export default function ClinicDetails() {
   const navigate = useNavigate();
   const { i18n } = useTranslation();
   const isRtl = i18n.language.startsWith('ar');
+  const confirm = useConfirm();
 
   const clinic = useSelector(selectSelectedClinic);
   const plans = useSelector(selectSubscriptionPlans);
@@ -228,9 +230,12 @@ export default function ClinicDetails() {
   };
 
   const handleDeleteAdmin = async (admin) => {
-    if (!window.confirm(isRtl
-      ? `هل تريد حذف حساب المسؤول ${admin.email}؟ لا يمكن التراجع عن هذا الإجراء.`
-      : `Delete admin account ${admin.email}? This cannot be undone.`)) {
+    if (!(await confirm({
+      message: isRtl
+        ? `هل تريد حذف حساب المسؤول ${admin.email}؟ لا يمكن التراجع عن هذا الإجراء.`
+        : `Delete admin account ${admin.email}? This cannot be undone.`,
+      danger: true,
+    }))) {
       return;
     }
     setDeletingId(admin.id);
@@ -245,9 +250,11 @@ export default function ClinicDetails() {
   };
 
   const handleResetPassword = async (admin) => {
-    if (!window.confirm(isRtl
-      ? `إعادة تعيين كلمة مرور ${admin.email}؟ سيُطلب منه تعيين كلمة مرور جديدة عند تسجيل الدخول التالي.`
-      : `Reset the password for ${admin.email}? They'll be required to set a new one on their next login.`)) {
+    if (!(await confirm({
+      message: isRtl
+        ? `إعادة تعيين كلمة مرور ${admin.email}؟ سيُطلب منه تعيين كلمة مرور جديدة عند تسجيل الدخول التالي.`
+        : `Reset the password for ${admin.email}? They'll be required to set a new one on their next login.`,
+    }))) {
       return;
     }
     setResettingId(admin.id);

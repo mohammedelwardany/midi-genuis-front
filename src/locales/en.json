@@ -487,7 +487,8 @@
     "filterRecords": "Filter Records",
     "yourFiles": "Your Files",
     "sortByDate": "Sort by Date",
-    "loadOlder": "Load Older Files"
+    "loadOlder": "Load Older Files",
+    "deleteConfirm": "Are you sure you want to delete this record?"
   },
   "visitHistory": {
     "title": "Visit History",
@@ -519,6 +520,7 @@
     "insuranceDetailsTitle": "Insurance Details",
     "insuranceDetailsDesc": "Manage your primary and secondary health insurance coverage files.",
     "hasInsuranceCheckbox": "I have health insurance",
+    "deleteAccountConfirm": "Are you absolutely sure? This will permanently delete your account and clinical data.",
     "primaryProviderLabel": "Primary Insurance Provider",
     "policyNumberLabel": "Policy Number / Member ID",
     "groupIdLabel": "Group ID",
@@ -723,6 +725,7 @@
     "all": "All",
     "save": "Save",
     "cancel": "Cancel",
+    "confirm": "Confirm",
     "search": "Search",
     "seeAll": "See All",
     "clear": "Clear"
@@ -739,7 +742,8 @@
     "editModalTitle": "Edit Profile",
     "editModalSubtitle": "Update clinical identity information",
     "saveChanges": "Save Changes",
-    "uploadedOn": "Uploaded on"
+    "uploadedOn": "Uploaded on",
+    "deleteReportConfirm": "Are you sure you want to delete this report?"
   },
   "adminBookVisit": {
     "bookingFor": "Booking for:",

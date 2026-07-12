@@ -8,6 +8,7 @@ import { selectCurrentUser, logoutUser } from '../store/slices/authSlice';
 import { updateMe, deleteMe } from '../store/slices/patientSlice';
 import { cn } from '../utils/cn';
 import { getAvatarSrc } from '../utils/avatar';
+import { useConfirm } from '../context/ConfirmDialogContext';
 
 export default function ProfileSettings() {
    const dispatch = useDispatch();
@@ -16,6 +17,7 @@ export default function ProfileSettings() {
    const [activeTab, setActiveTab] = useState('personal');
    const [loading, setLoading] = useState(false);
    const { t, i18n } = useTranslation();
+   const confirm = useConfirm();
 
    const formatDateForInput = (dateString) => {
       if (!dateString) return '';
@@ -67,7 +69,10 @@ export default function ProfileSettings() {
    };
 
    const handleDeleteAccount = async () => {
-      if (!window.confirm('Are you absolutely sure? This will permanently delete your account and clinical data.')) return;
+      if (!(await confirm({
+         message: t('profileSettings.deleteAccountConfirm', { defaultValue: 'Are you absolutely sure? This will permanently delete your account and clinical data.' }),
+         danger: true,
+      }))) return;
 
       setLoading(true);
       try {

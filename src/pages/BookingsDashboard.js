@@ -18,12 +18,14 @@ import {
   getApptSpecialization,
   getApptClinicName
 } from '../utils/appointmentDisplay';
+import { useConfirm } from '../context/ConfirmDialogContext';
 
 export default function BookingsDashboard() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { t, i18n } = useTranslation();
   const isRtl = i18n.language.startsWith('ar');
+  const confirm = useConfirm();
 
   const getApptDate = (appt) => {
     const scheduledDate = getApptScheduledDate(appt);
@@ -49,7 +51,7 @@ export default function BookingsDashboard() {
 
   const handleCancel = async (e, appt) => {
     e.stopPropagation();
-    if (!window.confirm(t('bookings.cancelConfirm', { defaultValue: 'Are you sure you want to cancel this appointment?' }))) return;
+    if (!(await confirm({ message: t('bookings.cancelConfirm', { defaultValue: 'Are you sure you want to cancel this appointment?' }), danger: true }))) return;
     try {
       await dispatch(cancelAppointment(appt.id ?? appt.appointment_id)).unwrap();
       toast.success(t('bookings.cancelSuccess', { defaultValue: 'Appointment cancelled successfully' }));

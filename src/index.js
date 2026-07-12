@@ -5,6 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import './i18n';
 import { SiteConfigProvider } from './context/SiteConfigContext';
+import { ConfirmDialogProvider } from './context/ConfirmDialogContext';
 import { Provider } from 'react-redux';
 import store from './store';
 
@@ -13,7 +14,9 @@ root.render(
   <React.StrictMode>
     <Provider store={store}>
       <SiteConfigProvider>
-        <App />
+        <ConfirmDialogProvider>
+          <App />
+        </ConfirmDialogProvider>
       </SiteConfigProvider>
     </Provider>
   </React.StrictMode>

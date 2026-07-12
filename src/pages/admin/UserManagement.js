@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { cn } from '../../utils/cn';
 import ModalPortal from '../../components/ModalPortal';
+import { useConfirm } from '../../context/ConfirmDialogContext';
 import {
   fetchDoctors,
   addDoctor,
@@ -25,6 +26,7 @@ export default function UserManagement() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { t, i18n } = useTranslation();
+  const confirm = useConfirm();
   const [activeTab, setActiveTab] = useState('doctors');
   const [showAddModal, setShowAddModal] = useState(false);
   const [openMenuId, setOpenMenuId] = useState(null);
@@ -129,9 +131,9 @@ export default function UserManagement() {
     }
   };
 
-  const handleDeleteItem = (id) => {
+  const handleDeleteItem = async (id) => {
     const type = activeTab === 'doctors' ? t('userManagement.doctorSingular') : t('userManagement.patientSingular');
-    if (window.confirm(t('userManagement.deleteConfirm', { type }))) {
+    if (await confirm({ message: t('userManagement.deleteConfirm', { type }), danger: true })) {
       if (activeTab === 'doctors') {
         dispatch(deleteDoctor(id));
       } else {

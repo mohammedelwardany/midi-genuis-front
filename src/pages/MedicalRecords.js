@@ -11,10 +11,12 @@ import {
   selectPatientsLoading 
 } from '../store/slices/patientSlice';
 import { BASE_URL } from '../api/endpoints';
+import { useConfirm } from '../context/ConfirmDialogContext';
 
 export default function MedicalRecords() {
   const { t } = useTranslation();
   const dispatch = useDispatch();
+  const confirm = useConfirm();
   const fileInputRef = useRef(null);
   
   const reports = useSelector(selectMyReports);
@@ -52,7 +54,7 @@ export default function MedicalRecords() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this record?')) return;
+    if (!(await confirm({ message: t('medicalRecords.deleteConfirm', { defaultValue: 'Are you sure you want to delete this record?' }), danger: true }))) return;
     try {
       await dispatch(deleteMyReport(id)).unwrap();
       dispatch(fetchMyReports());

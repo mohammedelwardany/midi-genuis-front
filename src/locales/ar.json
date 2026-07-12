@@ -330,6 +330,7 @@
     "all": "الكل",
     "save": "حفظ",
     "cancel": "إلغاء",
+    "confirm": "تأكيد",
     "search": "بحث",
     "seeAll": "عرض الكل",
     "clear": "مسح"
@@ -495,7 +496,8 @@
     "filterRecords": "تصفية السجلات",
     "yourFiles": "ملفاتك",
     "sortByDate": "ترتيب حسب التاريخ",
-    "loadOlder": "تحميل ملفات أقدم"
+    "loadOlder": "تحميل ملفات أقدم",
+    "deleteConfirm": "هل أنت متأكد من حذف هذا السجل؟"
   },
   "visitHistory": {
     "title": "سجل الزيارات",
@@ -527,6 +529,7 @@
     "insuranceDetailsTitle": "بيانات التأمين",
     "insuranceDetailsDesc": "أدر ملفات تغطية التأمين الصحي الأساسي والثانوي الخاصة بك.",
     "hasInsuranceCheckbox": "لدي تأمين طبي",
+    "deleteAccountConfirm": "هل أنت متأكد تمامًا؟ سيؤدي هذا إلى حذف حسابك وبياناتك الطبية نهائيًا.",
     "primaryProviderLabel": "مزود التأمين الأساسي",
     "policyNumberLabel": "رقم الوثيقة / معرف العضو",
     "groupIdLabel": "رقم المجموعة",
@@ -739,7 +742,8 @@
     "editModalTitle": "تعديل الملف",
     "editModalSubtitle": "تحديث بيانات الهوية الطبية",
     "saveChanges": "حفظ التغييرات",
-    "uploadedOn": "تم الرفع في"
+    "uploadedOn": "تم الرفع في",
+    "deleteReportConfirm": "هل أنت متأكد من حذف هذا التقرير؟"
   },
   "adminBookVisit": {
     "bookingFor": "الحجز لـ:",
