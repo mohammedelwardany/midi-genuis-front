@@ -120,7 +120,13 @@ export default function AdminSetAvailability() {
   };
 
   const formatDate = (date) => {
-    const d = new Date(date);
+    // available_date arrives from the backend as a plain 'YYYY-MM-DD' string -
+    // use it as-is rather than round-tripping through a local Date object,
+    // which would reinterpret it in the viewer's timezone and could shift it
+    // a day for anyone west of UTC. Real Date objects (from getWeekDays) still
+    // go through the local-getters path since those already represent local days.
+    if (typeof date === 'string') return date.slice(0, 10);
+    const d = date;
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   };
 
@@ -279,9 +285,9 @@ export default function AdminSetAvailability() {
                     {schedule.length > 0 ? schedule.map((item) => (
                        <div key={item.id} className="grid grid-cols-12 items-center bg-white border border-slate-100 p-4 rounded-[16px] shadow-sm">
                           <div className="col-span-5 flex items-center gap-4">
-                             <div className="w-10 h-10 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center font-extrabold">{new Date(item.available_date).toLocaleDateString(i18n.language, { weekday: 'narrow' })}</div>
+                             <div className="w-10 h-10 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center font-extrabold">{new Date(item.available_date).toLocaleDateString(i18n.language, { weekday: 'narrow', timeZone: 'UTC' })}</div>
                              <div>
-                                <div className="font-extrabold text-slate-900">{new Date(item.available_date).toLocaleDateString(i18n.language, { weekday: 'long' })}</div>
+                                <div className="font-extrabold text-slate-900">{new Date(item.available_date).toLocaleDateString(i18n.language, { weekday: 'long', timeZone: 'UTC' })}</div>
                                 <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{formatDate(item.available_date)}</div>
                              </div>
                           </div>

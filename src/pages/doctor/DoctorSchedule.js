@@ -93,7 +93,13 @@ export default function DoctorSchedule() {
   };
 
   const formatDate = (date) => {
-    const d = new Date(date);
+    // available_date arrives from the backend as a plain 'YYYY-MM-DD' string -
+    // use it as-is rather than round-tripping through a local Date object,
+    // which would reinterpret it in the viewer's timezone and could shift it
+    // a day for anyone west of UTC. Real Date objects (week-grid days) still
+    // go through the local-getters path since those already represent local days.
+    if (typeof date === 'string') return date.slice(0, 10);
+    const d = date;
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   };
 
@@ -285,14 +291,14 @@ export default function DoctorSchedule() {
                           <div key={item.id || item.available_date + item.start_time} className="grid grid-cols-12 items-center bg-white border border-slate-100 hover:border-slate-200 transition-colors p-[18px] rounded-[16px] shadow-[0_2px_8px_rgb(0,0,0,0.02)]">
                              <div className="col-span-3 flex items-center gap-4">
                                 <div className="w-10 h-10 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center font-extrabold opacity-80">
-                                   {new Date(item.available_date).toLocaleDateString('en-US', { weekday: 'narrow' })}
+                                   {new Date(item.available_date).toLocaleDateString('en-US', { weekday: 'narrow', timeZone: 'UTC' })}
                                 </div>
                                 <div>
                                    <div className="font-extrabold text-[15px] text-slate-900 leading-tight">
-                                     {new Date(item.available_date).toLocaleDateString('en-US', { weekday: 'long' })}
+                                     {new Date(item.available_date).toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' })}
                                    </div>
                                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
-                                     {new Date(item.available_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                     {new Date(item.available_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}
                                    </div>
                                 </div>
                              </div>
