@@ -5,7 +5,7 @@ import { ChevronRight, Printer, AlertTriangle, Calendar as CalendarIcon, Clock, 
 import { useTranslation } from 'react-i18next';
 import { fetchAppointmentById, selectSelectedAppt, selectAppointmentsLoading, selectAppointmentsError } from '../store/slices/appointmentSlice';
 import { fetchDoctorById, selectSelectedDoctor, clearSelectedDoctor } from '../store/slices/doctorSlice';
-import { fetchPaymentById, selectSelectedPayment, setSelectedPayment } from '../store/slices/paymentSlice';
+import { fetchPaymentByAppointmentId, selectSelectedPayment, setSelectedPayment } from '../store/slices/paymentSlice';
 import { selectCurrentUser } from '../store/slices/authSlice';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { getAppointmentStatusColor } from '../utils/statusColors';
@@ -51,8 +51,10 @@ export default function AppointmentDetails() {
       if (docId) {
         dispatch(fetchDoctorById(docId));
       }
-      if (appointment.payment_id) {
-        dispatch(fetchPaymentById(appointment.payment_id));
+      // appointments.payment_id is never populated by the backend - look the
+      // payment up by appointment id instead, which payments always carries.
+      if (appointment.id) {
+        dispatch(fetchPaymentByAppointmentId(appointment.id));
       }
     }
   }, [appointment, dispatch]);

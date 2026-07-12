@@ -91,6 +91,7 @@ export const ENDPOINTS = {
     getAllPayments: '/payments/getAllPayments',
     getMyPayments: '/payments/getMyPayments',
     getPaymentById: (id) => `/payments/getPaymentById/${id}`,
+    getPaymentByAppointmentId: (id) => `/payments/getPaymentByAppointmentId/${id}`,
   },
 
   // ── Platform (owner-level, cross-clinic) ───────────

@@ -74,6 +74,17 @@ export const fetchPaymentById = createAsyncThunk(
   }
 );
 
+export const fetchPaymentByAppointmentId = createAsyncThunk(
+  'payments/fetchByAppointmentId',
+  async (appointmentId, { rejectWithValue }) => {
+    try {
+      return await apiClient.get(ENDPOINTS.payments.getPaymentByAppointmentId(appointmentId));
+    } catch (err) {
+      return rejectWithValue({ message: err.message, status: err.status });
+    }
+  }
+);
+
 const paymentSlice = createSlice({
   name: 'payments',
   initialState: {
@@ -145,6 +156,15 @@ const paymentSlice = createSlice({
         state.selected = action.payload?.data || action.payload || null;
       })
       .addCase(fetchPaymentById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || 'Failed to fetch payment details';
+      })
+      .addCase(fetchPaymentByAppointmentId.pending, (state) => { state.loading = true; state.error = null; })
+      .addCase(fetchPaymentByAppointmentId.fulfilled, (state, action) => {
+        state.loading = false;
+        state.selected = action.payload?.data || action.payload || null;
+      })
+      .addCase(fetchPaymentByAppointmentId.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || 'Failed to fetch payment details';
       });
