@@ -104,6 +104,7 @@ export const ENDPOINTS = {
     updateSubscription: (id) => `/platform/clinics/${id}/subscription`,
     updateClinicStatus: (id) => `/platform/clinics/${id}/status`,
     updateClinicBranding: (id) => `/platform/clinics/${id}/branding`,
+    uploadClinicLogo: (id) => `/platform/clinics/${id}/logo`,
     impersonate: (id) => `/platform/clinics/${id}/impersonate`,
     platformAdmins: '/platform/platform-admins',
     platformAdminStatus: (id) => `/platform/platform-admins/${id}/status`,
@@ -117,6 +118,7 @@ export const ENDPOINTS = {
   // ── Clinic (public, pre-auth) ──────────────────────
   clinic: {
     branding: '/clinics/branding',
+    myBranding: '/clinics/my-branding',
   },
 
   // ── Notifications ───────────────────────────────────

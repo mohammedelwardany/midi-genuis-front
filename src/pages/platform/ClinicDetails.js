@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Loader2, UserPlus, ShieldCheck, ShieldAlert, Save, LogIn, Palette, Trash2, KeyRound, Copy, Check } from 'lucide-react';
+import { ArrowLeft, Loader2, UserPlus, ShieldCheck, ShieldAlert, Save, LogIn, Palette, Trash2, KeyRound, Copy, Check, Upload, ImageOff } from 'lucide-react';
 import toast from 'react-hot-toast';
 import {
   fetchClinicById,
@@ -12,6 +12,7 @@ import {
   updateSubscription,
   updateClinicStatus,
   updateClinicBranding,
+  uploadClinicLogo,
   fetchSubscriptionPlans,
   clearSelectedClinic,
   selectSelectedClinic,
@@ -20,6 +21,8 @@ import {
 } from '../../store/slices/platformSlice';
 import { impersonateClinicAdmin } from '../../store/slices/authSlice';
 import ModalPortal from '../../components/ModalPortal';
+import { BASE_URL } from '../../api/endpoints';
+import { generatePrimaryShades } from '../../utils/colorPalette';
 
 export default function ClinicDetails() {
   const { id } = useParams();
@@ -39,10 +42,20 @@ export default function ClinicDetails() {
     status: 'active',
   });
   const [adminForm, setAdminForm] = useState({ email: '', password: '' });
-  const [brandForm, setBrandForm] = useState({ tagline: '', logoUrl: '', primaryColor: '', accentColor: '' });
+  const [brandForm, setBrandForm] = useState({
+    tagline: '', primaryColor: '', accentColor: '', dangerColor: '', successColor: '', warningColor: '',
+    portalTitles: {
+      patient: { title: '', titleAr: '' },
+      doctor: { title: '', titleAr: '' },
+      admin: { title: '', titleAr: '' },
+    },
+  });
+  const [logoFile, setLogoFile] = useState(null);
+  const [logoPreview, setLogoPreview] = useState(null);
   const [savingSub, setSavingSub] = useState(false);
   const [addingAdmin, setAddingAdmin] = useState(false);
   const [savingBrand, setSavingBrand] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [impersonatingId, setImpersonatingId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   const [resettingId, setResettingId] = useState(null);
@@ -71,14 +84,35 @@ export default function ClinicDetails() {
       });
       setBrandForm({
         tagline: clinic.branding?.clinic?.tagline || '',
-        logoUrl: clinic.branding?.clinic?.logoUrl || '',
         primaryColor: clinic.branding?.branding?.colors?.primary?.['600'] || '',
         accentColor: clinic.branding?.branding?.colors?.accent || '',
+        dangerColor: clinic.branding?.branding?.colors?.danger || '',
+        successColor: clinic.branding?.branding?.colors?.success || '',
+        warningColor: clinic.branding?.branding?.colors?.warning || '',
+        portalTitles: {
+          patient: { title: clinic.branding?.portals?.patient?.title || '', titleAr: clinic.branding?.portals?.patient?.titleAr || '' },
+          doctor: { title: clinic.branding?.portals?.doctor?.title || '', titleAr: clinic.branding?.portals?.doctor?.titleAr || '' },
+          admin: { title: clinic.branding?.portals?.admin?.title || '', titleAr: clinic.branding?.portals?.admin?.titleAr || '' },
+        },
       });
+      setLogoFile(null);
+      setLogoPreview(null);
     }
   }, [clinic]);
 
   const toInt = (v) => (v === '' ? null : parseInt(v, 10));
+  const getFullLogoUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith('http') || path.startsWith('blob:')) return path;
+    const origin = BASE_URL.split('/backend/api')[0];
+    return `${origin}${path}`;
+  };
+  const setPortalTitle = (role, field, value) => {
+    setBrandForm((prev) => ({
+      ...prev,
+      portalTitles: { ...prev.portalTitles, [role]: { ...prev.portalTitles[role], [field]: value } },
+    }));
+  };
   const activePlans = plans.filter((p) => p.active);
   const isCustomPlan = !subForm.plan_id;
 
@@ -114,12 +148,43 @@ export default function ClinicDetails() {
     e.preventDefault();
     setSavingBrand(true);
     try {
-      await dispatch(updateClinicBranding({ id, data: brandForm })).unwrap();
+      const payload = {
+        ...brandForm,
+        // The admin only ever picks one base color ("Primary Color") -
+        // the full 9-shade palette every bg-primary-*/text-primary-*
+        // class actually needs is generated from it here, so the backend
+        // just stores whatever shade map it's given.
+        primaryShades: brandForm.primaryColor ? generatePrimaryShades(brandForm.primaryColor) : undefined,
+      };
+      await dispatch(updateClinicBranding({ id, data: payload })).unwrap();
       toast.success(isRtl ? 'تم تحديث هوية العيادة' : 'Clinic branding updated');
     } catch (err) {
       toast.error(err?.message || (isRtl ? 'فشل تحديث الهوية' : 'Failed to update branding'));
     } finally {
       setSavingBrand(false);
+    }
+  };
+
+  const handleLogoFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setLogoFile(file);
+      setLogoPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleUploadLogo = async () => {
+    if (!logoFile) return;
+    setUploadingLogo(true);
+    try {
+      await dispatch(uploadClinicLogo({ id, file: logoFile })).unwrap();
+      toast.success(isRtl ? 'تم رفع الشعار' : 'Logo uploaded');
+      setLogoFile(null);
+      setLogoPreview(null);
+    } catch (err) {
+      toast.error(err?.message || (isRtl ? 'فشل رفع الشعار' : 'Failed to upload logo'));
+    } finally {
+      setUploadingLogo(false);
     }
   };
 
@@ -334,40 +399,105 @@ export default function ClinicDetails() {
         <h3 className="text-lg font-extrabold text-slate-900 mb-4 flex items-center gap-2">
           <Palette className="w-5 h-5 text-primary-600" /> {isRtl ? 'الهوية البصرية' : 'Branding'}
         </h3>
-        <form onSubmit={handleSaveBranding} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        {/* Logo - uploaded directly to the server, persisted independently of the form below */}
+        <div className="mb-6 pb-6 border-b border-slate-50">
+          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'الشعار' : 'Logo'}</label>
+          <div className="mt-2 flex items-center gap-4">
+            <div className="w-16 h-16 rounded-2xl border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0">
+              {(logoPreview || getFullLogoUrl(clinic.branding?.clinic?.logoUrl)) ? (
+                <img src={logoPreview || getFullLogoUrl(clinic.branding?.clinic?.logoUrl)} alt="" className="w-full h-full object-contain" />
+              ) : (
+                <ImageOff className="w-6 h-6 text-slate-300" />
+              )}
+            </div>
+            <div className="flex-1 flex flex-col sm:flex-row gap-2">
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/jpg,image/svg+xml,image/webp"
+                onChange={handleLogoFileChange}
+                className="flex-1 text-sm file:me-3 file:px-4 file:py-2 file:rounded-xl file:border-0 file:bg-slate-100 file:text-slate-700 file:font-bold file:text-xs hover:file:bg-slate-200 file:cursor-pointer cursor-pointer"
+              />
+              <button
+                type="button"
+                onClick={handleUploadLogo}
+                disabled={!logoFile || uploadingLogo}
+                className="bg-primary-600 hover:bg-primary-700 disabled:opacity-40 text-white font-bold px-4 py-2 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shrink-0"
+              >
+                {uploadingLogo ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
+                {isRtl ? 'رفع' : 'Upload'}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <form onSubmit={handleSaveBranding} className="space-y-6">
           <div>
             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'الشعار النصي' : 'Tagline'}</label>
             <input value={brandForm.tagline} onChange={(e) => setBrandForm({ ...brandForm, tagline: e.target.value })}
               placeholder={isRtl ? 'مثال: رعاية استثنائية' : 'e.g. Exceptional Care'}
               className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
           </div>
+
+          {/* Colors */}
           <div>
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'رابط الشعار' : 'Logo URL'}</label>
-            <input value={brandForm.logoUrl} onChange={(e) => setBrandForm({ ...brandForm, logoUrl: e.target.value })}
-              placeholder="/clinic-logo.png"
-              className="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">{isRtl ? 'الألوان' : 'Colors'}</label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {[
+                { key: 'primaryColor', label: isRtl ? 'اللون الأساسي' : 'Primary Color', fallback: '#3b82f6' },
+                { key: 'accentColor', label: isRtl ? 'لون التمييز' : 'Accent Color', fallback: '#6366f1' },
+                { key: 'dangerColor', label: isRtl ? 'لون الخطر' : 'Danger Color', fallback: '#ef4444' },
+                { key: 'successColor', label: isRtl ? 'لون النجاح' : 'Success Color', fallback: '#10b981' },
+                { key: 'warningColor', label: isRtl ? 'لون التحذير' : 'Warning Color', fallback: '#f59e0b' },
+              ].map(({ key, label, fallback }) => (
+                <div key={key}>
+                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{label}</label>
+                  <div className="mt-1 flex items-center gap-2">
+                    <input type="color" value={brandForm[key] || fallback} onChange={(e) => setBrandForm({ ...brandForm, [key]: e.target.value })}
+                      className="w-12 h-10 rounded-lg border border-slate-200 cursor-pointer shrink-0" />
+                    <input value={brandForm[key]} onChange={(e) => setBrandForm({ ...brandForm, [key]: e.target.value })}
+                      placeholder={fallback}
+                      className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Live preview of the 9 shades that'll be generated from the single Primary Color above */}
+            {brandForm.primaryColor && (
+              <div className="mt-3">
+                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">{isRtl ? 'معاينة التدرج' : 'Generated shade preview'}</div>
+                <div className="flex rounded-lg overflow-hidden border border-slate-200">
+                  {Object.entries(generatePrimaryShades(brandForm.primaryColor)).map(([shade, hex]) => (
+                    <div key={shade} style={{ backgroundColor: hex }} className="flex-1 h-8" title={`${shade}: ${hex}`} />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
+
+          {/* Portal titles */}
           <div>
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'اللون الأساسي' : 'Primary Color'}</label>
-            <div className="mt-1 flex items-center gap-2">
-              <input type="color" value={brandForm.primaryColor || '#3b82f6'} onChange={(e) => setBrandForm({ ...brandForm, primaryColor: e.target.value })}
-                className="w-12 h-10 rounded-lg border border-slate-200 cursor-pointer" />
-              <input value={brandForm.primaryColor} onChange={(e) => setBrandForm({ ...brandForm, primaryColor: e.target.value })}
-                placeholder="#3b82f6"
-                className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">{isRtl ? 'عناوين البوابات' : 'Portal Titles'}</label>
+            <div className="space-y-3">
+              {[
+                { role: 'patient', label: isRtl ? 'بوابة المريض' : 'Patient Portal' },
+                { role: 'doctor', label: isRtl ? 'بوابة الطبيب' : 'Doctor Portal' },
+                { role: 'admin', label: isRtl ? 'بوابة الإدارة' : 'Admin Portal' },
+              ].map(({ role, label }) => (
+                <div key={role} className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center">
+                  <span className="text-xs font-bold text-slate-500">{label}</span>
+                  <input value={brandForm.portalTitles[role].title} onChange={(e) => setPortalTitle(role, 'title', e.target.value)}
+                    placeholder={isRtl ? 'العنوان (إنجليزي)' : 'Title (English)'}
+                    className="px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
+                  <input value={brandForm.portalTitles[role].titleAr} onChange={(e) => setPortalTitle(role, 'titleAr', e.target.value)}
+                    placeholder={isRtl ? 'العنوان (عربي)' : 'Title (Arabic)'} dir="rtl"
+                    className="px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
+                </div>
+              ))}
             </div>
           </div>
+
           <div>
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{isRtl ? 'لون التمييز' : 'Accent Color'}</label>
-            <div className="mt-1 flex items-center gap-2">
-              <input type="color" value={brandForm.accentColor || '#6366f1'} onChange={(e) => setBrandForm({ ...brandForm, accentColor: e.target.value })}
-                className="w-12 h-10 rounded-lg border border-slate-200 cursor-pointer" />
-              <input value={brandForm.accentColor} onChange={(e) => setBrandForm({ ...brandForm, accentColor: e.target.value })}
-                placeholder="#6366f1"
-                className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
-            </div>
-          </div>
-          <div className="md:col-span-2">
             <button
               type="submit"
               disabled={savingBrand}

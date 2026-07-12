@@ -126,6 +126,19 @@ export const updateClinicBranding = createAsyncThunk(
   }
 );
 
+export const uploadClinicLogo = createAsyncThunk(
+  'platform/uploadClinicLogo',
+  async ({ id, file }, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append('logo', file);
+      return await apiClient.post(ENDPOINTS.platform.uploadClinicLogo(id), formData);
+    } catch (err) {
+      return rejectWithValue({ message: err.message, status: err.status });
+    }
+  }
+);
+
 export const fetchPlatformAdmins = createAsyncThunk(
   'platform/fetchPlatformAdmins',
   async (_, { rejectWithValue }) => {
@@ -356,6 +369,14 @@ const platformSlice = createSlice({
       })
       .addCase(updateClinicBranding.rejected, (s, { payload }) => {
         s.error = payload?.message || 'Failed to update clinic branding';
+      });
+
+    builder
+      .addCase(uploadClinicLogo.fulfilled, (s, { payload }) => {
+        if (s.selectedClinic) s.selectedClinic = { ...s.selectedClinic, branding: payload.clinic.branding };
+      })
+      .addCase(uploadClinicLogo.rejected, (s, { payload }) => {
+        s.error = payload?.message || 'Failed to upload clinic logo';
       });
 
     builder
