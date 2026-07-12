@@ -4,11 +4,15 @@ import { useTranslation } from 'react-i18next';
 import { X, BriefcaseMedical } from 'lucide-react';
 import TopNav from './TopNav';
 import { cn } from '../utils/cn';
+import { useSiteConfig } from '../context/SiteConfigContext';
+import { getClinicLogoSrc } from '../utils/logoUrl';
 
 export default function DoctorLayout({ title, tabs }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { i18n } = useTranslation();
   const isRtl = i18n.language.startsWith('ar');
+  const siteConfig = useSiteConfig();
+  const logoSrc = getClinicLogoSrc(siteConfig.clinic.logoUrl);
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
@@ -31,10 +35,14 @@ export default function DoctorLayout({ title, tabs }) {
       )}>
         <div className="px-6 mb-8 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="bg-primary-600 rounded flex items-center justify-center p-2">
-                  <BriefcaseMedical className="w-5 h-5 text-white" />
-              </div>
-              <span className="font-bold text-primary-700 tracking-tight text-sm">Doctor Portal</span>
+              {logoSrc ? (
+                <img src={logoSrc} alt={siteConfig.clinic.name} className="w-8 h-8 object-contain rounded" onError={(e) => { e.target.style.display = 'none'; }} />
+              ) : (
+                <div className="bg-primary-600 rounded flex items-center justify-center p-2">
+                    <BriefcaseMedical className="w-5 h-5 text-white" />
+                </div>
+              )}
+              <span className="font-bold text-primary-700 tracking-tight text-sm">{title || siteConfig.clinic.name}</span>
             </div>
             <button onClick={toggleMobileMenu} className="p-2 text-slate-400 hover:text-slate-600">
               <X className="w-5 h-5" />

@@ -10,6 +10,7 @@ import { selectCurrentUser } from '../store/slices/authSlice';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { getAppointmentStatusColor } from '../utils/statusColors';
 import { formatDate, formatTime } from '../utils/dateFormatter';
+import { getApptTypeLabel, isFollowUpAppointment } from '../utils/appointmentDisplay';
 import { formatCurrency } from '../utils/currencyFormatter';
 import { getAvatarSrc } from '../utils/avatar';
 
@@ -164,11 +165,16 @@ export default function AppointmentDetails() {
           
           {/* Main Appointment Card */}
           <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 relative">
-            <span className={`px-3 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-widest mb-4 inline-block capitalize ${getStatusBadge(appointment.status)}`}>
-              {t(`appointmentDetails.status.${String(appointment.status || 'pending').toLowerCase()}`, { defaultValue: appointment.status || 'Pending' })}
-            </span>
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              <span className={`px-3 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-widest inline-block capitalize ${getStatusBadge(appointment.status)}`}>
+                {t(`appointmentDetails.status.${String(appointment.status || 'pending').toLowerCase()}`, { defaultValue: appointment.status || 'Pending' })}
+              </span>
+              <span className={`px-3 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-widest inline-block ${isFollowUpAppointment(appointment) ? 'bg-indigo-50 text-indigo-600' : 'bg-primary-50 text-primary-600'}`}>
+                {getApptTypeLabel(appointment, t)}
+              </span>
+            </div>
             <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-6">
-              {specialization} {t('appointmentDetails.consultation', { defaultValue: 'Consultation' })}
+              {specialization} {getApptTypeLabel(appointment, t)}
             </h1>
             
             <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-10 pb-8 border-b border-slate-100 text-slate-700">
@@ -389,6 +395,7 @@ export default function AppointmentDetails() {
               <thead>
                 <tr className="bg-slate-50 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
                   <th className="p-3 text-start">{t('appointmentDetails.dateTimeLabel', { defaultValue: 'Date & Time' })}</th>
+                  <th className="p-3 text-start">{t('pickSchedule.bookingType', { defaultValue: 'Booking Type' })}</th>
                   <th className="p-3 text-start">{t('appointmentDetails.durationLabel', { defaultValue: 'Duration' })}</th>
                   <th className="p-3 text-start">{t('appointmentDetails.reasonForVisit', { defaultValue: 'Reason / Patient Notes' })}</th>
                 </tr>
@@ -398,6 +405,9 @@ export default function AppointmentDetails() {
                   <td className="p-3 align-top">
                     <div className="font-extrabold">{formattedDate}</div>
                     <div className="text-[10px] text-slate-400 mt-0.5">{formattedTime}</div>
+                  </td>
+                  <td className="p-3 align-top">
+                    {getApptTypeLabel(appointment, t)}
                   </td>
                   <td className="p-3 align-top">
                     {appointment.duration_minutes ? `${appointment.duration_minutes} ${t('appointmentDetails.minutes', { defaultValue: 'min' })}` : 'N/A'}

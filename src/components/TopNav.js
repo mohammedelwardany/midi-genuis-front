@@ -5,6 +5,7 @@ import { Bell, Settings, User, LogOut, CheckCircle, AlertTriangle, XCircle, File
 import { useDispatch, useSelector } from 'react-redux';
 import { cn } from '../utils/cn';
 import { useSiteConfig } from '../context/SiteConfigContext';
+import { getClinicLogoSrc } from '../utils/logoUrl';
 import { selectCurrentUser, logoutUser } from '../store/slices/authSlice';
 import {
   fetchNotifications,
@@ -166,14 +167,21 @@ export default function TopNav({ title = "MediGenius Patient Portal", tabs = [],
         {/* Logo + Clinic Name */}
         <div className="flex items-center gap-2.5 shrink-0">
           <img
-            src={siteConfig.clinic.logoUrl}
+            src={getClinicLogoSrc(siteConfig.clinic.logoUrl)}
             alt={siteConfig.clinic.name}
             className="h-7 md:h-8 w-auto object-contain"
             onError={(e) => { e.target.style.display = 'none'; }}
           />
-          <span className="text-sm md:text-[17px] font-bold text-primary-600 tracking-tight hidden xs:block">
-            {siteConfig.clinic.name}
-          </span>
+          <div className="hidden xs:flex flex-col leading-tight">
+            <span className="text-sm md:text-[17px] font-bold text-primary-600 tracking-tight">
+              {siteConfig.clinic.name}
+            </span>
+            {title && (
+              <span className="text-[10px] md:text-[11px] font-medium text-slate-400 tracking-tight truncate max-w-[220px]">
+                {title}
+              </span>
+            )}
+          </div>
         </div>
         {tabs.length > 0 && (
           <nav className="hidden md:flex gap-6">

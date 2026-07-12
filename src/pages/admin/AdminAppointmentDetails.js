@@ -28,6 +28,7 @@ import { getAppointmentStatusColor } from '../../utils/statusColors';
 import { formatCurrency } from '../../utils/currencyFormatter';
 import { formatDate, formatTime } from '../../utils/dateFormatter';
 import { getAvatarSrc } from '../../utils/avatar';
+import { getApptTypeLabel, isFollowUpAppointment } from '../../utils/appointmentDisplay';
 
 export default function AdminAppointmentDetails() {
   const { id } = useParams();
@@ -183,11 +184,16 @@ export default function AdminAppointmentDetails() {
 
           {/* Appointment Information Card */}
           <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 relative">
-            <span className={`px-3 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-widest mb-4 inline-block capitalize ${getStatusBadge(apptData.status)}`}>
-              {t(`appointmentDetails.status.${String(apptData.status || 'pending').toLowerCase()}`, { defaultValue: apptData.status || 'Pending' })}
-            </span>
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              <span className={`px-3 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-widest inline-block capitalize ${getStatusBadge(apptData.status)}`}>
+                {t(`appointmentDetails.status.${String(apptData.status || 'pending').toLowerCase()}`, { defaultValue: apptData.status || 'Pending' })}
+              </span>
+              <span className={`px-3 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-widest inline-block ${isFollowUpAppointment(apptData) ? 'bg-indigo-50 text-indigo-600' : 'bg-primary-50 text-primary-600'}`}>
+                {getApptTypeLabel(apptData, t)}
+              </span>
+            </div>
             <h1 className="text-2xl font-black text-slate-900 tracking-tight mb-6">
-              {specialization} {isRtl ? 'جلسة فحص' : 'Consultation'}
+              {specialization} {getApptTypeLabel(apptData, t)}
             </h1>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 text-slate-700">

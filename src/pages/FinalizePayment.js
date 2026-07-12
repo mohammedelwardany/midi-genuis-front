@@ -57,7 +57,8 @@ export default function FinalizePayment() {
         doctor_id: parseInt(doctorId),
         availability_id: selectedSlot.id,
         scheduled_at: `${selectedDate} ${selectedSlot.start_time.substring(0, 5)}`,
-        notes: `${reason || symptoms || "Patient booking"}`
+        notes: `${reason || symptoms || "Patient booking"}`,
+        appointment_type: bookingType || 'consultation'
       };
 
       const apptResult = await dispatch(createAppointment(payload)).unwrap();

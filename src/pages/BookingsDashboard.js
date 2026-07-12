@@ -16,7 +16,8 @@ import {
   getDisplayStatus,
   getApptDoctorName,
   getApptSpecialization,
-  getApptClinicName
+  getApptClinicName,
+  getApptTypeLabel
 } from '../utils/appointmentDisplay';
 import { useConfirm } from '../context/ConfirmDialogContext';
 
@@ -111,7 +112,7 @@ export default function BookingsDashboard() {
                     <img src={getAvatarSrc(null, appt.doctor_gender)} alt="Dr" className="w-14 h-14 rounded-full border-2 border-slate-50 shadow-sm" />
                     <div>
                       <div className="font-bold text-lg text-slate-800 tracking-tight">{getApptDoctorName(appt, isRtl)}</div>
-                      <div className="text-sm font-medium text-slate-500">{getApptSpecialization(appt, isRtl, t)}</div>
+                      <div className="text-sm font-medium text-slate-500">{getApptSpecialization(appt, isRtl, t)} · {getApptTypeLabel(appt, t)}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
@@ -164,13 +165,14 @@ export default function BookingsDashboard() {
               <tr className="bg-slate-50/80 text-[11px] font-bold text-slate-500 uppercase tracking-widest border-b border-slate-100">
                 <th className="p-4 ps-6 w-[250px] text-start">{t('bookings.table.practitioner', { defaultValue: 'Practitioner' })}</th>
                 <th className="p-4 text-start">{t('bookings.table.service', { defaultValue: 'Service' })}</th>
+                <th className="p-4 text-start">{t('pickSchedule.bookingType', { defaultValue: 'Type' })}</th>
                 <th className="p-4 text-start">{t('bookings.table.date', { defaultValue: 'Date' })}</th>
                 <th className="p-4 text-end pe-8">{t('bookings.table.status', { defaultValue: 'Status' })}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50 text-sm">
               {loading ? (
-                <tr><td colSpan="4" className="py-20 text-center"><Loader2 className="w-6 h-6 animate-spin mx-auto text-primary-400" /></td></tr>
+                <tr><td colSpan="5" className="py-20 text-center"><Loader2 className="w-6 h-6 animate-spin mx-auto text-primary-400" /></td></tr>
               ) : history.length > 0 ? history.map(appt => {
                 const displayStatus = getDisplayStatus(appt);
                 return (
@@ -186,6 +188,7 @@ export default function BookingsDashboard() {
                       </div>
                     </td>
                     <td className="p-4 font-medium text-slate-500 text-start">{getApptSpecialization(appt, isRtl, t)}</td>
+                    <td className="p-4 font-medium text-slate-500 text-start">{getApptTypeLabel(appt, t)}</td>
                     <td className="p-4 font-bold text-slate-800 text-start">{getApptDate(appt)}</td>
                     <td className="p-4 text-end pe-8">
                       <span className={cn("px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-widest border", getAppointmentStatusColor(displayStatus))}>
@@ -195,7 +198,7 @@ export default function BookingsDashboard() {
                   </tr>
                 );
               }) : (
-                <tr><td colSpan="4" className="py-8 text-center text-slate-400 italic">{t('bookings.noHistoricalVisits', { defaultValue: 'No historical visits found.' })}</td></tr>
+                <tr><td colSpan="5" className="py-8 text-center text-slate-400 italic">{t('bookings.noHistoricalVisits', { defaultValue: 'No historical visits found.' })}</td></tr>
               )}
             </tbody>
           </table>

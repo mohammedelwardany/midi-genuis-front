@@ -10,6 +10,7 @@ import { selectCurrentUser } from '../store/slices/authSlice';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { formatDate, formatTime } from '../utils/dateFormatter';
 import { formatCurrency } from '../utils/currencyFormatter';
+import { getApptTypeLabel } from '../utils/appointmentDisplay';
 
 export default function AppointmentConfirmed() {
    const navigate = useNavigate();
@@ -180,6 +181,14 @@ export default function AppointmentConfirmed() {
                   </div>
 
                   <div className="flex gap-4">
+                     <div className="text-primary-500 mt-0.5"><Clock className="w-5 h-5" /></div>
+                     <div>
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t('pickSchedule.bookingType', { defaultValue: 'Booking Type' })}</div>
+                        <div className="font-bold text-slate-900 text-[15px]">{getApptTypeLabel(appointment || {}, t)}</div>
+                     </div>
+                  </div>
+
+                  <div className="flex gap-4">
                      <div className="text-primary-500 mt-0.5"><Calendar className="w-5 h-5" /></div>
                      <div>
                         <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t('appointmentConfirmed.dateTime', { defaultValue: 'Date & Time' })}</div>
@@ -336,6 +345,7 @@ export default function AppointmentConfirmed() {
                      <thead>
                         <tr className="bg-slate-50 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
                            <th className="p-3 text-start">{t('appointmentDetails.dateTimeLabel', { defaultValue: 'Date & Time' })}</th>
+                           <th className="p-3 text-start">{t('pickSchedule.bookingType', { defaultValue: 'Booking Type' })}</th>
                            <th className="p-3 text-start">{t('appointmentDetails.reasonForVisit', { defaultValue: 'Reason / Patient Notes' })}</th>
                         </tr>
                      </thead>
@@ -344,6 +354,9 @@ export default function AppointmentConfirmed() {
                            <td className="p-3 align-top">
                               <div className="font-extrabold">{printFormattedDate}</div>
                               <div className="text-[10px] text-slate-400 mt-0.5">{printFormattedTime}</div>
+                           </td>
+                           <td className="p-3 align-top">
+                              {getApptTypeLabel(appointment || {}, t)}
                            </td>
                            <td className="p-3 align-top">
                               {appointment?.notes || appointment?.reason || t('appointmentDetails.noReason', { defaultValue: 'No additional reason or consultation notes provided.' })}

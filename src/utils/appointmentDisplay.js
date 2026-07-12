@@ -42,3 +42,12 @@ export const getApptSpecialization = (appt, isRtl, t) => {
 };
 
 export const getApptClinicName = (appt, t) => appt.clinic_name || t('bookings.mainCenter', { defaultValue: 'Main Center' });
+
+// appointment_type is stored as 'consultation' | 'followup'; older rows booked
+// before this column existed default to 'consultation' at the DB level.
+export const getApptTypeLabel = (appt, t) => {
+  const type = appt.appointment_type === 'followup' ? 'followup' : 'consultation';
+  return t(`pickSchedule.${type}En`, { defaultValue: type === 'followup' ? 'Follow-up' : 'Consultation' });
+};
+
+export const isFollowUpAppointment = (appt) => appt.appointment_type === 'followup';

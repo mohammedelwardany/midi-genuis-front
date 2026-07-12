@@ -7,6 +7,7 @@ import { fetchAllAppointments, selectAppointments, selectAppointmentsLoading, se
 import toast from 'react-hot-toast';
 import { getAppointmentStatusColor } from '../../utils/statusColors';
 import { formatDate, formatTime } from '../../utils/dateFormatter';
+import { getApptTypeLabel, isFollowUpAppointment } from '../../utils/appointmentDisplay';
 
 
 const ensureArray = (val) => {
@@ -239,6 +240,7 @@ export default function AdminAppointments() {
                 <th className="p-4 text-start">{isRtl ? 'التاريخ والوقت' : 'Date & Time'}</th>
                 <th className="p-4 text-start">{isRtl ? 'المريض' : 'Patient Profile'}</th>
                 <th className="p-4 text-start">{isRtl ? 'الطبيب المعالج' : 'Care Provider'}</th>
+                <th className="p-4 text-start">{isRtl ? 'نوع الحجز' : 'Type'}</th>
                 <th className="p-4 text-start">{isRtl ? 'سبب الزيارة' : 'Reason for Visit'}</th>
                 <th className="p-4 text-start">{isRtl ? 'الحالة' : 'Status'}</th>
                 <th className="p-4 text-center pe-6">{isRtl ? 'الإجراء' : 'Actions'}</th>
@@ -247,7 +249,7 @@ export default function AdminAppointments() {
             <tbody className="divide-y divide-slate-50 text-sm">
               {loading && appointments.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="py-24 text-center">
+                  <td colSpan="8" className="py-24 text-center">
                     <Loader2 className="w-10 h-10 text-primary-600 animate-spin mx-auto mb-2" />
                     <span className="text-slate-400 font-bold text-sm">
                       {isRtl ? 'جاري الاستعلام عن المواعيد...' : 'Fetching clinical records...'}
@@ -318,6 +320,11 @@ export default function AdminAppointments() {
                         <div className="font-bold text-slate-800 text-start">{docName}</div>
                         <div className="text-[11px] text-primary-600 font-bold mt-0.5 text-start">{spec}</div>
                       </td>
+                      <td className="p-4 text-start">
+                        <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${isFollowUpAppointment(appt) ? 'bg-indigo-50 text-indigo-600 border border-indigo-100' : 'bg-primary-50 text-primary-600 border border-primary-100'}`}>
+                          {getApptTypeLabel(appt, t)}
+                        </span>
+                      </td>
                       <td className="p-4 max-w-[200px] truncate text-start">
                         <span className="text-slate-600 font-medium text-start">{appt.reason || appt.notes || '-'}</span>
                       </td>
@@ -339,7 +346,7 @@ export default function AdminAppointments() {
                 })
               ) : (
                 <tr>
-                  <td colSpan="7" className="py-20 text-center text-slate-400 font-bold italic bg-slate-50/20">
+                  <td colSpan="8" className="py-20 text-center text-slate-400 font-bold italic bg-slate-50/20">
                     {isRtl ? 'لا توجد مواعيد تطابق معايير البحث المحددة.' : 'No appointments match search criteria or selected filters.'}
                   </td>
                 </tr>

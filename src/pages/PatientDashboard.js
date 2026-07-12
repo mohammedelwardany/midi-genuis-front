@@ -15,6 +15,7 @@ import {
    getDisplayStatus,
    getApptDoctorName,
    getApptSpecialization,
+   getApptTypeLabel,
 } from '../utils/appointmentDisplay';
 
 export default function PatientDashboard() {
@@ -168,7 +169,7 @@ export default function PatientDashboard() {
                               </div>
                               <div className="min-w-0">
                                  <div className="font-bold text-slate-800 text-sm truncate">{getApptDoctorName(appt, isRtl)}</div>
-                                 <div className="text-xs font-medium text-slate-500 truncate">{getApptSpecialization(appt, isRtl, t)}</div>
+                                 <div className="text-xs font-medium text-slate-500 truncate">{getApptSpecialization(appt, isRtl, t)} · {getApptTypeLabel(appt, t)}</div>
                               </div>
                            </div>
                            <div className="flex items-center gap-3 shrink-0">

@@ -42,6 +42,7 @@ export default function AdminBookVisit() {
    const [paymentScreenshot, setPaymentScreenshot] = useState(null);
    const [previewUrl, setPreviewUrl] = useState(null);
    const [amount, setAmount] = useState('250');
+   const [appointmentType, setAppointmentType] = useState('consultation');
 
    useEffect(() => {
       if (patientId) {
@@ -89,7 +90,8 @@ export default function AdminBookVisit() {
             availability_id: selectedSlot.id,
             scheduled_at: `${selectedDate} ${selectedSlot.start_time.substring(0, 5)}`,
             status: 'confirmed',
-            notes: `Admin booking for patient: ${selectedPatient?.name_en || selectedPatient?.name}`
+            notes: `Admin booking for patient: ${selectedPatient?.name_en || selectedPatient?.name}`,
+            appointment_type: appointmentType
          };
 
          const apptResult = await dispatch(createAppointment(payload)).unwrap();
@@ -358,6 +360,26 @@ export default function AdminBookVisit() {
 
                   {/* Payment Selection and optional Receipt upload */}
                   <div className="text-start mb-8 space-y-6">
+                     <div className="pt-2">
+                        <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">{t('pickSchedule.bookingType', { defaultValue: 'Booking Type' })}</label>
+                        <div className="grid grid-cols-2 gap-4">
+                           <button
+                              type="button"
+                              onClick={() => setAppointmentType('consultation')}
+                              className={`p-4 rounded-xl border-2 text-center transition-all ${appointmentType === 'consultation' ? 'border-primary-600 bg-primary-50/50 text-primary-700 font-bold' : 'border-slate-100 bg-slate-50 text-slate-600 hover:border-slate-200'}`}
+                           >
+                              <span className="font-extrabold text-xs block">{t('pickSchedule.consultationEn', { defaultValue: 'Consultation' })}</span>
+                           </button>
+                           <button
+                              type="button"
+                              onClick={() => setAppointmentType('followup')}
+                              className={`p-4 rounded-xl border-2 text-center transition-all ${appointmentType === 'followup' ? 'border-primary-600 bg-primary-50/50 text-primary-700 font-bold' : 'border-slate-100 bg-slate-50 text-slate-600 hover:border-slate-200'}`}
+                           >
+                              <span className="font-extrabold text-xs block">{t('pickSchedule.followupEn', { defaultValue: 'Follow-up' })}</span>
+                           </button>
+                        </div>
+                     </div>
+
                      <div className="pt-2">
                         <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">{t('adminBookVisit.amountToPay', { defaultValue: 'Amount to Pay (EGP)' })}</label>
                         <input

@@ -12,6 +12,7 @@ import {
    selectAppointmentsLoading
 } from '../../store/slices/appointmentSlice';
 import { formatDate, formatTime } from '../../utils/dateFormatter';
+import { getApptTypeLabel, isFollowUpAppointment } from '../../utils/appointmentDisplay';
 
 export default function DoctorDashboard() {
    const navigate = useNavigate();
@@ -185,6 +186,7 @@ export default function DoctorDashboard() {
                         <th className="px-8 py-5 w-[150px]">{t('doctorDashboard.thTime')}</th>
                         <th className="px-4 py-5 w-[250px]">{t('doctorDashboard.thPatient')}</th>
                         <th className="px-4 py-5">{t('doctorDashboard.thReason')}</th>
+                        <th className="px-4 py-5 w-[130px]">{t('pickSchedule.bookingType', { defaultValue: 'Type' })}</th>
                         <th className="px-4 py-5 w-[200px]">{t('doctorDashboard.thStatus')}</th>
                         <th className="px-4 py-5 text-center w-[100px]">{t('doctorDashboard.thActions')}</th>
                      </tr>
@@ -193,7 +195,7 @@ export default function DoctorDashboard() {
 
                      {loading ? (
                         <tr>
-                           <td colSpan="5" className="px-8 py-16 text-center text-slate-400 font-bold">
+                           <td colSpan="6" className="px-8 py-16 text-center text-slate-400 font-bold">
                               <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2 text-primary-500" />
                               {t('common.loading', { defaultValue: 'Loading clinical records...' })}
                            </td>
@@ -223,6 +225,11 @@ export default function DoctorDashboard() {
                                  </td>
                                  <td className="px-4 py-6 font-bold text-slate-700">{appt.notes || appt.reason || 'Clinical consultation'}</td>
                                  <td className="px-4 py-6">
+                                    <span className={`inline-flex items-center gap-1.5 font-black text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-md ${isFollowUpAppointment(appt) ? 'bg-indigo-50 text-indigo-600' : 'bg-primary-50 text-primary-600'}`}>
+                                       {getApptTypeLabel(appt, t)}
+                                    </span>
+                                 </td>
+                                 <td className="px-4 py-6">
                                     <span className={`inline-flex items-center gap-2 font-bold text-xs px-3 py-1.5 rounded-lg ${getStatusBadgeClass(appt.status)}`}>
                                        <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
                                        {appt.status}
@@ -243,7 +250,7 @@ export default function DoctorDashboard() {
                         })
                      ) : (
                         <tr>
-                           <td colSpan="5" className="px-8 py-16 text-center text-slate-400 font-bold italic">
+                           <td colSpan="6" className="px-8 py-16 text-center text-slate-400 font-bold italic">
                               {t('doctorDashboard.noAppointments', { defaultValue: 'No clinical appointments scheduled.' })}
                            </td>
                         </tr>

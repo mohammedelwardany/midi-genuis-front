@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { registerUser, selectAuthLoading, selectAuthError, clearError } from '../../store/slices/authSlice';
 import { useSiteConfig } from '../../context/SiteConfigContext';
+import { getClinicLogoSrc } from '../../utils/logoUrl';
 
 // Common country codes with flags
 const COUNTRY_CODES = [
@@ -114,7 +115,7 @@ export default function Register() {
           <div className="flex flex-col items-center gap-3 mb-6">
             <div className="w-16 h-16 bg-primary-600 rounded-2xl flex items-center justify-center shadow-lg shadow-primary-600/20 rotate-3 overflow-hidden">
               <img
-                src={siteConfig.clinic.logoUrl}
+                src={getClinicLogoSrc(siteConfig.clinic.logoUrl)}
                 alt={siteConfig.clinic.name}
                 className="w-full h-full object-contain p-2 -rotate-3"
                 onError={(e) => {
