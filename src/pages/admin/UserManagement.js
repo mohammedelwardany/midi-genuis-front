@@ -336,7 +336,15 @@ export default function UserManagement() {
                       )}
 
                       <button
-                        onClick={() => { handleDeleteItem(user.user_id || user.id); setOpenMenuId(null); }}
+                        onClick={() => {
+                          // deleteDoctor expects the doctors table's own id (user.id here,
+                          // since the doctors list is selected via `d.*`); deletePatient
+                          // expects the account's users.id (user.user_id here, since the
+                          // patients list aliases patients.id to patient_id instead).
+                          // Passing the wrong one 404s "not found" against the other table.
+                          handleDeleteItem(activeTab === 'doctors' ? user.id : (user.user_id || user.id));
+                          setOpenMenuId(null);
+                        }}
                         className="w-full flex items-center gap-2 px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50 transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5" /> {t('userManagement.delete')}

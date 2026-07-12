@@ -4,9 +4,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { Search, Star, Clock, Loader2, Award, X } from 'lucide-react';
 import {
-   fetchDoctors,
+   fetchAvailableDoctors,
    fetchTopDoctors,
-   selectDoctors,
+   selectAvailableDoctors,
    selectTopDoctors,
    selectDoctorsLoading
 } from '../store/slices/doctorSlice';
@@ -19,7 +19,7 @@ export default function BookVisit() {
    const { t, i18n } = useTranslation();
    const isRtl = i18n.language.startsWith('ar');
 
-   const doctors = useSelector(selectDoctors);
+   const doctors = useSelector(selectAvailableDoctors);
    const topDoctors = useSelector(selectTopDoctors);
    const loading = useSelector(selectDoctorsLoading);
 
@@ -44,7 +44,7 @@ export default function BookVisit() {
    const [sortMode, setSortMode] = useState('rating'); // 'rating' | 'soonest'
 
    useEffect(() => {
-      dispatch(fetchDoctors());
+      dispatch(fetchAvailableDoctors());
       dispatch(fetchTopDoctors());
    }, [dispatch]);
 

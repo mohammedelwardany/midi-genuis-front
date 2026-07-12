@@ -115,6 +115,21 @@ export const fetchTopDoctors = createAsyncThunk(
   }
 );
 
+// Patient-facing doctor list, backed by the all_doctors_with_next_slot view -
+// unlike fetchDoctors (the admin-management list, no slot columns), this one
+// actually carries next_available_date/next_start_time/next_end_time per
+// doctor, which is what "Find a Doctor" needs to show real availability.
+export const fetchAvailableDoctors = createAsyncThunk(
+  'doctors/fetchAvailable',
+  async (_, { rejectWithValue }) => {
+    try {
+      return await apiClient.get(ENDPOINTS.doctors.availableList);
+    } catch (err) {
+      return rejectWithValue({ message: err.message, status: err.status });
+    }
+  }
+);
+
 // ─── Slice ────────────────────────────────────────────────────────────────────
 
 const doctorSlice = createSlice({
@@ -122,6 +137,7 @@ const doctorSlice = createSlice({
   initialState: {
     list: [],
     topDoctors: [],
+    availableDoctors: [],
     selected: null,
     schedule: [],
     total: 0,
@@ -238,6 +254,17 @@ const doctorSlice = createSlice({
         s.loading = false;
         s.error = payload?.message || 'Failed to load top doctors';
       });
+
+    builder
+      .addCase(fetchAvailableDoctors.pending, (s) => { s.loading = true; s.error = null; })
+      .addCase(fetchAvailableDoctors.fulfilled, (s, { payload }) => {
+        s.loading = false;
+        s.availableDoctors = payload.data || payload;
+      })
+      .addCase(fetchAvailableDoctors.rejected, (s, { payload }) => {
+        s.loading = false;
+        s.error = payload?.message || 'Failed to load available doctors';
+      });
   },
 });
 
@@ -246,6 +273,7 @@ export const { clearSelectedDoctor, clearDoctorError } = doctorSlice.actions;
 // Selectors
 export const selectDoctors = (state) => state.doctors.list;
 export const selectTopDoctors = (state) => state.doctors.topDoctors;
+export const selectAvailableDoctors = (state) => state.doctors.availableDoctors;
 export const selectSelectedDoctor = (state) => state.doctors.selected;
 export const selectDoctorSchedule = (state) => state.doctors.schedule;
 export const selectDoctorsLoading = (state) => state.doctors.loading;

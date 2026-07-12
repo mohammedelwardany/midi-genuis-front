@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
@@ -49,9 +49,39 @@ export default function AdminSetAvailability() {
     return h * 60 + m;
   };
 
-  const GRID_START = 8 * 60;
-  const GRID_END = 18 * 60;
+  const minutesToTime = (totalMinutes) => {
+    const h = Math.floor(totalMinutes / 60);
+    const m = totalMinutes % 60;
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  };
+
+  // The grid used to hard-code 08:00-18:00, which silently clipped any
+  // Evening block (17:00-20:00 by default, or later if customized) off the
+  // bottom of the view. Size it from the doctor's actual schedule instead,
+  // padded an hour on each side, falling back to a sane default when there's
+  // no data yet.
+  const { GRID_START, GRID_END } = useMemo(() => {
+    if (!schedule || schedule.length === 0) {
+      return { GRID_START: 8 * 60, GRID_END: 18 * 60 };
+    }
+    let min = Infinity, max = -Infinity;
+    schedule.forEach(slot => {
+      const s = getTimeInMinutes(slot.start_time);
+      const e = getTimeInMinutes(slot.end_time);
+      if (s < min) min = s;
+      if (e > max) max = e;
+    });
+    const start = Math.max(0, Math.floor(min / 60) * 60 - 60);
+    const end = Math.min(24 * 60, Math.ceil(max / 60) * 60 + 60);
+    return { GRID_START: start, GRID_END: end };
+  }, [schedule]);
   const GRID_TOTAL = GRID_END - GRID_START;
+  const timeLabels = useMemo(() => {
+    const labels = [];
+    for (let m = GRID_START; m <= GRID_END; m += 120) labels.push(minutesToTime(m));
+    return labels;
+  }, [GRID_START, GRID_END]);
+  const hourLineCount = Math.max(1, Math.round(GRID_TOTAL / 60));
 
   const getSlotStyle = (start, end) => {
     const startMin = getTimeInMinutes(start);
@@ -221,13 +251,13 @@ export default function AdminSetAvailability() {
   
                     <div className="relative h-[600px] grid grid-cols-8 px-4 divide-x divide-slate-50/50">
                        <div className="flex flex-col justify-between pe-4 pb-4">
-                          {['08:00', '10:00', '12:00', '14:00', '16:00', '18:00'].map((time) => (
+                          {timeLabels.map((time) => (
                              <div key={time} className="text-[11px] font-bold text-slate-400 h-16">{time}</div>
                           ))}
                        </div>
                        {getWeekDays(currentWeekStart).map((date, idx) => (
                           <div key={idx} className="relative h-full flex flex-col border-l border-slate-100/50">
-                             {[...Array(10)].map((_, i) => <div key={i} className="flex-1 border-t border-slate-100/50"></div>)}
+                             {[...Array(hourLineCount)].map((_, i) => <div key={i} className="flex-1 border-t border-slate-100/50"></div>)}
                              {(groupedSchedule[formatDate(date)] || []).map((slot, i) => (
                                 <div key={i} style={getSlotStyle(slot.start_time, slot.end_time)} className="absolute start-1 end-1 bg-blue-50/90 border-s-4 border-s-blue-500 rounded-xl shadow-sm px-3 hover:bg-blue-100 transition-all cursor-pointer overflow-hidden flex flex-col justify-center">
                                    <div className="text-[10px] font-black text-blue-700 leading-none mb-1">{slot.start_time.substring(0, 5)} - {slot.end_time.substring(0, 5)}</div>

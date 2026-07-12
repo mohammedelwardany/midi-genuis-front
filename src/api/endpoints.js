@@ -38,6 +38,7 @@ export const ENDPOINTS = {
   // ── Doctors ───────────────────────────────────────
   doctors: {
     list: '/doctors/getAllDoctors',
+    availableList: '/doctors/getAllAvailableDoctors',
     add: '/doctors/addDoctor',
     byId: (id) => `/doctors/getDoctorById/${id}`,
     update: (id) => `/doctors/updateDoctor/${id}`,
