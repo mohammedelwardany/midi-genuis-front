@@ -1,4 +1,5 @@
 import { BASE_URL } from './endpoints';
+import { emitClinicSuspended } from '../utils/clinicSuspension';
 
 // ─── Token helpers ────────────────────────────────────────────────────────────
 const getToken = () => localStorage.getItem('auth_token');
@@ -58,8 +59,17 @@ async function request(method, endpoint, { body, params, headers: extraHeaders }
       window.location.href = '/login';
     }
 
+    // Global clinic-suspended lockout - notify the app so it can show a
+    // dedicated screen instead of every page rendering its own generic
+    // "Failed to load ... HTTP 403" error. Session is left intact (unlike
+    // the 401 case) so the lockout clears itself once the clinic's
+    // subscription is reactivated, without forcing a re-login.
+    if (response.status === 403 && data?.code === 'CLINIC_SUSPENDED') {
+      emitClinicSuspended();
+    }
+
     // Throw structured error so Redux thunks can catch it
-    const error = new Error(data?.message || `HTTP ${response.status}`);
+    const error = new Error(data?.message || data?.error || `HTTP ${response.status}`);
     error.status = response.status;
     error.data   = data;
     throw error;

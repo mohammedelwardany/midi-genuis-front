@@ -842,5 +842,11 @@
       "updateSuccess": "تم تحديث الدفعة رقم #{{id}} إلى {{status}}",
       "updateError": "فشل مراجعة الدفعة"
     }
+  },
+  "clinicSuspended": {
+    "title": "تم تعليق حساب العيادة",
+    "messageWithPhone": "تم تعليق حساب العيادة حاليًا، يرجى التواصل مع إدارة MediGenius على: {{phone}}",
+    "messageNoPhone": "تم تعليق حساب العيادة حاليًا، يرجى التواصل مع إدارة MediGenius لحل هذا الأمر.",
+    "logOut": "تسجيل الخروج"
   }
 }

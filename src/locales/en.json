@@ -842,5 +842,11 @@
       "updateSuccess": "Payment #{{id}} updated to {{status}}",
       "updateError": "Failed to review payment"
     }
+  },
+  "clinicSuspended": {
+    "title": "Clinic Account Suspended",
+    "messageWithPhone": "The clinic is currently suspended, please communicate with MediGenius admin on: {{phone}}",
+    "messageNoPhone": "The clinic is currently suspended, please communicate with MediGenius admin to resolve this.",
+    "logOut": "Log Out"
   }
 }

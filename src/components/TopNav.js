@@ -172,7 +172,7 @@ export default function TopNav({ title = "MediGenius Patient Portal", tabs = [],
             className="h-7 md:h-8 w-auto object-contain"
             onError={(e) => { e.target.style.display = 'none'; }}
           />
-          <div className="hidden xs:flex flex-col leading-tight">
+          <div className="flex flex-col leading-tight">
             <span className="text-sm md:text-[17px] font-bold text-primary-600 tracking-tight">
               {siteConfig.clinic.name}
             </span>
@@ -279,9 +279,10 @@ export default function TopNav({ title = "MediGenius Patient Portal", tabs = [],
             onClick={() => setShowProfileMenu(!showProfileMenu)}
             className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white overflow-hidden border border-slate-200 transition-transform active:scale-95 font-bold text-xs"
           >
-            {i18n.language.startsWith('ar')
+            {(i18n.language.startsWith('ar')
               ? (user?.name_ar?.charAt(0) || user?.name?.charAt(0))
-              : (user?.name_en?.charAt(0) || user?.name?.charAt(0)) || <User className="w-4 h-4" />}
+              : (user?.name_en?.charAt(0) || user?.name?.charAt(0))
+            ) || <User className="w-4 h-4" />}
           </button>
 
           {showProfileMenu && (

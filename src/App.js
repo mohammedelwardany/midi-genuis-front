@@ -65,6 +65,7 @@ import EmergencyContact from './pages/EmergencyContact';
 
 import { Toaster } from 'react-hot-toast';
 import ImpersonationBanner from './components/ImpersonationBanner';
+import ClinicSuspendedOverlay from './components/ClinicSuspendedOverlay';
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -113,6 +114,7 @@ function App() {
     <BrowserRouter>
       <Toaster position="top-center" reverseOrder={false} />
       <ImpersonationBanner />
+      <ClinicSuspendedOverlay />
       <Routes>
         {/* Core Auth & Entry */}
         <Route path="/" element={<Navigate to="/login" />} />
